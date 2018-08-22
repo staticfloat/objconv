@@ -32,7 +32,7 @@ SIntTxt SectionDotOptionNames[] = {
 };
 
 // Check that integer type definitions are correct.
-// Will generate an error message if the compiler makes the integer types 
+// Will generate an error message if the compiler makes the integer types
 // with wrong size.
 static void CheckIntegerTypes() {
    if (
@@ -89,11 +89,11 @@ int main(int argc, char * argv[]) {
       argc = 2; argv = dummyarg;}
 #endif
 
-   cmd.ReadCommandLine(argc, argv);    // Read command line parameters   
+   cmd.ReadCommandLine(argc, argv);    // Read command line parameters
    if (cmd.ShowHelp) return 0;         // Help screen has been printed. Do nothing else
 
    CMain maincvt;                      // This object takes care of all conversions etc.
-   maincvt.Go();          
+   maincvt.Go();
    // Do everything the command line says
 
    if (cmd.Verbose) printf("\n");      // End with newline
@@ -121,7 +121,7 @@ void CMain::Go() {
    CheckOutputFileName();              // Construct output file name with default extension
    if (err.Number()) return;
 
-   if ((FileType & (FILETYPE_LIBRARY | FILETYPE_OMFLIBRARY)) 
+   if ((FileType & (FILETYPE_LIBRARY | FILETYPE_OMFLIBRARY))
    || (cmd.LibraryOptions & CMDL_LIBRARY_ADDMEMBER)) {
       // Input file is a library or we are building a library
       CLibrary lib;                    // Library handler object
@@ -226,7 +226,7 @@ void CConverter::COF2ELF() {
    // Convert COFF to ELF file
    if (WordSize == 32) {
       // Make instance of converter, 32 bit template
-      CCOF2ELF<ELF32STRUCTURES> conv;  // Make object for conversion 
+      CCOF2ELF<ELF32STRUCTURES> conv;  // Make object for conversion
       *this >> conv;                   // Give it my buffer
       conv.ParseFile();                // Parse file buffer
       if (err.Number()) return;        // Return if error
@@ -235,7 +235,7 @@ void CConverter::COF2ELF() {
    }
    else {
       // Make instance of converter, 64 bit template
-      CCOF2ELF<ELF64STRUCTURES> conv;  // Make object for conversion 
+      CCOF2ELF<ELF64STRUCTURES> conv;  // Make object for conversion
       *this >> conv;                   // Give it my buffer
       conv.ParseFile();                // Parse file buffer
       if (err.Number()) return;        // Return if error
@@ -246,7 +246,7 @@ void CConverter::COF2ELF() {
 
 void CConverter::COF2OMF() {
    // Convert COFF to OMF file
-   CCOF2OMF conv;                      // Make object for conversion 
+   CCOF2OMF conv;                      // Make object for conversion
    *this >> conv;                      // Give it my buffer
    conv.ParseFile();                   // Parse file buffer
    if (err.Number()) return;           // Return if error
@@ -255,8 +255,8 @@ void CConverter::COF2OMF() {
 }
 
 void CConverter::OMF2COF() {
-   // Convert OMF to COFF file 
-   COMF2COF conv;                      // Make object for conversion 
+   // Convert OMF to COFF file
+   COMF2COF conv;                      // Make object for conversion
    *this >> conv;                      // Give it my buffer
    conv.ParseFile();                   // Parse file buffer
    if (err.Number()) return;           // Return if error
@@ -332,7 +332,7 @@ void CConverter::MAC2ELF() {
 
 void CConverter::COF2ASM() {
    // Disassemble COFF file
-   CCOF2ASM conv;                      // Make object for conversion 
+   CCOF2ASM conv;                      // Make object for conversion
    *this >> conv;                      // Give it my buffer
    conv.ParseFile();                   // Parse file buffer
    if (err.Number()) return;           // Return if error
@@ -386,7 +386,7 @@ void CConverter::MAC2ASM() {
 
 void CConverter::OMF2ASM() {
    // Disassemble OMF file
-   COMF2ASM conv;                      // Make object for conversion 
+   COMF2ASM conv;                      // Make object for conversion
    *this >> conv;                      // Give it my buffer
    conv.ParseFile();                   // Parse file buffer
    if (err.Number()) return;           // Return if error
@@ -499,8 +499,8 @@ void CConverter::Go() {
          // Tell what we are doing:
          printf("\nInput file: %s, output file: %s", FileName, OutputFileName);
          if (FileType != cmd.OutputType) {
-            printf("\nConverting from %s%2i to %s%2i", 
-               GetFileFormatName(FileType), WordSize, 
+            printf("\nConverting from %s%2i to %s%2i",
+               GetFileFormatName(FileType), WordSize,
                GetFileFormatName(cmd.OutputType), WordSize);
          }
          else {
@@ -527,7 +527,7 @@ void CConverter::Go() {
                   cmd.Underscore = CMDL_UNDERSCORE_NOCHANGE;
                }
             }
-            else { 
+            else {
                // In 64-bit, only Mach-O has underscores
                if (FileType == FILETYPE_MACHO_LE && cmd.OutputType != FILETYPE_MACHO_LE) {
                   // Converting from MachO-64. Remove underscores
@@ -621,7 +621,7 @@ void CConverter::Go() {
             // Disassemble ELF file
             ELF2ASM();                 // Disassemble
             break;
-            
+
          default:
             // Conversion not supported
             err.submit(2013, GetFileFormatName(FileType), GetFileFormatName(cmd.OutputType));
@@ -653,13 +653,13 @@ void CConverter::Go() {
             if (err.Number()) return;  // Return if error
             COF2ELF();                 // Convert to ELF
             break;
-            
+
          case FILETYPE_OMF:
             COF2COF();                 // Make symbol changes in COFF file
             if (err.Number()) return;  // Return if error
             COF2OMF();                 // Convert to OMF
             break;
-            
+
          case FILETYPE_MACHO_LE:
             COF2ELF();                 // Convert from COFF to ELF
             if (err.Number()) return;  // Return if error
@@ -672,7 +672,7 @@ void CConverter::Go() {
             // Disassemble COFF file
             COF2ASM();                 // Disassemble
             break;
-            
+
          default:
             // Conversion not supported
             err.submit(2013, GetFileFormatName(FileType), GetFileFormatName(cmd.OutputType));
@@ -708,7 +708,7 @@ void CConverter::Go() {
             if (err.Number()) return;  // Return if error
             COF2ELF();                 // Convert to ELF
             break;
-            
+
          case FILETYPE_MACHO_LE:
             OMF2COF();                 // Convert to COFF
             if (err.Number()) return;  // Return if error
@@ -723,7 +723,7 @@ void CConverter::Go() {
             // Disassemble OMF file
             OMF2ASM();                 // Disassemble
             break;
-            
+
          default:
             // Conversion not supported
             err.submit(2013, GetFileFormatName(FileType), GetFileFormatName(cmd.OutputType));
@@ -766,7 +766,7 @@ void CConverter::Go() {
             // Disassemble Mach-O file
             MAC2ASM();                 // Disassemble
             break;
-            
+
          default:
             // Conversion not supported
             err.submit(2013, GetFileFormatName(FileType), GetFileFormatName(cmd.OutputType));

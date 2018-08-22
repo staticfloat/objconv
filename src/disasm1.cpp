@@ -19,15 +19,15 @@
 /**************************  class CSymbolTable   *****************************
 
 class CSymbolTable is a container class for a sorted list of symbols. The list
-of symbols is kept sorted by address at all times. Named symbols from the 
-original file are added to the list with AddSymbol(). New symbols for jump 
+of symbols is kept sorted by address at all times. Named symbols from the
+original file are added to the list with AddSymbol(). New symbols for jump
 targets and code blocks that do not have a name are added during pass 1 by
 NewSymbol(). AssignNames() assigns names to these unnamed symbols.
 
 A symbol in the list can be found in three different ways: By its address,
 by its old index, and by its new index. The new index is monotonous, so that
 consecutive new indices correspond to consecutive addresses. Unfortunately,
-the new index of a symbol will change whenever another symbol with a lower 
+the new index of a symbol will change whenever another symbol with a lower
 address is added to the list. Therefore, we need to use the old index rather
 than the new index for identifying a symbol, e.g. in the relocation table.
 The old index is a permanent, unique identifier, but in random order.
@@ -61,13 +61,13 @@ CSymbolTable::CSymbolTable() {
     SymbolNameBuffer.Push(0, 1);                  // Make string 0 empty
 }
 
-uint32 CSymbolTable::AddSymbol(int32 Section, uint32 Offset, uint32 Size, 
+uint32 CSymbolTable::AddSymbol(int32 Section, uint32 Offset, uint32 Size,
 uint32 Type, uint32 Scope, uint32 OldIndex, const char * Name, const char * DLLName) {
     // Add symbol from original file to symbol table.
     // If name is not known then set Name = 0. A name will then be assigned
     // OldIndex is the identifier used in relocation records. If the symbol is known
     // by address rather than by index, then set OldIndex = 0. The return value will
-    // be the assigned value of OldIndex to use in relocation records. The returned value 
+    // be the assigned value of OldIndex to use in relocation records. The returned value
     // of OldIndex will be equal to the OldIndex of any previous symbols with same address.
 
     // Symbol record
@@ -125,7 +125,7 @@ uint32 CSymbolTable::NewSymbol(SASymbol & sym) {
     // The return value is the new index to a new or existing symbol.
     // The type or scope of any existing symbol will be modified if
     // the type or scope of the new symbol is higher.
-    // The name will be applied to the existing symbol if the existing symbol 
+    // The name will be applied to the existing symbol if the existing symbol
     // has no name.
 
     // Find new index of any existing symbol with same address
@@ -229,8 +229,8 @@ void CSymbolTable::AssignNames() {
 
         //   if (List[i].Offset > 0x0 && List[i].Offset < 0x8)
 
-        printf("\n%3X %3X %s Sect %i Offset %X Type %X Size %i Scope %i", 
-            i, List[i].OldIndex, GetName(i), 
+        printf("\n%3X %3X %s Sect %i Offset %X Type %X Size %i Scope %i",
+            i, List[i].OldIndex, GetName(i),
             List[i].Section, List[i].Offset, List[i].Type, List[i].Size, List[i].Scope);
     }
 #endif
@@ -238,12 +238,12 @@ void CSymbolTable::AssignNames() {
 
 uint32 CSymbolTable::FindByAddress(int32 Section, uint32 Offset, uint32 * Last, uint32 * NextAfter) {
     // Find symbols by address
-    // The return value will be the new index to the first symbol at the 
+    // The return value will be the new index to the first symbol at the
     // specified address. The return value will be zero if no symbol found.
     // If more than one symbol is found with the same address then Last
     // will receive the new index of the last symbol with this address.
     // NextAfter will receive the new index of the first symbol with an
-    // address higher than the specified address in the same section, or 
+    // address higher than the specified address in the same section, or
     // zero if none.
 
     uint32 i1;                                    // New index of first symbol
@@ -297,7 +297,7 @@ uint32 CSymbolTable::FindByAddress(int32 Section, uint32 Offset, uint32 * Last, 
 
 uint32 CSymbolTable::FindByAddress(int32 Section, uint32 Offset) {
     // Find symbols by address
-    // The return value will be the new index to a first symbol at the 
+    // The return value will be the new index to a first symbol at the
     // specified address. If more than one symbol is found at the same
     // address then the one with the highest scope (and which is not
     // a section record) is returned;
@@ -377,7 +377,7 @@ const char * CSymbolTable::GetName(uint32 symi) {
             sprintf(name, "Unnamed_%X_%X", (*this)[symi].Section, (*this)[symi].Offset);
             // sprintf(name, UnnamedSymFormat, ++UnnamedNum);
             // Store new name
-            NameIndex = (*this)[symi].Name = SymbolNameBuffer.PushString(name);         
+            NameIndex = (*this)[symi].Name = SymbolNameBuffer.PushString(name);
         }
     }
     // Check if valid
@@ -450,7 +450,7 @@ CDisassembler::CDisassembler() {
     // Constructor
     Sections.PushZero();                          // Make first section entry zero
     Relocations.PushZero();                       // Make first relocation entry zero
-    NameBuffer.Push(0, 1);                        // Make first string entry zero   
+    NameBuffer.Push(0, 1);                        // Make first string entry zero
     FunctionList.PushZero();                      // Make first function entry zero
     // Initialize variables
     Buffer = 0;
@@ -534,9 +534,9 @@ int32 CDisassembler::AddSectionGroup(const char * Name, int32 MemberSegment) {
     // Define section group (from OMF file).
     // Must be called after all segments have been defined.
     // To define a group with multiple members, you must call AddSectionGroup
-    // multiple times. You must finish adding members to one group before 
+    // multiple times. You must finish adding members to one group before
     // starting the definition of another group.
-    // You can define a group without defining its members by calling 
+    // You can define a group without defining its members by calling
     // AddSectionGroup with MemberSegment = 0.
 
     // Check values
@@ -596,14 +596,14 @@ const char * DLLName) {                    // Name of DLL if imported dynamicall
     // OldIndex is the identifier used in relocation records. It must be nonzero.
     // If the original file uses 0-based symbol indices then add 1 to OldIndex
     // and remember to also add 1 when referring to the symbol in a relocation record.
-    // If the symbol is known by address rather than by index, then set OldIndex = 0. 
+    // If the symbol is known by address rather than by index, then set OldIndex = 0.
     // The return value will be the assigned value of OldIndex to use in relocation records.
-    // The returned value of OldIndex will be equal to the OldIndex of any previous symbols 
+    // The returned value of OldIndex will be equal to the OldIndex of any previous symbols
     // with same address. All symbols that have an identifier (OldIndex) must be defined
     // before any symbol identified by address only in order to avoid using the same OldIndex.
 
     // Check if image-relative
-    if (Section == ASM_SEGMENT_IMGREL) {   
+    if (Section == ASM_SEGMENT_IMGREL) {
         // Translate absolute virtual address to section and offset
         TranslateAbsAddress(ImageBase + (int32)Offset, Section, Offset);
     }
@@ -615,7 +615,7 @@ const char * DLLName) {                    // Name of DLL if imported dynamicall
 void CDisassembler::AddRelocation(
 int32  Section,                               // Section of relocation source
 uint32 Offset,                                // Offset of relocation source into section
-int32  Addend,                                // Addend to add to target address, 
+int32  Addend,                                // Addend to add to target address,
 // including distance from source to instruction pointer in self-relative addresses,
 // not including inline addend.
 uint32 Type,                                  // Relocation type. See SARelocation in disasm.h for definition of values
@@ -624,7 +624,7 @@ uint32 TargetIndex,                           // Symbol index of target
 uint32 ReferenceIndex) {                      // Symbol index of reference point if Type = 8 or 0x10
 
     // Check if image-relative
-    if (Section == ASM_SEGMENT_IMGREL) {   
+    if (Section == ASM_SEGMENT_IMGREL) {
         // Translate absolute virtual address to section and offset
         if (!TranslateAbsAddress(ImageBase + (int32)Offset, Section, Offset)) {
             err.submit(1304);
@@ -676,7 +676,7 @@ void CDisassembler::Go() {
     Pass = 1;
     Pass1();
     Pass = 2;
-    Pass1(); 
+    Pass1();
 
     if (Pass & 0x100) {
         // Repetition of pass 1 requested
@@ -697,16 +697,16 @@ void CDisassembler::Go() {
     printf("\n\nFunctionList:");
     for (uint32 i = 0; i < FunctionList.GetNumEntries(); i++) {
         printf("\nsect %i, start %X, end %X, scope %i, name %s",
-            FunctionList[i].Section, FunctionList[i].Start, FunctionList[i].End, 
+            FunctionList[i].Section, FunctionList[i].Start, FunctionList[i].End,
             FunctionList[i].Scope, Symbols.GetNameO(FunctionList[i].OldSymbolIndex));
     }
 #endif
-#if 0 
+#if 0
     // For debugging: list all relocations
     printf("\n\nRelocations:");
     for (uint32 i = 0; i < Relocations.GetNumEntries(); i++) {
         printf("\nsect %i, os %X, type %X, size %i, add %X, target %X",
-            Relocations[i].Section, Relocations[i].Offset, Relocations[i].Type, 
+            Relocations[i].Section, Relocations[i].Offset, Relocations[i].Type,
             Relocations[i].Size, Relocations[i].Addend, Relocations[i].TargetOldIndex);
     }
 #endif
@@ -741,7 +741,7 @@ void CDisassembler::Pass1() {
 
     * Tries to identify where each function begins and ends.
 
-    * Follows all references to data in order to determine data type for 
+    * Follows all references to data in order to determine data type for
     each data symbol.
 
     * Assigns symbol table entries for all jump and call targets that do not
@@ -758,7 +758,7 @@ void CDisassembler::Pass1() {
     sequences of zeroes are found then the nearest preceding label is marked
     as dubious and the analysis of code is skipped until the next code label.
     Pass 1 will be repeated in this case in order to follow backwards jumps
-    from subsequent code. Dubious code will be shown as both code and data 
+    from subsequent code. Dubious code will be shown as both code and data
     in the output of pass 2.
     */
 
@@ -841,7 +841,7 @@ void CDisassembler::FindLabels() {
             if ((Symbols[sym2].Scope & 4) && SectionType == 1) {
                 // Public label in code segment. Consider this code
                 CodeMode = 1;
-            } 
+            }
             // Otherwise: Assume same type as previous
         }
         else {
@@ -1058,7 +1058,7 @@ void CDisassembler::CheckForFunctionEnd() {
         return;
     }
 
-    // Function ends after ret or unconditional jump and preceding code had no 
+    // Function ends after ret or unconditional jump and preceding code had no
     // jumps beyond this position:
     if (s.OpcodeDef && s.OpcodeDef->Options & 0x10) {
         // A return or unconditional jump instruction was found.
@@ -1148,7 +1148,7 @@ void CDisassembler::CheckRelocationTarget(uint32 IRel, uint32 TargetType, uint32
                 // Relative jump or rip-relative address
                 TargetOffset += IEnd - s.AddressField;
                 InlineA      += IEnd - s.AddressField;
-            } 
+            }
             else {
                 // Self-relative address in data segment or unknown
                 // This may occur in position-independent code
@@ -1177,7 +1177,7 @@ void CDisassembler::CheckRelocationTarget(uint32 IRel, uint32 TargetType, uint32
     if (Symbols[SymNewI].Scope == 0) Symbols[SymNewI].Scope = 2;
 
     // Choose between Symbols[SymNewI].Type and TargetType the one that has the highest priority
-    if ((TargetType & 0xFF) > (Symbols[SymNewI].Type & 0xFF) 
+    if ((TargetType & 0xFF) > (Symbols[SymNewI].Type & 0xFF)
         || (((TargetType+1) & 0xFE) == 0x0C && (Symbols[SymNewI].Type & 0xFF) > 0x0C)) {
 
             // No type assigned yet, or new type overrides old type
@@ -1243,7 +1243,7 @@ void CDisassembler::CheckJumpTarget(uint32 symi) {
         // Get maximum end of the two functions
         if (FunctionList[IFun].End < FunctionList[IFunction].End) {
         FunctionList[IFun].End = FunctionList[IFunction].End;
-        }         
+        }
 
         // Remove entry IFunction from FunctionList
         FunctionList.Remove(IFunction);
@@ -1268,7 +1268,7 @@ void CDisassembler::Pass2() {
     * Outputs warnings for suboptimal instruction codes and error messages
     for erroneous code and erroneous relocations.
 
-    * Outputs disassembly of all instructions, operands and relocations, 
+    * Outputs disassembly of all instructions, operands and relocations,
     followed by the binary code listing as comment.
 
     * Outputs disassembly of all data, followed by alternative representations
@@ -1399,7 +1399,7 @@ dd      imagerel(Label2)
 dd      imagerel(Label3)
 
 Some other compilers use the beginning of the switch table or the beginning of
-the code section as reference point for 32-bit jump addresses. Other 
+the code section as reference point for 32-bit jump addresses. Other
 compilers use 64-bit addresses in the switch table. We want to recognize
 all these patterns in order to disassemble a switch table in a comprehensible
 way and find the case label targets.
@@ -1408,7 +1408,7 @@ In order to recognize a switch table in the above example, the tracer must
 do the following tasks:
 
 1.  Calculate the rip-relative address in the lea instruction and detect
-that it is equal to the image base. 
+that it is equal to the image base.
 
 2.  Remember that rbx contains the image base.
 
@@ -1423,7 +1423,7 @@ It is not yet known that SwitchTable is a switch table.
 5.  After add rcx,rbx remember that rcx contains an element from the array
 SwitchTable plus the image base.
 
-6.  When interpreting the jmp rcx instruction, the information about the 
+6.  When interpreting the jmp rcx instruction, the information about the
 contents of rcx is used for concluding that SwitchTable contains jump
 addresses, and that these addresses are image-relative. If there had
 been no add rcx,rbx, we would conclude that SwitchTable contains
@@ -1434,11 +1434,11 @@ element points to, give it a name, and extend the scope of the current
 function to include this target.
 
 8.  It would be possible to determine the length of the switch table from
-the cmp instruction, but the tracer does not currently use this 
-information. Instead, it stops parsing the switch table at the first 
+the cmp instruction, but the tracer does not currently use this
+information. Instead, it stops parsing the switch table at the first
 known label or the first invalid address.
 
-This is quite a long way to go for acquiring this information, but it is 
+This is quite a long way to go for acquiring this information, but it is
 necessary in order to tell what is code and what is data and to find out
 where the function ends. Unfortunately, the MS compiler puts switch tables
 in the code segment rather than in the data segment which would give better
@@ -1511,9 +1511,9 @@ void CDisassembler::UpdateTracer() {
 
     // Check the opcode to find out what has happened to this register
     switch (Opcodei) {
-    case 0xB0: case 0xB1: case 0xB2: case 0xB3: 
+    case 0xB0: case 0xB1: case 0xB2: case 0xB3:
     case 0xB4: case 0xB5: case 0xB6: case 0xB7:
-    case 0xB8: case 0xB9: case 0xBA: case 0xBB: 
+    case 0xB8: case 0xB9: case 0xBA: case 0xBB:
     case 0xBC: case 0xBD: case 0xBE: case 0xBF:
         // MOV register, constant
         t.Regist[reg] = 0;
@@ -1542,7 +1542,7 @@ void CDisassembler::UpdateTracer() {
         case 2:
             t.Value[reg] = Get<uint16>(s.ImmediateField);
             break;
-        case 4: 
+        case 4:
         case 8: // 64-bit value truncated to 32 bits
             t.Value[reg] = Get<uint32>(s.ImmediateField);
             break;
@@ -1751,7 +1751,7 @@ void CDisassembler::UpdateSymbols() {
                     if ((OperandType & 0xFE) == 0x84) RelocationType = 8; // Far
 
                     // Scope
-                    uint32 TargetScope = 1;           // Function local    
+                    uint32 TargetScope = 1;           // Function local
                     if ((OperandType & 0xFF) >= 0x83) TargetScope = 2;  // Call or far. File scope
 
                     // Make relocation and target symbol
@@ -1836,7 +1836,7 @@ void CDisassembler::UpdateSymbols() {
                 if ((s.Operands[OpI] & 0xF0) >= 0x10 && (s.Operands[OpI] & 0xF0) < 0x40) {
                     // Immediate operand
 
-                    if (!s.ImmediateRelocation && s.ImmediateFieldSize >= 4 
+                    if (!s.ImmediateRelocation && s.ImmediateFieldSize >= 4
                         && ImageBase && !(RelocationsInSource & 0x20)
                         && (Opcodei == 0x3000 || Opcodei == 0x68 || (Opcodei & 0xFFF8) == 0xB8)) {
                             // instruction = MOV or PUSH, immediate operand may be an address
@@ -1886,7 +1886,7 @@ void CDisassembler::UpdateSymbols() {
                             SymNewI = Symbols.Old2NewIndex(t.Value[s.RM]);
                             // Check relocation type
                             if (t.Regist[s.RM] == 0x12) {
-                                // Register contains array element plus imagebase. 
+                                // Register contains array element plus imagebase.
                                 RelocationType = 4;         // Array elements must have image-relative relocations
                             }
                             if (t.Regist[s.RM] == 0x13) {
@@ -1987,7 +1987,7 @@ void CDisassembler::FollowJumpTable(uint32 symi, uint32 RelType) {
         Symbols[symi].Type = s.OpcodeDef->Destination | 0x4000000;
     }
     // Make sure symbol is marked as data
-    Symbols[symi].Type |= 0x4000000;   
+    Symbols[symi].Type |= 0x4000000;
 
     // Check if symbol has a scope assigned
     if (Symbols[symi].Scope == 0) Symbols[symi].Scope = 2;
@@ -1997,8 +1997,8 @@ void CDisassembler::FollowJumpTable(uint32 symi, uint32 RelType) {
     SourceSection = Symbols[symi].Section;
     SourceOffset  = Symbols[symi].Offset;
     SourceSize    = Symbols[symi].Size;
-    TargetType    = 0x82; 
-    
+    TargetType    = 0x82;
+
     // Target type = jump label
     if ((Symbols[symi].Type & 0xFF) == 0x0C) TargetType++;  // Target type = call label
 
@@ -2073,7 +2073,7 @@ void CDisassembler::FollowJumpTable(uint32 symi, uint32 RelType) {
                 // Make new symbol at target address
                 uint32 NewSymOffset = Addend;
                 if (Relocations[Reli].Type & 2) {  // relative
-                    if (RelType == 0x10) {  // arbitrary reference point                       
+                    if (RelType == 0x10) {  // arbitrary reference point
                         NewSymOffset -= (Relocations[Reli].Offset - SourceOffset);
                     }
                 }
@@ -2109,7 +2109,7 @@ void CDisassembler::FollowJumpTable(uint32 symi, uint32 RelType) {
 
 uint32 CDisassembler::MakeMissingRelocation(int32 Section, uint32 Offset, uint32 RelType, uint32 TargetType, uint32 TargetScope, uint32 SourceSize, uint32 RefPoint) {
     // Make a relocation and its target symbol from inline address
-    /* This function is used for executable files that have already been 
+    /* This function is used for executable files that have already been
     relocated for making the relocation information that has been
     lost as well as the symbol record that the relocation should
     point to.
@@ -2125,7 +2125,7 @@ uint32 CDisassembler::MakeMissingRelocation(int32 Section, uint32 Offset, uint32
     The return value is a symbol new index for the target, or zero if failure
 
     The size of the relocation source is implied from RelType
-    A symbol record for the target will be made if none exists. 
+    A symbol record for the target will be made if none exists.
     The scope of the target symbol will be file local (2)
     */
 
@@ -2309,7 +2309,7 @@ void CDisassembler::MarkCodeAsDubious() {
         || CountErrors > 5) {
             // There are more than 5 errors, or consecutive zeroes and at
             // least one more error or inaccessible code.
-            // Consider this sufficient evidence that this is very unlikely 
+            // Consider this sufficient evidence that this is very unlikely
             // to be code. Show it as data only
             CodeMode = 4;
     }
@@ -2342,7 +2342,7 @@ void CDisassembler::MarkCodeAsDubious() {
         Pass |= 0x100;
 
         /* Skip to next label.
-        This is removed because we want to accumulate errors as evidence for 
+        This is removed because we want to accumulate errors as evidence for
         determined whether this is code or data
         // Is there a label after this?
         if (sym3) {
@@ -2401,7 +2401,7 @@ void CDisassembler::ParseInstruction() {
     FindOperandTypes();
 
     if (s.Prefixes[3] == 0x62) {
-        if (s.Prefixes[6] & 0x20) { // EVEX   
+        if (s.Prefixes[6] & 0x20) { // EVEX
             FindBroadcast();                      // Find broadcast and offet multiplier for EVEX code
         }
         else {  // MVEX
@@ -2450,7 +2450,7 @@ void CDisassembler::ScanPrefixes() {
             }
             StorePrefix(7, Byte);                        // Store in category REX
         }
-        else if (i+1 < SectionEnd &&         
+        else if (i+1 < SectionEnd &&
             ((((Byte & 0xFE) == 0xC4 || Byte == 0x62) && (WordSize == 64 || (Buffer[i+1] >= 0xC0)))
             || (Byte == 0x8F && (Buffer[i+1] & 0x38)))) {
                 // This is a VEX, EVEX, MVEX or XOP prefix
@@ -2609,22 +2609,22 @@ void CDisassembler::FindMapEntry() {
         if (StartPage >= NumOpcodeStartPageVEX) {
             s.Errors |= 0x10000; StartPage = 0;     // mmmm bits out of range
         }
-        MapNumber = OpcodeStartPageVEX[StartPage]; 
+        MapNumber = OpcodeStartPageVEX[StartPage];
         if (StartPage == 1) MapNumber0 = 1;
         if (StartPage == 2 && s.Prefixes[3] == 0x62) {
             if ((s.Prefixes[5] & 0xFE) == 0xF2) {   // shortcut for EVEX F2 0F 38 and EVEX F3 0F 38
-                StartPage = 8 + (s.Prefixes[5] & 1); 
+                StartPage = 8 + (s.Prefixes[5] & 1);
                 MapNumber0 = MapNumber;
-                MapNumber = OpcodeStartPageVEX[StartPage]; 
+                MapNumber = OpcodeStartPageVEX[StartPage];
             }
         }
 
         // Get entry [Byte] in map
         MapEntry  = OpcodeTables[MapNumber] + Byte;
-        
+
         // There are two entries for mm = 1: OpcodeMap1 for legacy code and OpcodeMapB1 for VEX-only code.
         // There are two entries for mm = 2: OpcodeMap2 for legacy code and OpcodeMapB2 for EVEX-only code with F3 prefix.
-        // We don't want to have the same code in two different maps because this may cause errors if a code 
+        // We don't want to have the same code in two different maps because this may cause errors if a code
         // is updated only in one of the maps.
         // Search the shortcut map first, then the default map
         if ((MapEntry->Name == 0 && MapEntry->TableLink == 0) || Byte >= OpcodeTableLength[MapNumber]) {
@@ -2706,7 +2706,7 @@ void CDisassembler::FindMapEntry() {
                 Byte = 0;  break;
             case 32: default:
                 Byte = 1;  break;
-            case 64: 
+            case 64:
                 Byte = 2;
             }
             break;
@@ -2730,7 +2730,7 @@ void CDisassembler::FindMapEntry() {
             case 0: default:
                 Byte = 0;  break;
             case 0x66:
-                Byte = 1;  
+                Byte = 1;
                 if (s.Prefixes[3] == 0xF2) Byte = 2;      // F2/F3 take precedence over 66 in (tzcnt instruction)
                 else if (s.Prefixes[3] == 0xF3) Byte = 3;
                 break;
@@ -2785,7 +2785,7 @@ void CDisassembler::FindMapEntry() {
                     // MVEX. Always 512 bits
                     Byte = 2;
                 }
-            }             
+            }
             break;
 
         case 0x0E:   // Use VEX type as index into next table: 0 = 2 or 3 bytes VEX, 1 = 4 bytes EVEX
@@ -2839,15 +2839,15 @@ void CDisassembler::FindMapEntry() {
 void CDisassembler::FindOperands() {
     // Interpret mod/reg/rm and SIB bytes and find operands
     s.MFlags = 0;                                 // Memory operand flags:
-    // 1 = has memory operand, 
-    // 2 = has mod/reg/rm byte, 
-    // 4 = has SIB byte, 
+    // 1 = has memory operand,
+    // 2 = has mod/reg/rm byte,
+    // 4 = has SIB byte,
     // 8 = has DREX byte (AMD SSE5 instructions never implemented),
     // 0x10 = is rip-relative
-    uint8 ModRegRM;                               // mod/reg/rm byte 
+    uint8 ModRegRM;                               // mod/reg/rm byte
     uint8 SIB;                                    // SIB byte
 
-    // Get address size   
+    // Get address size
     if (WordSize == 64) s.AddressSize = (s.Prefixes[1] == 0x67) ? 32 : 64;
     else s.AddressSize = (WordSize == 16) ^ (s.Prefixes[1] == 0x67) ? 16 : 32;
 
@@ -3031,7 +3031,7 @@ void CDisassembler::FindOperands() {
 
     case 0x80:  // Has 2 or 4 bytes immediate operand or near jump/call
         if ((s.OpcodeDef->Destination & 0xFE) == 0x82) {
-            // Near jump/call address size depends on WordSize and operand size prefix, 
+            // Near jump/call address size depends on WordSize and operand size prefix,
             // but not on address size prefix
             s.ImmediateFieldSize = (WordSize == 16) ^ (s.Prefixes[4] == 0x66) ? 2 : 4;
             if (WordSize == 64) s.ImmediateFieldSize = 4; // 66 prefix ignored in 64 bit mode
@@ -3067,7 +3067,7 @@ void CDisassembler::FindOperands() {
         CheckForMisplacedLabel();
         if (IEnd > SectionEnd) {
             // instruction extends outside code block
-            s.Errors |= 0x10; 
+            s.Errors |= 0x10;
             IEnd = SectionEnd;
         }
     }
@@ -3076,7 +3076,7 @@ void CDisassembler::FindOperands() {
 void CDisassembler::FindBroadcast() {
     // Find broadcast and offset multiplier for EVEX code
     if (s.Mod != 3) {
-        // has memory operand        
+        // has memory operand
         uint32 m;       // find memory operand
         for (m = 0; m < s.MaxNumOperands; m++) {
             if (s.Operands[m] & 0x2000) break;
@@ -3134,12 +3134,12 @@ void CDisassembler::SwizTableLookup() {
     // find record in swizzle tables
     s.SwizRecord = &(SwizTables[sw | opsize][IsMem][s.Esss & 7]);
     // find offset multiplier
-    if (s.OpcodeDef->MVEX & 0x40) {  
+    if (s.OpcodeDef->MVEX & 0x40) {
         // address single element
         s.OffsetMultiplier = s.SwizRecord->elementsize;
     }
     else {
-        // address vector or subvector 
+        // address vector or subvector
         s.OffsetMultiplier = s.SwizRecord->memopsize;
         if (s.OffsetMultiplier == 0) {
             // no swizzle, use vector size
@@ -3169,7 +3169,7 @@ void CDisassembler::FindOperandTypes() {
 
     s.MaxNumOperands = 4;  // may be 5 in the future in cases where EVEX field is used as an extra operand
 
-    // Copy all operands from opcode map and zero-extend 
+    // Copy all operands from opcode map and zero-extend
     for (i = 0; i < s.MaxNumOperands; i++) {
         s.Operands[i] = (&s.OpcodeDef->Destination)[i];
     }
@@ -3184,7 +3184,7 @@ void CDisassembler::FindOperandTypes() {
         // Find which of the operands it applies to
         if ((s.Operands[0] & 0xFF) > 0 && (s.Operands[0] & 0xFF) < 0xB) i = 0; else i = 1;
         // Indicate this operand uses opcode bits
-        s.Operands[i] |= 0x20000; 
+        s.Operands[i] |= 0x20000;
         break;
 
     case 4: // Register operand indicated by VEX.vvvv bits
@@ -3217,7 +3217,7 @@ void CDisassembler::FindOperandTypes() {
 
     case 0x12: // There is a mod/reg/rm byte and two operands. Destination is reg
         // Destination operand uses s.Reg bits
-        s.Operands[0] |= 0x40000; 
+        s.Operands[0] |= 0x40000;
         // Source operand uses mod and rm bits
         s.Operands[1] |= 0x30000;
         break;
@@ -3226,7 +3226,7 @@ void CDisassembler::FindOperandTypes() {
         // Destination operand uses mod and rm bits
         s.Operands[0] |= 0x30000;
         // Source operand uses s.Reg bits
-        s.Operands[1] |= 0x40000; 
+        s.Operands[1] |= 0x40000;
         break;
 
     case 0x14: case 0x15: { // There is a DREX byte and three or four operands
@@ -3249,12 +3249,12 @@ void CDisassembler::FindOperandTypes() {
         break;
     case 2:
         s.Operands[1] |= 0x40000;           // 1. source = reg
-        s.Operands[2] |= 0x30000;           // 2. source = rm 
+        s.Operands[2] |= 0x30000;           // 2. source = rm
         s.Operands[3]  = s.Operands[0];     // 3. source = same as destination
         break;
     case 3:
         s.Operands[1] |= 0x30000;           // 1. source = rm
-        s.Operands[2] |= 0x40000;           // 2. source = reg 
+        s.Operands[2] |= 0x40000;           // 2. source = reg
         s.Operands[3]  = s.Operands[0];     // 3. source = same as destination
         break;
             }
@@ -3264,30 +3264,30 @@ void CDisassembler::FindOperandTypes() {
             if ((OperandConfiguration & 1) == 0) {
                 // OC0 = 0
                 s.Operands[1] |= 0x40000;           // 1. source = reg
-                s.Operands[2] |= 0x30000;           // 2. source = rm 
+                s.Operands[2] |= 0x30000;           // 2. source = rm
             }
             else {
                 // OC0 = 1
                 s.Operands[1] |= 0x30000;           // 1. source = rm
-                s.Operands[2] |= 0x40000;           // 2. source = reg 
+                s.Operands[2] |= 0x40000;           // 2. source = reg
             }
         }
         break;}
 
     case 0x18: // Has VEX prefix and 2 operands
-        // Dest = VEX.vvvv, src = rm, opcode extension in r bits. 
+        // Dest = VEX.vvvv, src = rm, opcode extension in r bits.
         // Destination operand uses VEX.vvvv bits
-        s.Operands[0] |= 0x60000; 
+        s.Operands[0] |= 0x60000;
         // Source1 operand uses mod and rm bits
         s.Operands[1] |= 0x30000;
         if (!(s.Prefixes[7] & 0xB0)) {
             // One operand omitted if no VEX prefix
             s.Operands[0] = s.Operands[1];  s.Operands[1] = 0;
         }
-        break;   
+        break;
 
     case 0x19: // Has VEX prefix and 3 operands
-        // Dest = r, src1 = VEX.vvvv, src2 = rm. 
+        // Dest = r, src1 = VEX.vvvv, src2 = rm.
         s.Operands[0] |= 0x40000;
         s.Operands[1] |= 0x60000;
         s.Operands[2] |= 0x30000;
@@ -3302,7 +3302,7 @@ void CDisassembler::FindOperandTypes() {
         }
         break;
 
-    case 0x1A: // Has VEX prefix and 3 operands. 
+    case 0x1A: // Has VEX prefix and 3 operands.
         // Dest = rm, src1 = VEX.v, src2 = r
         s.Operands[0] |= 0x30000;
         s.Operands[1] |= 0x60000;
@@ -3350,7 +3350,7 @@ void CDisassembler::FindOperandTypes() {
         nimm++;                                    // part of immediate byte used
         break;
 
-    case 0x1E: // Has VEX prefix, VSIB and 1, 2 or 3 operands. 
+    case 0x1E: // Has VEX prefix, VSIB and 1, 2 or 3 operands.
         if (s.Operands[0] & 0x2000) {
             // destination is memory
             // Dest = rm, src1 = r
@@ -3366,7 +3366,7 @@ void CDisassembler::FindOperandTypes() {
         }
         break;
 
-    default: // No explicit operands. 
+    default: // No explicit operands.
         // Check for implicit memory operands
         for (i = 0; i < 2; i++) {
             if (s.Operands[i] & 0x2000) {
@@ -3374,7 +3374,7 @@ void CDisassembler::FindOperandTypes() {
                 s.Operands[i] |= 0x10000;
                 if (s.OpcodeDef->InstructionFormat > 1) {
                     // There is an address field
-                    s.AddressFieldSize = s.AddressSize / 8; 
+                    s.AddressFieldSize = s.AddressSize / 8;
                     s.AddressField = s.OpcodeStart2 + 1;
                     s.MFlags |= 1;                    // Remember we have a memory operand
                 }
@@ -3437,13 +3437,13 @@ void CDisassembler::FindOperandTypes() {
 
         // Resolve types that depend on prefixes or WordSize
         switch (s.Operands[i] & 0xFF) {
-        case 8: case 0x18: case 0x28: case 0x38: case 0xA8: 
+        case 8: case 0x18: case 0x28: case 0x38: case 0xA8:
             // 16 or 32 bits
             s.Operands[i] &= ~0x0F;
             s.Operands[i] |= (s.OperandSize == 16) ? 2 : 3;
             break;
 
-        case 9: case 0x19: case 0x29: case 0x39: case 0xA9: 
+        case 9: case 0x19: case 0x29: case 0x39: case 0xA9:
             // 8, 16, 32 or 64 bits, depending on operand size prefixes
             s.Operands[i] &= ~0x0F;
             switch (AllowedPref & 0x7000) {
@@ -3451,12 +3451,12 @@ void CDisassembler::FindOperandTypes() {
                 s.Operands[i] |= (s.OperandSize == 16) ? 2 : ((s.OperandSize == 64) ? 4 : 3);
                 break;
             case 0x4000:  // VEX.W prefix determines integer (vector) operand size b/w
-                if ((s.Prefixes[7] & 8) == 0) {  // W bit                
-                    s.OperandSize = 8;                
+                if ((s.Prefixes[7] & 8) == 0) {  // W bit
+                    s.OperandSize = 8;
                     s.Operands[i] |= 1;
                 }
                 else {
-                    s.OperandSize = 16;                
+                    s.OperandSize = 16;
                     s.Operands[i] |= 2;
                 }
                 break;
@@ -3510,11 +3510,11 @@ void CDisassembler::FindOperandTypes() {
                 case 0x66: // 66 prefix = pd
                     s.Operands[i] |= 0x4C;  break;
                 case 0xF3: // F3 prefix = ss
-                    s.Operands[i] |= 0x4B;  
+                    s.Operands[i] |= 0x4B;
                     s.Operands[i] &= ~0xF00;  // make scalar
                     break;
                 case 0xF2: // F2 prefix = sd
-                    s.Operands[i] |= 0x4C;  
+                    s.Operands[i] |= 0x4C;
                     s.Operands[i] &= ~0xF00;  // make scalar
                     break;
                 };
@@ -3532,9 +3532,9 @@ void CDisassembler::FindOperandTypes() {
             if (s.Prefixes[3] == 0x62) {             // EVEX or MVEX prefix
                 if (s.Prefixes[6] & 0x20) {
                     // EVEX prefix
-                    // Do LL bits specify vector size when b = 1 for instructions that allow 
+                    // Do LL bits specify vector size when b = 1 for instructions that allow
                     // sae but not rounding? Perhaps not, because sae is only allowed for
-                    // 512 bit vectors, but manual says otherwise. 
+                    // 512 bit vectors, but manual says otherwise.
                     // NASM version 2.11.06 sets LL = 0 when b = 1 for vrangeps instruction
                     //??if ((s.OpcodeDef->EVEX & 4) && (s.Mod == 3) && (s.Esss & 1)) {
                     if ((s.OpcodeDef->EVEX & 6) && (s.Mod == 3) && (s.Esss & 1)) {
@@ -3610,7 +3610,7 @@ void CDisassembler::FindWarnings() {
 
     if ((s.OpcodeDef->Options & 0x80) && s.ImmediateFieldSize > 1 && s.ImmediateRelocation == 0) {
         // Check if sign-extended operand can be used
-        if ((s.ImmediateFieldSize == 2 && Get<int16>(s.ImmediateField) == Get<int8>(s.ImmediateField)) 
+        if ((s.ImmediateFieldSize == 2 && Get<int16>(s.ImmediateField) == Get<int8>(s.ImmediateField))
             ||  (s.ImmediateFieldSize == 4 && Get<int32>(s.ImmediateField) == Get<int8>(s.ImmediateField))) {
                 s.Warnings1 |= 1; // Sign-extended operand could be used
         }
@@ -3625,14 +3625,14 @@ void CDisassembler::FindWarnings() {
         }
     }
     // Check if displacement could be made smaller
-    if (s.AddressFieldSize > 0 && s.AddressRelocation == 0 
+    if (s.AddressFieldSize > 0 && s.AddressRelocation == 0
         && (s.BaseReg || (s.IndexReg && !s.BaseReg && s.Scale < 2))
         && s.OffsetMultiplier <= 1) {
             // There is a displacement which might be unnecessary
             switch (s.AddressFieldSize) {
             case 1:  // 1 byte displacement
-                if (Get<uint8>(s.AddressField) == 0 
-                    && (((s.BaseReg-1) & 7) != 5 || (s.AddressSize == 16 && s.IndexReg))) 
+                if (Get<uint8>(s.AddressField) == 0
+                    && (((s.BaseReg-1) & 7) != 5 || (s.AddressSize == 16 && s.IndexReg)))
                     s.Warnings1 |= 4; // Displacement is 0 and an addressing mode without displacement exists
                 break;
             case 2:  // 2 bytes displacement
@@ -3646,7 +3646,7 @@ void CDisassembler::FindWarnings() {
                 }
                 break;
             case 8:  // 8 bytes displacement
-                if (Get<int32>(s.AddressField) == Get<int64>(s.AddressField)) 
+                if (Get<int32>(s.AddressField) == Get<int64>(s.AddressField))
                     // Has 8 bytes displacement. Could use sign-extended or rip-relative
                     s.Warnings1 |= 8;
                 break;
@@ -3665,7 +3665,7 @@ void CDisassembler::FindWarnings() {
             s.Warnings1 |= 0x20;   // No memory operand. A shorter version exists for register operand
     }
     // Check for length-changing prefix
-    if (s.ImmediateFieldSize > 1 && s.Prefixes[4] == 0x66 
+    if (s.ImmediateFieldSize > 1 && s.Prefixes[4] == 0x66
         && (s.OpcodeDef->AllowedPrefixes & 0x100) && !(s.OpcodeDef->InstructionFormat & 0x20)) {
             // 66 prefix changes length of immediate field
             s.Warnings1 |= 0x40;
@@ -3676,7 +3676,7 @@ void CDisassembler::FindWarnings() {
         s.Warnings1 |= 0x2000000;
     }
     // Warn for address size prefix if mod/reg/rm byte
-    // (This does not cause a stall in 64 bit mode, but I am issueing a 
+    // (This does not cause a stall in 64 bit mode, but I am issueing a
     // warning anyway because the changed address size is probably unintended)
     if (s.Prefixes[1] == 0x67 && (s.MFlags & 2)) {
         s.Warnings1 |= 0x80;
@@ -3697,9 +3697,9 @@ void CDisassembler::FindWarnings() {
     // Check for meaningless segment prefixes
     if (s.Prefixes[0] && !(s.OpcodeDef->AllowedPrefixes & 0x0C)) {
         // Segment prefix is not branch hint
-        if (WordSize == 64 && (s.Prefixes[0] & 0x02)) 
+        if (WordSize == 64 && (s.Prefixes[0] & 0x02))
             s.Warnings1 |= 0x400; // CS, DS, ES or SS prefix in 64 bit mode has no effect
-        if (s.Prefixes[0] == 0x3E && s.BaseReg != 4+1 && s.BaseReg != 5+1) 
+        if (s.Prefixes[0] == 0x3E && s.BaseReg != 4+1 && s.BaseReg != 5+1)
             s.Warnings1 |= 0x400; // Unnecessary DS: segment prefix
         if (s.Prefixes[0] == 0x36 && (s.BaseReg == 4+1 || s.BaseReg == 5+1) )
             s.Warnings1 |= 0x400; // Unnecessary SS: segment prefix
@@ -3813,7 +3813,7 @@ void CDisassembler::FindWarnings() {
         if (s.Prefixes[6] & 0x20) {
             // EVEX prefix
             if (s.Mod == 3) {
-                // register operands 
+                // register operands
                 if (!(s.OpcodeDef->EVEX & 6) && (s.Esss & 1)) {
                     s.Warnings2 |= 0x40; // rounding and sae not allowed
                 }
@@ -3857,13 +3857,13 @@ void CDisassembler::FindWarnings() {
     if (*(int64*)&s.Conflicts) s.Warnings1 |= 0x800;  // Conflicting prefixes. Check all categories at once
 
     // Check for missing prefixes
-    if ((s.OpcodeDef->AllowedPrefixes & 0x8000) && s.Prefixes[5] == 0) 
+    if ((s.OpcodeDef->AllowedPrefixes & 0x8000) && s.Prefixes[5] == 0)
         s.Warnings1 |= 0x1000; // Required 66/F2/F3 prefix missing
-    if ((s.OpcodeDef->AllowedPrefixes & 0x20000) && (s.Prefixes[7] & 0xB0) == 0) 
+    if ((s.OpcodeDef->AllowedPrefixes & 0x20000) && (s.Prefixes[7] & 0xB0) == 0)
         s.Warnings1 |= 0x1000; // Required VEX prefix missing
 
     // Check for VEX prefix not allowed
-    if (!(s.OpcodeDef->AllowedPrefixes & 0xC30000) && (s.Prefixes[7] & 0xB0)) 
+    if (!(s.OpcodeDef->AllowedPrefixes & 0xC30000) && (s.Prefixes[7] & 0xB0))
         s.Warnings1 |= 0x40000000; // VEX prefix not allowed
 
     // Check for EVEX and MVEX prefix allowed
@@ -3894,7 +3894,7 @@ void CDisassembler::FindWarnings() {
         }
     }
     // Check if direct address is relocated
-    if (s.AddressFieldSize > 1 && !s.AddressRelocation && !s.BaseReg && !s.IndexReg && (WordSize != 16 || !(s.Prefixes[0] & 0x40))) 
+    if (s.AddressFieldSize > 1 && !s.AddressRelocation && !s.BaseReg && !s.IndexReg && (WordSize != 16 || !(s.Prefixes[0] & 0x40)))
         s.Warnings1 |= 0x8000;  // Direct address has no relocation, except FS: and GS:
 
     // Check if address relocation type is correct
@@ -3927,7 +3927,7 @@ void CDisassembler::FindWarnings() {
                 case 2:
                     TargetOffset = Get<int16>(s.AddressField);  break;
                 case 4:
-                    TargetOffset = Get<int32>(s.AddressField); 
+                    TargetOffset = Get<int32>(s.AddressField);
                     if (s.MFlags & 0x100) {
                         // Compute rip-relative address
                         TargetOffset += IEnd - s.AddressField;
@@ -3964,7 +3964,7 @@ void CDisassembler::FindWarnings() {
 
                 // Get operand size
                 OperandSize = GetDataItemSize(OperandType);
-                if (s.OffsetMultiplier) OperandSize = s.OffsetMultiplier; 
+                if (s.OffsetMultiplier) OperandSize = s.OffsetMultiplier;
                 while (OperandSize & (OperandSize-1)) {
                     // Not a power of 2. Get nearest lower power of 2
                     OperandSize = OperandSize & (OperandSize-1);
@@ -4012,7 +4012,7 @@ void CDisassembler::FindWarnings() {
     }
 
     // Check address size for stack operations
-    if ((s.OpcodeDef->AllowedPrefixes & 2) && s.Prefixes[1]) 
+    if ((s.OpcodeDef->AllowedPrefixes & 2) && s.Prefixes[1])
         s.Warnings1 |= 0x40000; // Stack operation has address size prefix
 
     // Check for undocumented opcode
@@ -4024,10 +4024,10 @@ void CDisassembler::FindWarnings() {
         s.Warnings1 |= 0x200000; // Opcode reserved for future extensions
 
     // Check instruction set
-    if (s.OpcodeDef->InstructionSet & 0x10000) 
+    if (s.OpcodeDef->InstructionSet & 0x10000)
         s.Warnings2 |= 0x2; // Planned future instruction
 
-    if (s.OpcodeDef->InstructionSet & 0x20000) 
+    if (s.OpcodeDef->InstructionSet & 0x20000)
         s.Warnings2 |= 0x4; // Proposed instruction code never implemented, preliminary specification later changed
 
     // Check operand size for stack operations
@@ -4062,7 +4062,7 @@ void CDisassembler::FindErrors() {
         // Lock prefix not allowed for this instruction
         s.Errors |= 2;
     }
-    if ( s.OpcodeDef->InstructionFormat == 0 
+    if ( s.OpcodeDef->InstructionFormat == 0
         || ((s.OpcodeDef->InstructionFormat & 0x4000) && s.OpcodeDef->Name == 0)) {
             // Illegal instruction
             s.Errors |= 4;
@@ -4082,7 +4082,7 @@ void CDisassembler::FindErrors() {
             IEnd = LabelEnd;
         }
         else {
-            // Symbol is local. 
+            // Symbol is local.
             // This may be a spurious label produced by misinterpretation elsewhere
             if (sym1) Symbols[sym1].Type = 0;       // Remove symbol type
             s.Warnings2 |= 1;
@@ -4109,7 +4109,7 @@ void CDisassembler::FindErrors() {
         if (s.IndexReg == 0) s.Errors |= 8;  // Illegal operand: no index register
     }
     if (LabelEnd >= s.OpcodeStart2+2 && (
-        Get<uint16>(s.OpcodeStart2) == 0 
+        Get<uint16>(s.OpcodeStart2) == 0
         || Get<uint16>(s.OpcodeStart2) == 0xFFFF
         // || Get<uint16>(s.OpcodeStart2) == 0xCCCC
         )) {
@@ -4278,7 +4278,7 @@ void CDisassembler::CheckForNops() {
     // Check for multi-byte NOP and UD2 instructions
 
     switch (Opcodei) {
-    case 0x3C00: case 0x3C01: case 0x3C02: case 0x11F:  // NOP      
+    case 0x3C00: case 0x3C01: case 0x3C02: case 0x11F:  // NOP
         // These opcodes are intended for NOPs. Indicate if longer than one byte
         if (IEnd - IBegin > 1) s.Warnings1 |= 0x1000000;
         // Remember NOP
@@ -4287,9 +4287,9 @@ void CDisassembler::CheckForNops() {
 
     case 0x8D:   // LEA
         // LEA is often used as NOP with destination = base register
-        if (s.Mod < 3 && s.Reg+1 == s.BaseReg && s.IndexReg == 0 && 
+        if (s.Mod < 3 && s.Reg+1 == s.BaseReg && s.IndexReg == 0 &&
             s.AddressSize == s.OperandSize && s.OperandSize >= WordSize) {
-                // Destination is same as base register. 
+                // Destination is same as base register.
                 // Check if displacement is 0
                 switch (s.AddressFieldSize) {
     case 0:
@@ -4325,7 +4325,7 @@ void CDisassembler::CheckForNops() {
     }
 
     if (s.Warnings1 & 0x1000000) {
-        // A multi-byte NOP is detected. 
+        // A multi-byte NOP is detected.
         // Remove warnings for longer-than-necessary instruction
         s.Warnings1 &= ~ 0x873D;
         // Remember NOP
@@ -4396,7 +4396,7 @@ void CDisassembler::FinalErrorCheck() {
     // Loop through relocations table
     for (i = 1; i < Relocations.GetNumEntries(); i++) {
         // Check source address
-        if (Relocations[i].Section == 0 
+        if (Relocations[i].Section == 0
             || (uint32)Relocations[i].Section >= Sections.GetNumEntries()
             || (Sections[Relocations[i].Section].Type & 0xFF) == 3
             || Relocations[i].Offset >= Sections[Relocations[i].Section].InitSize) {
@@ -4419,7 +4419,7 @@ void CDisassembler::FinalErrorCheck() {
                 OutFile.NewLine();
         }
         // Check target
-        if (Relocations[i].TargetOldIndex == 0 
+        if (Relocations[i].TargetOldIndex == 0
             || Relocations[i].TargetOldIndex >= Symbols.GetLimit()
             || Relocations[i].RefOldIndex >= Symbols.GetLimit()) {
                 // Relocation has illegal target
@@ -4475,7 +4475,7 @@ void CDisassembler::CheckNamesValid() {
                 ||  stricmp(SecName, ".code") == 0
                 ||  stricmp(SecName, ".const") == 0) {
                     // Change . to _ in beginning of name to avoid reserved directive name
-                    SecName[0] = '_'; 
+                    SecName[0] = '_';
             }
             else {
                 // Other name beginning with .
@@ -4488,7 +4488,7 @@ void CDisassembler::CheckNamesValid() {
     for (i = 1; i < Symbols.GetNumEntries(); i++) {
         if (Symbols[i].Name) {
             // Warning: violating const specifier in GetName():
-            char * SymName = (char *)Symbols.GetName(i);  
+            char * SymName = (char *)Symbols.GetName(i);
             Len = strlen(SymName);  Changed = 0;
             // Loop through characters in symbol
             for (j = 0; j < Len; j++) {
@@ -4510,14 +4510,14 @@ void CDisassembler::CheckNamesValid() {
                                         SymName[0] = '_';  // Warning: violating const specifier in GetName()
                                         break; // break out of j loop
                                 }
-                            }         
+                            }
                             // Set option dotname
                             MasmOptions |= 1;
                         }
                         else {
                             // Other illegal character in MASM
 #if ReplaceIllegalChars
-                            SymName[j] = '?'; 
+                            SymName[j] = '?';
 #endif
                             Changed++;
                         }

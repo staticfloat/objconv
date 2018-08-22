@@ -119,8 +119,8 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeSegments() {
 
    if (newsec != NumSectionsNew) {
       // Check my program for internal consistency
-      // If you get this error then change the value of NumSectionsNew in 
-      // the constructor to equal the number of entries in 
+      // If you get this error then change the value of NumSectionsNew in
+      // the constructor to equal the number of entries in
       // SpecialSegmentNames, including the Null segment
       err.submit(9000);
    }
@@ -269,7 +269,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeSegments() {
             int IsImportTable = SectionType >= MAC_S_NON_LAZY_SYMBOL_POINTERS && SectionType <= MAC_S_SYMBOL_STUBS;
 
             if (sectp->nreloc > 0 || IsImportTable) {
-               // Source section has relocations. 
+               // Source section has relocations.
                // Make a relocation section in destination file
 
                // Put data into relocation section header:
@@ -374,7 +374,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeSymbolTable() {
    uint32 DebugRemoved = 0;// Debug symbols removed
 
    // pointer to old string table
-   char * oldstringtab = (char*)(this->Buf() + this->StringTabOffset); 
+   char * oldstringtab = (char*)(this->Buf() + this->StringTabOffset);
 
    // pointer to old symbol table
    TMAC_nlist * symp0, *symp;
@@ -440,10 +440,10 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeSymbolTable() {
       else {
          err.submit(2112);  break;
       }
-         
+
       // Symbol value
       sym.st_value = symp->n_value;
-         
+
       // Get section
       OldSectionIndex = symp->n_sect;
       if (OldSectionIndex > this->NumSections) {
@@ -482,7 +482,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeSymbolTable() {
       else if (sym.st_shndx == 0) {  // added by Vladimir 'phcoder' Serbinenko:
          // This is an external
          sym.st_type = STT_NOTYPE;
-      }		  
+      }
       else {
          // This is a data definition record
          if (NewSectionHeaders[NewSectionIndex].sh_flags & SHF_EXECINSTR) {
@@ -617,7 +617,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeRelocationTables(MAC_header_32&)
                      }
                      // Scattered, self-relative, vanilla
                      // Note: I have never seen this relocation method, so I have not
-                     // been able to test it. I don't know for sure how it works and 
+                     // been able to test it. I don't know for sure how it works and
                      // the documentation is poor.
                      SourceAddress = SectAddr + scatp->r_address;
 
@@ -652,7 +652,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeRelocationTables(MAC_header_32&)
                   else if (scatp->r_type == MAC32_RELOC_SECTDIFF || scatp->r_type == MAC32_RELOC_LOCAL_SECTDIFF) {
                      // relative to arbitrary reference point
                      // check that next record is MAC32_RELOC_PAIR
-                     if (oldr == sectp->nreloc || (scatp+1)->r_type != MAC32_RELOC_PAIR || scatp->r_length != 2) {                              
+                     if (oldr == sectp->nreloc || (scatp+1)->r_type != MAC32_RELOC_PAIR || scatp->r_length != 2) {
                         err.submit(2050); continue;
                      }
                      // Find target address and reference point
@@ -679,7 +679,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeRelocationTables(MAC_header_32&)
                      // Linker will add (target section) - (source full address) to *inlinep, which gives
                      // (target full address) - (reference point full address)
                      // Advance pointers because we have used two records
-                     oldr++; relp++; 
+                     oldr++; relp++;
                   }
                   else if (scatp->r_type == MAC32_RELOC_PB_LA_PTR) {
                      // procedure linkage table. Not supported
@@ -709,7 +709,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeRelocationTables(MAC_header_32&)
                      }
                      NewRelocEntry.r_sym = NewSymbolIndex[symold];
                      if (relp->r_pcrel) {
-                        // Self-relative. 
+                        // Self-relative.
                         // Inline contains -(source address)
                         // Add (source address) to compensate
                         *inlinep += int32(SectAddr + relp->r_address);
@@ -728,7 +728,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeRelocationTables(MAC_header_32&)
                         err.submit(2031); continue; // refers to non-program section
                      }
                      if (relp->r_pcrel) {
-                        // Self-relative. 
+                        // Self-relative.
                         // Inline contains (target address)-(source address)
                         // Subtract this to compensate
 
@@ -885,7 +885,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeRelocationTables(MAC_header_64&)
                      TargetSection = NewSectIndex[symold];
                      NewRelocEntry.r_sym = SectionSymbols[TargetSection];
                      if (relp->r_pcrel) {
-                        // Self-relative. 
+                        // Self-relative.
                         // Inline contains (target address)-(source address)
                         // Subtract this to compensate
                         // Target section address
@@ -927,7 +927,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeRelocationTables(MAC_header_64&)
                      // relative to arbitrary reference point
                      // must be followed by a X86_64_RELOC_UNSIGNED
                      // check that next record is MAC64_RELOC_UNSIGNED
-                     if (oldr == sectp->nreloc || (relp+1)->r_type != MAC64_RELOC_UNSIGNED) {                              
+                     if (oldr == sectp->nreloc || (relp+1)->r_type != MAC64_RELOC_UNSIGNED) {
                         err.submit(2050); continue;
                      }
                      // Reference symbol
@@ -957,7 +957,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeRelocationTables(MAC_header_64&)
                         // use 32-bit self-relative and hope there is no carry
                         err.submit(1302); // Warn. This will fail if inline value changes sign
                      }
-                     else {                              
+                     else {
                         err.submit(2044);  // wrong size
                      }
                      // self-relative type
@@ -968,7 +968,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeRelocationTables(MAC_header_64&)
                      break;
 
                   case MAC64_RELOC_GOT_LOAD: // a rip-relative load of a GOT entry
-                     *inlinep = -4;  
+                     *inlinep = -4;
                      // Continue into next case
                   case MAC64_RELOC_GOT:      // other GOT references
                      // Make fake GOT entry
@@ -1002,7 +1002,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeBinaryFile() {
 
    // Set file type in ToFile
    ToFile.SetFileType(FILETYPE_ELF);
-   
+
    // Make space for file header in ToFile, but don't fill data into it yet
    ToFile.Push(0, sizeof(TELF_Header));
 
@@ -1213,7 +1213,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::TranslateAddress(MInt addr, uint32 &
       }
    }
    // Not found
-   section = offset = 0; 
+   section = offset = 0;
 }
 
 template <class TMAC_header, class TMAC_segment_command, class TMAC_section, class TMAC_nlist, class MInt,
@@ -1226,7 +1226,7 @@ uint32 CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeGOTEntry(int symbol) {
 
    // Get symbol for start of GOT
    FakeGOTSymbol = SectionSymbols[FakeGOTSection];
-   
+
    // Search for symbol in previous entries
    for (symi = 0; symi < NumGOTEntries; symi++) {
       if (GOTSymbols[symi] == symbol) break;
@@ -1247,7 +1247,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeGOT() {
    if (!HasGOT) return;
 
    uint32 NumEntries = GOTSymbols.GetNumEntries();
-   NewSections[FakeGOTSection].Push(0, NumEntries*(WordSize/8)); 
+   NewSections[FakeGOTSection].Push(0, NumEntries*(WordSize/8));
 
    // Make relocations for GOT
    Elf64_Rela NewRelocEntry;

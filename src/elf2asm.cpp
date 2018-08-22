@@ -54,7 +54,7 @@ void CELF2ASM<ELFSTRUCTURES>::FindImageBase() {
    }
    // Failure. Cannot compute image base from any of the sections
    ImageBase = 0;
-   return;    
+   return;
 }
 
 
@@ -188,7 +188,7 @@ void CELF2ASM<ELFSTRUCTURES>::MakeSymbolList() {
 
             // Symbol number in joined table = symi1 + number of symbols in preceding tables
             symi2 = SymbolTableOffset[sc] + symi1;
-            
+
             // Copy 32 bit symbol table entry or convert 64 bit entry
             TELF_Symbol sym = *(TELF_Symbol*)symtab;
 
@@ -223,10 +223,10 @@ void CELF2ASM<ELFSTRUCTURES>::MakeSymbolList() {
             if (*(strtab + sym.st_name)) {
                Name = strtab + sym.st_name;
             }
-            
+
             // Get import .so name
             const char * DLLName = 0;
-            if (sheader.sh_type==SHT_DYNSYM && sym.st_value == 0 
+            if (sheader.sh_type==SHT_DYNSYM && sym.st_value == 0
             && sym.st_shndx == 0 && sym.st_size > 0) {
                // I don't know how to find out which .so the symbol is imported from
                // It must be something in the .dynamic section.
@@ -263,10 +263,10 @@ void CELF2ASM<ELFSTRUCTURES>::MakeSymbolList() {
                // Probably a data object
                switch (Size) {
                case 1:
-                  Type = 1; 
+                  Type = 1;
                   break;
                case 2:
-                  Type = 2; 
+                  Type = 2;
                   break;
                case 4:
                   Type = 3;
@@ -295,7 +295,7 @@ void CELF2ASM<ELFSTRUCTURES>::MakeSymbolList() {
             else if (sym.st_type == STT_FILE) {
                // file name. ignore
                continue;
-            }            
+            }
             else {
                // unknown type. warning
                err.submit(1062, Name);
@@ -308,15 +308,15 @@ void CELF2ASM<ELFSTRUCTURES>::MakeSymbolList() {
                // Check if offset is absolute or section relative
                if (ExeType && Offset >= (uint32)ImageBase) {
                   // Offset is absolute address
-                  if (Section >= 0 
-                     && (uint32)Section < this->NSections 
+                  if (Section >= 0
+                     && (uint32)Section < this->NSections
                      && Offset >= (uint32)this->SectionHeaders[Section].sh_addr
                      && Offset - (uint32)this->SectionHeaders[Section].sh_addr < (uint32)(this->SectionHeaders[Section].sh_size)) {
                         // Change to section relative offset
                         Offset -= (uint32)(this->SectionHeaders[Section].sh_addr);
                      }
                   else {
-                     // Address is outside specified section or otherwise inconsistent. 
+                     // Address is outside specified section or otherwise inconsistent.
                      // Let Disasm try to find the address
                      Section = ASM_SEGMENT_IMGREL;
                      Offset -= (uint32)ImageBase;
@@ -351,7 +351,7 @@ void CELF2ASM<ELFSTRUCTURES>::MakeRelocations() {
          // Relocations section
          int8 * reltab = this->Buf() + uint32(sheader.sh_offset);
          int8 * reltabend = reltab + uint32(sheader.sh_size);
-         int expectedentrysize = sheader.sh_type == SHT_RELA ? 
+         int expectedentrysize = sheader.sh_type == SHT_RELA ?
             sizeof(TELF_Relocation) :              // Elf32_Rela, Elf64_Rela
             sizeof(TELF_Relocation) - this->WordSize/8;  // Elf32_Rel,  Elf64_Rel
          if (entrysize < expectedentrysize) {err.submit(2033); entrysize = expectedentrysize;}
@@ -376,7 +376,7 @@ void CELF2ASM<ELFSTRUCTURES>::MakeRelocations() {
             }
 
             // Find section
-            if (sheader.sh_info < this->NSections) {            
+            if (sheader.sh_info < this->NSections) {
                Section = SectionNumberTranslate[sheader.sh_info];
             }
             else {
@@ -415,7 +415,7 @@ void CELF2ASM<ELFSTRUCTURES>::MakeRelocations() {
                   // Reference to Gnu indirect function
                   Type = 0x81;  Size = 4;
                   break;
-               case R_386_GLOB_DAT: 
+               case R_386_GLOB_DAT:
                case R_386_GOT32:
                case R_386_GOTOFF:
                   // Create GOT entry
@@ -432,7 +432,7 @@ void CELF2ASM<ELFSTRUCTURES>::MakeRelocations() {
                case R_X86_64_JUMP_SLOT: // Create PLT entry
                   Type = 0x41;  Size = 8;
                   break;
-               case R_X86_64_64: 
+               case R_X86_64_64:
                   // Direct 64 bit
                   Type = 1;  Size = 8;
                   break;
@@ -481,7 +481,7 @@ void CELF2ASM<ELFSTRUCTURES>::MakeRelocations() {
             // Check if offset is absolute or section relative
             if (ImageBase && Offset > (uint32)ImageBase) {
                // Offset is absolute address
-               if (Section > 0 && (uint32)Section < this->NSections 
+               if (Section > 0 && (uint32)Section < this->NSections
                && Offset >= (uint32)(this->SectionHeaders[Section].sh_addr)
                && Offset - (uint32)(this->SectionHeaders[Section].sh_addr) < (uint32)(this->SectionHeaders[Section].sh_size)) {
                   // Change to section relative offset

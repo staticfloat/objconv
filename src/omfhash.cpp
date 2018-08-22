@@ -75,7 +75,7 @@ void COMFHashTable::MakeHash(int8 * name) {
 
 
 int  COMFHashTable::FindString(uint32 & ModulePage, uint32 & Conflicts) {
-   // Search for String. 
+   // Search for String.
    // Returns number of occurrences of String
    // Module receives the module page for the first occurrence
    // Conflicts receives the number of conflicting entries encountered before the match
@@ -108,7 +108,7 @@ int  COMFHashTable::FindString(uint32 & ModulePage, uint32 & Conflicts) {
                // here in order to allow all buckets in the next block
                // to be tried, but the official algorithm doesn't seem
                // to do so!?
-               // StartBucket = Bucket; 
+               // StartBucket = Bucket;
 
                break;
             }
@@ -143,7 +143,7 @@ int COMFHashTable::InsertString(uint16 & ModulePage) {
    // Parameter:
    // ModulePage = module address / page size
    // Return value:
-   // 0 if success, 
+   // 0 if success,
    // 1 if identical string allready exists in the table. New string will not be entered.
    //   ModulePage will receive the module page of the existing string in this case.
    // 2 if table is full,
@@ -177,7 +177,7 @@ int COMFHashTable::InsertString(uint16 & ModulePage) {
                // here in order to allow all buckets in the next block
                // to be tried, but the official algorithm doesn't seem
                // to do so!?
-               // StartBucket = Bucket; 
+               // StartBucket = Bucket;
                break;
             }
             // Enough space found. Enter string in bucket
@@ -212,7 +212,7 @@ int COMFHashTable::InsertString(uint16 & ModulePage) {
          Bucket = (Bucket + BucketD) % OMFNumBuckets;
       } while (Bucket != StartBucket);
 
-      // If we got here, we have found no empty bucket in the block or 
+      // If we got here, we have found no empty bucket in the block or
       // there was not enough string space in the block.
       // We need to mark the block as full to tell the linker to
       // continue in next block when searching for this string
@@ -287,7 +287,7 @@ static const uint32 PrimeNumbers[] = {
 static const uint32 PrimeNumbersLen = sizeof(PrimeNumbers)/sizeof(PrimeNumbers[0]);
 
 
-void COMFHashTable::MakeHashTable(CSList<SStringEntry> & StringEntries, 
+void COMFHashTable::MakeHashTable(CSList<SStringEntry> & StringEntries,
 CMemoryBuffer & StringBuffer, CMemoryBuffer & OutFile, CLibrary * Library) {
    // Make hash table. Parameters:
    // StringEntries[].String = name of each public symbol as offset into StringBuffer

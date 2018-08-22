@@ -17,7 +17,7 @@
 * compilers. All structures should be compiled without any alignment padding.
 * The specification of structure packing is not standardized among compilers.
 * You may remove or replace the #pragma pack directives if you make sure that
-* you never use the sizeof() operator or pointer arithmetics on any of the 
+* you never use the sizeof() operator or pointer arithmetics on any of the
 * structures that need packing. See coff.cpp for examples.
 *****************************************************************************/
 
@@ -29,9 +29,9 @@
 struct SCOFF_FileHeader {
  uint16 Machine;              // Machine ID (magic number)
  uint16 NumberOfSections;     // number of sections
- uint32 TimeDateStamp;        // time & date stamp 
+ uint32 TimeDateStamp;        // time & date stamp
  uint32 PSymbolTable;         // file pointer to symbol table
- uint32 NumberOfSymbols;      // number of symbol table entries 
+ uint32 NumberOfSymbols;      // number of symbol table entries
  uint16 SizeOfOptionalHeader; // size of optional header
  uint16 Flags;                // Flags indicating attributes
 };
@@ -234,7 +234,7 @@ struct SCOFF_SectionHeader {
  uint32  PLineNumbers;   // file  to line number entries
  uint16  NRelocations;   // number of relocation entries
  uint16  NLineNumbers;   // number of line number entries
- uint32  Flags;          // flags   
+ uint32  Flags;          // flags
 };
 
 // Section flags values
@@ -268,7 +268,7 @@ struct SCOFF_SectionHeader {
 #define PE_SCN_MEM_READ         0x40000000  // section is readable
 #define PE_SCN_MEM_WRITE        0x80000000  // section is writeable
 
-/* names of "special" sections 
+/* names of "special" sections
 #define _TEXT ".text"
 #define _DATA ".data"
 #define _BSS ".bss"
@@ -336,8 +336,8 @@ union SCOFF_SymTableEntry {
    struct {
       uint32 TagIndex; // Symbol table index of alternative symbol2
       uint32 Characteristics; //
-      uint32 Unused1; 
-      uint32 Unused2; 
+      uint32 Unused1;
+      uint32 Unused2;
       uint16 Unused3;      // Unused
    } weak;
 
@@ -382,7 +382,7 @@ union SCOFF_SymTableEntry {
 //#pragma pack(pop)
 
 /********************** Section number values for symbol table entries **********************/
-    
+
 #define COFF_SECTION_UNDEF ((int16)0)      // external symbol
 #define COFF_SECTION_ABSOLUTE ((int16)-1)  // value of symbol is absolute
 #define COFF_SECTION_DEBUG ((int16)-2)     // debugging symbol - value is meaningless
@@ -394,30 +394,30 @@ union SCOFF_SymTableEntry {
  * Type of a symbol, in low N bits of the word
 
 #define T_NULL  0
-#define T_VOID  1 // function argument (only used by compiler) 
-#define T_CHAR  2 // character  
-#define T_SHORT  3 // short integer 
-#define T_INT  4 // integer  
-#define T_LONG  5 // long integer  
-#define T_FLOAT  6 // floating point 
-#define T_DOUBLE 7 // double word  
-#define T_STRUCT 8 // structure   
-#define T_UNION  9 // union   
-#define T_ENUM  10 // enumeration   
+#define T_VOID  1 // function argument (only used by compiler)
+#define T_CHAR  2 // character
+#define T_SHORT  3 // short integer
+#define T_INT  4 // integer
+#define T_LONG  5 // long integer
+#define T_FLOAT  6 // floating point
+#define T_DOUBLE 7 // double word
+#define T_STRUCT 8 // structure
+#define T_UNION  9 // union
+#define T_ENUM  10 // enumeration
 #define T_MOE  11 // member of enumeration
-#define T_UCHAR  12 // unsigned character 
-#define T_USHORT 13 // uint16 
-#define T_UINT  14 // unsigned integer 
-#define T_ULONG  15 // uint32 
-#define T_LNGDBL 16 // long double  
+#define T_UCHAR  12 // unsigned character
+#define T_USHORT 13 // uint16
+#define T_UINT  14 // unsigned integer
+#define T_ULONG  15 // uint32
+#define T_LNGDBL 16 // long double
  */
 /*
  * derived types, in n_type
 
-#define DT_NON  (0) // no derived type 
-#define DT_PTR  (1) // pointer 
- #define DT_FCN  (2) // function 
-#define DT_ARY  (3) // array 
+#define DT_NON  (0) // no derived type
+#define DT_PTR  (1) // pointer
+ #define DT_FCN  (2) // function
+#define DT_ARY  (3) // array
 
 #define BTYPE(x) ((x) & N_BTMASK)
 
@@ -431,35 +431,35 @@ union SCOFF_SymTableEntry {
 
 #define COFF_CLASS_NULL                    0
 #define COFF_CLASS_AUTOMATIC               1 // automatic variable
-#define COFF_CLASS_EXTERNAL                2 // external symbol 
+#define COFF_CLASS_EXTERNAL                2 // external symbol
 #define COFF_CLASS_STATIC                  3 // static
 #define COFF_CLASS_REGISTER                4 // register variable
-#define COFF_CLASS_EXTERNAL_DEF            5 // external definition 
+#define COFF_CLASS_EXTERNAL_DEF            5 // external definition
 #define COFF_CLASS_LABEL                   6 // label
 #define COFF_CLASS_UNDEFINED_LABEL         7 // undefined label
 #define COFF_CLASS_MEMBER_OF_STRUCTURE     8 // member of structure
 #define COFF_CLASS_ARGUMENT                9 // function argument
-#define COFF_CLASS_STRUCTURE_TAG          10 // structure tag 
-#define COFF_CLASS_MEMBER_OF_UNION        11 // member of union 
-#define COFF_CLASS_UNION_TAG              12 // union tag 
+#define COFF_CLASS_STRUCTURE_TAG          10 // structure tag
+#define COFF_CLASS_MEMBER_OF_UNION        11 // member of union
+#define COFF_CLASS_UNION_TAG              12 // union tag
 #define COFF_CLASS_TYPE_DEFINITION        13 // type definition
-#define COFF_CLASS_UNDEFINED_STATIC       14 // undefined static 
-#define COFF_CLASS_ENUM_TAG               15 // enumeration tag 
+#define COFF_CLASS_UNDEFINED_STATIC       14 // undefined static
+#define COFF_CLASS_ENUM_TAG               15 // enumeration tag
 #define COFF_CLASS_MEMBER_OF_ENUM         16 // member of enumeration
 #define COFF_CLASS_REGISTER_PARAM         17 // register parameter
-#define COFF_CLASS_BIT_FIELD              18 // bit field  
-#define COFF_CLASS_AUTO_ARGUMENT          19 // auto argument 
+#define COFF_CLASS_BIT_FIELD              18 // bit field
+#define COFF_CLASS_AUTO_ARGUMENT          19 // auto argument
 #define COFF_CLASS_LASTENTRY              20 // dummy entry (end of block)
-#define COFF_CLASS_BLOCK                 100 // ".bb" or ".eb" 
-#define COFF_CLASS_FUNCTION              101 // ".bf" or ".ef" 
-#define COFF_CLASS_END_OF_STRUCT         102 // end of structure 
-#define COFF_CLASS_FILE                  103 // file name  
-#define COFF_CLASS_LINE                  104 // line # reformatted as symbol table entry 
+#define COFF_CLASS_BLOCK                 100 // ".bb" or ".eb"
+#define COFF_CLASS_FUNCTION              101 // ".bf" or ".ef"
+#define COFF_CLASS_END_OF_STRUCT         102 // end of structure
+#define COFF_CLASS_FILE                  103 // file name
+#define COFF_CLASS_LINE                  104 // line # reformatted as symbol table entry
 #define COFF_CLASS_SECTION               104 // line # reformatted as symbol table entry
-#define COFF_CLASS_ALIAS                 105 // duplicate tag 
-#define COFF_CLASS_WEAK_EXTERNAL         105 // duplicate tag  
-#define COFF_CLASS_HIDDEN                106 // ext symbol in dmert public lib 
-#define COFF_CLASS_END_OF_FUNCTION      0xff // physical end of function 
+#define COFF_CLASS_ALIAS                 105 // duplicate tag
+#define COFF_CLASS_WEAK_EXTERNAL         105 // duplicate tag
+#define COFF_CLASS_HIDDEN                106 // ext symbol in dmert public lib
+#define COFF_CLASS_END_OF_FUNCTION      0xff // physical end of function
 
 /********************** Type for symbol table entries **********************/
 #define COFF_TYPE_FUNCTION              0x20 // Symbol is function
@@ -494,7 +494,7 @@ struct SCOFF_Relocation {
 
 /********************** Relocation types for 64-bit COFF **********************/
 // Note: These values are obtained by my own testing.
-// I haven't found any official values 
+// I haven't found any official values
 
 #define COFF64_RELOC_ABS         0x00   // Ignored
 #define COFF64_RELOC_ABS64       0x01   // 64 bit absolute virtual address

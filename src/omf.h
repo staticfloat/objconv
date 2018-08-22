@@ -5,14 +5,14 @@
 * Project:       objconv
 * Module:        omf.h
 * Description:
-* Header file for definition of data structures and constants in OMF object 
+* Header file for definition of data structures and constants in OMF object
 * file format. Also defines class COMFFileBuilder.
 *
 * Copyright 2006-2008 GNU General Public License http://www.gnu.org/licenses
 ******************************************************************************
 *
 * An OMF file consists of a chain of records which all have the same basic
-* structure: 
+* structure:
 * 1. One byte describing the type of record
 * 2. A 16-bit word indicating the length of the rest of the record
 * 3. Data of variable types and sizes (max 1024 bytes)
@@ -30,18 +30,18 @@
 * subsequent fields variable.
 *
 * For these reasons, you will not find any structures defining OMF records
-* in this header file. Only the bitfields that are used are defined here. 
-* Instead, I have defined the member functions of SOMFRecordPointer for 
+* in this header file. Only the bitfields that are used are defined here.
+* Instead, I have defined the member functions of SOMFRecordPointer for
 * reading fields of various types occurring in OMF records, and the member
-* functions of COMFFileBuilder for writing these fields. The structure of 
-* an OMF record is simply defined by calling these functions in the right 
+* functions of COMFFileBuilder for writing these fields. The structure of
+* an OMF record is simply defined by calling these functions in the right
 * order.
 *
 * The size of the data field is limited to 1024 bytes because records of type
 * FIXUPP have only 10 bits for indexing into the data field of a preceding
 * record of type LEDATA or LIDATA. Most tools (but not all!) limit the size
 * of all types of records to 1024 bytes of data, although this limitation
-* is technically necessary only for LEDATA and LIDATA records. A segment 
+* is technically necessary only for LEDATA and LIDATA records. A segment
 * bigger than one kilobyte must be split into several LEDATA records. Each
 * LEDATA record is followed by a FIXUPP record if it has relocations.
 *
@@ -101,7 +101,7 @@
 #define OMF_Fixup_32bitLoader 13  // 32 bit, loader resolved
 
 // Define fixed indexes in LNAMES for default group and class names
-#define OMF_LNAME_FLAT         1  // Default group name 
+#define OMF_LNAME_FLAT         1  // Default group name
 #define OMF_LNAME_CODE         2  // Default class for code
 #define OMF_LNAME_DATA         3  // Default class for data
 #define OMF_LNAME_BSS          4  // Default class for uninitialized data
@@ -235,7 +235,7 @@ public:
    uint32 SourceOffset;                // Offset of source relative to section
    int32  Mode;                        // 0 = EIP-relative, 1 = direct, -1 = unsupported
    uint32 Scope;                       // 0 = local, 2 = external
-   uint32 TargetSegment;               // Segment index or EXTDEF index of target in new file 
+   uint32 TargetSegment;               // Segment index or EXTDEF index of target in new file
    uint32 TargetOffset;                // Offset relative to segment in new file of target
    int operator < (SOMFRelocation const & x) const {// operator < for sorting by CSList::Sort()
       return Section < x.Section || (Section == x.Section && SourceOffset < x.SourceOffset);

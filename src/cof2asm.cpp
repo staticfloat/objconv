@@ -78,7 +78,7 @@ void CCOF2ASM::MakeSectionList() {
       // Save section record
       Disasm.AddSection(Buffer, InitSize, TotalSize, SectionAddress, Type, Align, WordSize, Name);
 
-      // Get relocations 
+      // Get relocations
       // Pointer to relocation entry
       union {
          SCOFF_Relocation * p;  // pointer to record
@@ -189,7 +189,7 @@ void CCOF2ASM::MakeSymbolList() {
       naux = Sym.p->s.NumAuxSymbols;
 
       if (Sym.p->s.SectionNumber != COFF_SECTION_ABSOLUTE
-      && (Sym.p->s.SectionNumber < 0 
+      && (Sym.p->s.SectionNumber < 0
       || (Sym.p->s.StorageClass != COFF_CLASS_EXTERNAL && Sym.p->s.StorageClass != COFF_CLASS_STATIC && Sym.p->s.StorageClass != COFF_CLASS_LABEL))) {
          // Ignore irrelevant symbol table entries
          continue;
@@ -203,9 +203,9 @@ void CCOF2ASM::MakeSymbolList() {
       uint32 Type    = (Sym.p->s.Type == COFF_TYPE_FUNCTION) ? 0x83 : 0;
 
       // Identify segment entries in symbol table
-      if (Sym.p->s.Value == 0 && Sym.p->s.StorageClass == COFF_CLASS_STATIC 
+      if (Sym.p->s.Value == 0 && Sym.p->s.StorageClass == COFF_CLASS_STATIC
       && naux && Sym.p->s.Type != 0x20) {
-         // Note: The official MS specification says that a symbol table entry 
+         // Note: The official MS specification says that a symbol table entry
          // is a section if the storage class is static and the value is 0,
          // but I have encountered static functions that meet these criteria.
          // Therefore, I am also checking Type and naux.
@@ -251,7 +251,7 @@ void CCOF2ASM::MakeSymbolList() {
 
 void CCOF2ASM::MakeDynamicRelocations() {
    // Make dynamic base relocations for executable files
-   
+
    // Find base relocation table
    SCOFF_ImageDirAddress reldir;
    if (!GetImageDir(5, &reldir)) {
@@ -444,6 +444,9 @@ void CCOF2ASM::MakeExportList() {
    uint32 * pExportAddressTable = &Get<uint32>(expdir.FileOffset + ExportAddressTableOffset);
 
    // Find ExportNameTable
+   if (pExportDirectory->NamePointerTableRVA == 0) {
+       return;  // I don't know why this happens
+   }
    uint32 ExportNameTableOffset = pExportDirectory->NamePointerTableRVA - expdir.VirtualAddress;
    if (ExportNameTableOffset == 0 || ExportNameTableOffset >= expdir.MaxOffset) {
       // Points outside section

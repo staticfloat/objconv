@@ -12,14 +12,14 @@
 
 #include "stdafx.h"
 
-template <class TELF_Header, class TELF_SectionHeader, class TELF_Symbol, class TELF_Relocation, 
+template <class TELF_Header, class TELF_SectionHeader, class TELF_Symbol, class TELF_Relocation,
           class TMAC_header, class TMAC_segment_command, class TMAC_section, class TMAC_nlist, class MInt>
    CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::CELF2MAC() {
    // Constructor
       memset(this, 0, sizeof(*this));                   // Reset everything
 }
 
-template <class TELF_Header, class TELF_SectionHeader, class TELF_Symbol, class TELF_Relocation, 
+template <class TELF_Header, class TELF_SectionHeader, class TELF_Symbol, class TELF_Relocation,
           class TMAC_header, class TMAC_segment_command, class TMAC_section, class TMAC_nlist, class MInt>
    void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Convert() {
    // Do the conversion
@@ -62,9 +62,9 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSectionsIndex() {
    // Make sections index translation table and section offset table.
 
    // We must make these tables before the sections, because they are needed for the
-   // symbol tables and relocation tables, and we must make the symbol tables before 
+   // symbol tables and relocation tables, and we must make the symbol tables before
    // the relocation tables, and we must make the relocation tables together with the
-   // sections. 
+   // sections.
    uint32 oldsec;                         // Section number in old file
    uint32 newsec = 0;                     // Section number in new file
    NewSectIndex. SetNum(this->NSections); // Allocate size for section index table
@@ -111,7 +111,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSectionsIndex() {
       }
 
       // Search for program data sections only
-      if (this->SectionHeaders[oldsec].sh_type != SHT_PROGBITS 
+      if (this->SectionHeaders[oldsec].sh_type != SHT_PROGBITS
       &&  this->SectionHeaders[oldsec].sh_type != SHT_NOBITS) {
          // Has no data. Ignore
          continue;
@@ -126,7 +126,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSectionsIndex() {
       // Section index translation table
       NewSectIndex[oldsec] = newsec++;
 
-      // Calculate virtual memory address of section. This address does not have 
+      // Calculate virtual memory address of section. This address does not have
       // much to do with the final address, but it is needed in relocation entries.
 
       // Alignment
@@ -151,10 +151,10 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSectionsIndex() {
    NumSectionsNew = newsec;
 
    // Calculate file offset of first raw data
-   RawDataOffset = sizeof(TMAC_header) 
-      + sizeof(TMAC_segment_command) 
+   RawDataOffset = sizeof(TMAC_header)
+      + sizeof(TMAC_segment_command)
       + NumSectionsNew * sizeof(TMAC_section)
-      + sizeof(MAC_symtab_command) 
+      + sizeof(MAC_symtab_command)
       + sizeof(MAC_dysymtab_command);
 
    // Align end of memory address by 4
@@ -195,13 +195,13 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSymbolTable() {
    int NewType;                    // New symbol type
    int NewDesc;                    // New symbol reference type
    MInt Value;                     // Symbol value
-   uint32 Scope;                   // 0: Local, 1: Public, 2: External 
+   uint32 Scope;                   // 0: Local, 1: Public, 2: External
 
    // Loop through old sections to find symbol table
    for (oldsec = 0; oldsec < this->NSections; oldsec++) {
 
       // Search for program data sections only
-      if (this->SectionHeaders[oldsec].sh_type == SHT_SYMTAB 
+      if (this->SectionHeaders[oldsec].sh_type == SHT_SYMTAB
       ||  this->SectionHeaders[oldsec].sh_type == SHT_DYNSYM) {
          FoundSymTab++;
 
@@ -234,7 +234,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSymbolTable() {
 
             // Copy 32 bit symbol table entry or convert 64 bit entry
             OldSym = *(TELF_Symbol*)symtab;
- 
+
             // Old symbol type
             int type = OldSym.st_type;
 
@@ -257,7 +257,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSymbolTable() {
                int os = UnnamedSymbolsTable.PushString(tempbuf);
                symname = UnnamedSymbolsTable.Buf() + os;
             }
-            
+
             NewType = NewDesc = 0; // New symbol type
 
             // Value = address
@@ -270,19 +270,19 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSymbolTable() {
             else if ((int16)(OldSym.st_shndx) == SHN_ABS) {
                NewType |= MAC_N_ABS; // Absolute symbol
                NewDesc |= MAC_N_NO_DEAD_STRIP;
-               NewSection = 0; 
+               NewSection = 0;
             }
             else if ((int16)(OldSym.st_shndx) == SHN_COMMON) {
                NewType |= MAC_N_ABS; // Common symbol. Translate to abs and make warning
                NewDesc |= MAC_N_NO_DEAD_STRIP;
-               NewSection = 0; 
+               NewSection = 0;
                err.submit(1053, symname); // Warning. Common symbol
-            }            
+            }
             else if (OldSym.st_shndx >= this->NSections) {
                err.submit(2036, OldSym.st_shndx); // Special/unknown section index or out of range
             }
             else {
-               // Normal section index. 
+               // Normal section index.
                // Look up in section index translation table and add 1 because it is 1-based
                NewSection = NewSectIndex[OldSym.st_shndx] + 1;
                // Value must be absolute address. Add section address
@@ -348,7 +348,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSymbolTable() {
                // Function
                break;
 
-            case STT_FILE: 
+            case STT_FILE:
                // File name record. Ignore
                continue;
 
@@ -464,12 +464,12 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf32_Shdr & OldR
       int newindex = NewSymTab[Scope].TranslateIndex(OldRelocation.r_sym);
       if (newindex < 0) {
          // Symbol not found or wrong type
-         err.submit(2031); 
+         err.submit(2031);
          break;
       }
       if (r_extern) {
          // r_symbolnum is zero based index into combined symbol tables.
-         // Add number of entries in preceding NewSymTab tables to index 
+         // Add number of entries in preceding NewSymTab tables to index
          // into NewSymTab[Scope]
          r_symbolnum = newindex + NumSymbols[Scope];
       }
@@ -490,11 +490,11 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf32_Shdr & OldR
          err.submit(1063); // Warning: Gnu indirect function cannot be converted
          // continue in next case?:
       case R_386_32:       // 32-bit absolute virtual address
-         r_type  = MAC32_RELOC_VANILLA;  
+         r_type  = MAC32_RELOC_VANILLA;
          break;
 
       case R_386_PC32:   // 32-bit self-relative
-         r_type  = MAC32_RELOC_VANILLA;  
+         r_type  = MAC32_RELOC_VANILLA;
          r_pcrel = 1;
          // Mach-O 32 bit format requires that self-relative addresses must have
          // self-relative values already before relocation. Therefore
@@ -503,8 +503,8 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf32_Shdr & OldR
          // of source + 4, but ELF files have the same offset so no further
          // correction is needed when converting from ELF file).
 
-         // !! ToDo: Self-relative relocations plus offset to local symbol in a different section 
-         // sometimes causes problems in Mac linker, perhaps because it fails to determine 
+         // !! ToDo: Self-relative relocations plus offset to local symbol in a different section
+         // sometimes causes problems in Mac linker, perhaps because it fails to determine
          // correctly which section the target is in. Use a relocation with a reference point
          // instead. This probably occurs only in assembler-coded self-relative 32-bit code.
          // (Use asmlib A_strtoupper and A_strcspn as test cases - they fail if dummy data
@@ -539,7 +539,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf32_Shdr & OldR
          r_type = 0;
          break;
 
-      case R_386_PLT32: case R_386_JMP_SLOT: 
+      case R_386_PLT32: case R_386_JMP_SLOT:
          // procedure linkage table
          err.submit(2043);     // cannot convert import table
          err.ClearError(2043); // report this error only once
@@ -547,14 +547,14 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf32_Shdr & OldR
          break;
 
       default:      // Unknown or unsupported relocation method
-         err.submit(2030, OldRelocation.r_type); 
+         err.submit(2030, OldRelocation.r_type);
          r_type = 0;  break;
       }
 
       if (!r_pcrel) {
-         // Warn for position dependent code. 
+         // Warn for position dependent code.
          // This warning is currently turned off in error.cpp.
-         err.submit(1050, this->SymbolName(OldRelocation.r_sym)); 
+         err.submit(1050, this->SymbolName(OldRelocation.r_sym));
          // Write this error only once
          err.ClearError(1050);
       }
@@ -564,12 +564,12 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf32_Shdr & OldR
       memset(&rel, 0, sizeof(rel));
 
       // Make non-scattered relocation entry
-      rel.r_address   = r_address; 
-      rel.r_symbolnum = r_symbolnum; 
-      rel.r_pcrel     = r_pcrel; 
-      rel.r_length    = r_length; 
-      rel.r_extern    = r_extern; 
-      rel.r_type      = r_type; 
+      rel.r_address   = r_address;
+      rel.r_symbolnum = r_symbolnum;
+      rel.r_pcrel     = r_pcrel;
+      rel.r_length    = r_length;
+      rel.r_extern    = r_extern;
+      rel.r_type      = r_type;
 
       // Store relocation entry
       NewRelocationTab.Push(&rel, sizeof(rel));
@@ -667,7 +667,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf64_Shdr & OldR
          break;
 
       case S_EXTERNAL:  // External target is always referenced by index
-         r_extern = 1;  
+         r_extern = 1;
          break;
       }
 
@@ -675,12 +675,12 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf64_Shdr & OldR
       int newindex = NewSymTab[Scope].TranslateIndex(OldRelocation.r_sym);
       if (newindex < 0) {
          // Symbol not found or wrong type
-         err.submit(2031); 
+         err.submit(2031);
          break;
       }
 
       // r_symbolnum is zero based index into combined symbol tables.
-      // Add number of entries in preceding NewSymTab tables to index 
+      // Add number of entries in preceding NewSymTab tables to index
       // into NewSymTab[Scope]
       r_symbolnum = newindex + NumSymbols[Scope];
 
@@ -689,7 +689,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf64_Shdr & OldR
       case R_X86_64_NONE:    // Ignored
          continue;
 
-      case R_X86_64_64:      
+      case R_X86_64_64:
          // 64-bit absolute virtual address
          r_type  = MAC64_RELOC_UNSIGNED;  r_length = 3;
          break;
@@ -709,29 +709,29 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf64_Shdr & OldR
          // Make subtractor relocation entry for image base
          relsub.r_address   = r_address;
          relsub.r_symbolnum = GetImagebaseSymbol();
-         relsub.r_length    = 2; 
-         relsub.r_extern    = 1; 
-         relsub.r_type      = MAC64_RELOC_SUBTRACTOR; 
+         relsub.r_length    = 2;
+         relsub.r_extern    = 1;
+         relsub.r_type      = MAC64_RELOC_SUBTRACTOR;
 
          NewRelocationTab.Push(&relsub, sizeof(relsub));
          NewHeader.nreloc++;
          // Add image base to compensate for subtracted image base
          *piaddend += cmd.ImageBase;
-         
+
          // Now we can add the address we really want:
-         r_type  = MAC64_RELOC_UNSIGNED;  
+         r_type  = MAC64_RELOC_UNSIGNED;
          r_length = 2;
-         
+
          // Warn that image base must be set to the specified value
          char ImageBaseHex[32];
          sprintf(ImageBaseHex, "%X", cmd.ImageBase); // write value as hexadecimal
          err.submit(1300, ImageBaseHex);  err.ClearError(1300);
-         break;}       
- 
+         break;}
+
       case R_X86_64_PC32:   // 32-bit self-relative
          r_type  = MAC64_RELOC_BRANCH;
          // MAC64_RELOC_SIGNED does the same, but the linker complains if external symbol
-         r_length = 2;  
+         r_length = 2;
          r_pcrel = 1;
          // Difference between EIP-relative and self-relative relocation = size of address field
          // Adjust inline addend for different relocation method:
@@ -743,22 +743,22 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf64_Shdr & OldR
          // Make subtractor relocation entry for image base
          relsub.r_address   = r_address;
          relsub.r_symbolnum = GetImagebaseSymbol();
-         relsub.r_length    = 2; 
-         relsub.r_extern    = 1; 
-         relsub.r_type      = MAC64_RELOC_SUBTRACTOR; 
+         relsub.r_length    = 2;
+         relsub.r_extern    = 1;
+         relsub.r_type      = MAC64_RELOC_SUBTRACTOR;
 
          NewRelocationTab.Push(&relsub, sizeof(relsub));
          NewHeader.nreloc++;
-         
+
          // Second record adds the target address
-         r_type  = MAC64_RELOC_UNSIGNED;  
+         r_type  = MAC64_RELOC_UNSIGNED;
          r_length = 2;
          break;
 
       case R_X86_64_GLOB_DAT: case R_X86_64_GOTPCREL:
          // Create 64-bit GOT entry??
          r_type  = MAC64_RELOC_GOT;  r_length = 2;
-         break;         
+         break;
 
       case R_X86_64_GOT32:
          // 32-bit GOT entry
@@ -767,7 +767,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf64_Shdr & OldR
          r_type = 0;
          break;
 
-      case R_X86_64_PLT32: case R_X86_64_JUMP_SLOT: 
+      case R_X86_64_PLT32: case R_X86_64_JUMP_SLOT:
          // procedure linkage table
          err.submit(2043);     // cannot convert import table
          err.ClearError(2043); // report this error only once
@@ -776,7 +776,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf64_Shdr & OldR
 
       case R_X86_64_COPY: case R_X86_64_RELATIVE:
       default:      // Unknown or unsupported relocation method
-         err.submit(2030, OldRelocation.r_type); 
+         err.submit(2030, OldRelocation.r_type);
          r_type = 0;  break;
       }
 
@@ -785,12 +785,12 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf64_Shdr & OldR
       memset(&rel, 0, sizeof(rel));
 
       // Make non-scattered relocation entry
-      rel.r_address   = r_address; 
-      rel.r_symbolnum = r_symbolnum; 
-      rel.r_pcrel     = r_pcrel; 
-      rel.r_length    = r_length; 
-      rel.r_extern    = r_extern; 
-      rel.r_type      = r_type; 
+      rel.r_address   = r_address;
+      rel.r_symbolnum = r_symbolnum;
+      rel.r_pcrel     = r_pcrel;
+      rel.r_length    = r_length;
+      rel.r_extern    = r_extern;
+      rel.r_type      = r_type;
 
       // Store relocation entry
       NewRelocationTab.Push(&rel, sizeof(rel));
@@ -813,8 +813,8 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSections() {
    TELF_SectionHeader OldHeader;   // Old section header
    TELF_SectionHeader OldRelHeader;// Old relocation section header
    uint32 NewVirtualAddress = 0;   // Virtual address of new section
-   uint32 NewRawDataOffset = 0;    // Offset into NewRawData of section. 
-   // NewRawDataOffset is different from NewVirtualAddress if alignment of sections in 
+   uint32 NewRawDataOffset = 0;    // Offset into NewRawData of section.
+   // NewRawDataOffset is different from NewVirtualAddress if alignment of sections in
    // the object file is different from alignment of sections in memory
 
    // Count cumulative number of symbols in each scope
@@ -898,7 +898,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSections() {
 
          if (OldHeader.sh_size && OldHeader.sh_type != SHT_NOBITS) { // Not for .bss segment
             // Copy raw data
-            NewRawDataOffset = NewRawData.Push(this->Buf()+(uint32)OldHeader.sh_offset, (uint32)OldHeader.sh_size); 
+            NewRawDataOffset = NewRawData.Push(this->Buf()+(uint32)OldHeader.sh_offset, (uint32)OldHeader.sh_size);
             NewRawData.Align(4);
          }
 
@@ -918,16 +918,16 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSections() {
          // Align memory address
          NewVirtualAddress = (NewVirtualAddress + AlignBy - 1) & -AlignBy;
 
-         // Virtual memory address of new section 
-         NewHeader.addr = NewVirtualAddress; 
+         // Virtual memory address of new section
+         NewHeader.addr = NewVirtualAddress;
          NewVirtualAddress += (uint32)OldHeader.sh_size;
 
          // Find relocation table for this section by searching through all sections
          for (relsec = 1; relsec < this->NSections; relsec++) {
 
             // Get section header
-            OldRelHeader = this->SectionHeaders[relsec];            
-            
+            OldRelHeader = this->SectionHeaders[relsec];
+
             // Check if this is a relocations section referring to oldsec
             if ((OldRelHeader.sh_type == SHT_REL || OldRelHeader.sh_type == SHT_RELA) // if section is relocation
             && OldRelHeader.sh_info == oldsec) { // and if section refers to current section
@@ -974,7 +974,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::FindUnusedSymbols() {
          // Relocation list
          int8 * reltab = this->Buf() + uint32(this->SectionHeaders[sc].sh_offset);
          int8 * reltabend = reltab + uint32(this->SectionHeaders[sc].sh_size);
-         uint32 expectedentrysize = this->SectionHeaders[sc].sh_type == SHT_RELA ? 
+         uint32 expectedentrysize = this->SectionHeaders[sc].sh_type == SHT_RELA ?
             sizeof(TELF_Relocation) :              // Elf32_Rela, Elf64_Rela
             sizeof(TELF_Relocation) - this->WordSize/8;  // Elf32_Rel,  Elf64_Rel
          if (entrysize < expectedentrysize) {err.submit(2033); entrysize = expectedentrysize;}
@@ -982,7 +982,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::FindUnusedSymbols() {
          // Loop through entries
          for (; reltab < reltabend; reltab += entrysize) {
             int isymbol = ((TELF_Relocation*)reltab)->r_sym;
-            // printf("\n>SymbolUsed: %i, Name: %s",isymbol,SymbolName(isymbol)); 
+            // printf("\n>SymbolUsed: %i, Name: %s",isymbol,SymbolName(isymbol));
             // Remember symbol used
             OldSymbolUsed[isymbol]++;
          }
@@ -1015,9 +1015,9 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeBinaryFile() {
    dysymtab.cmd        = MAC_LC_DYSYMTAB;
    dysymtab.cmdsize    = sizeof(dysymtab);
    dysymtab.ilocalsym  = 0;                            // index to local symbols
-   dysymtab.nlocalsym  = NewSymTab[0].GetNumEntries(); // number of local symbols 
+   dysymtab.nlocalsym  = NewSymTab[0].GetNumEntries(); // number of local symbols
    dysymtab.iextdefsym = dysymtab.nlocalsym;           // index to externally defined symbols
-   dysymtab.nextdefsym = NewSymTab[1].GetNumEntries(); // number of externally defined symbols 
+   dysymtab.nextdefsym = NewSymTab[1].GetNumEntries(); // number of externally defined symbols
    dysymtab.iundefsym  = dysymtab.iextdefsym + dysymtab.nextdefsym;	// index to public symbols
    dysymtab.nundefsym  = NewSymTab[2].GetNumEntries(); // number of public symbols
    // Store MAC_dysymtab_command command
@@ -1081,7 +1081,7 @@ int CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::GetImagebaseSymbol() {
    // Search for name among external symbols
    int index2 = NewSymTab[2].Search(ImageBaseName);
    if (index2 >= 0) {
-      // found 
+      // found
       ImagebaseSymbol = index2 + NumSymbols[2];
       return ImagebaseSymbol;
    }

@@ -5,7 +5,7 @@
 * Project:       objconv
 * Module:        library.h
 * Description:
-* Header file defining classes for reading and writing UNIX and OMF style 
+* Header file defining classes for reading and writing UNIX and OMF style
 * libraries.
 *
 * Copyright 2007-2013 GNU General Public License http://www.gnu.org/licenses

@@ -125,7 +125,7 @@ void CCOF2COF::MakeSymbolTable() {
             // File name is stored in aux records, not in symbol table
             if ((uint32)strlen(name2) > (uint32)numaux * SIZE_SCOFF_SymTableEntry) {
                // Name too long. I don't want to add more aux records
-               err.submit(2201, name2); 
+               err.submit(2201, name2);
             }
             else {
                // Insert new file name in aux records
@@ -250,14 +250,14 @@ void CCOF2COF::MakeBinaryFile() {
    // First 4 bytes = size
    ToFile.Push(&NewStringTableSize, sizeof(uint32));
    // Then the string table itself, except the first 4 bytes
-   if (NewStringTableSize > 4) 
+   if (NewStringTableSize > 4)
       ToFile.Push(NewStringTable.Buf() + 4, NewStringTableSize - 4);
 
    // Find end of old and new string tables
-   uint32 EndOfOldStringTable = FileHeader->PSymbolTable 
+   uint32 EndOfOldStringTable = FileHeader->PSymbolTable
       + NumberOfSymbols * SIZE_SCOFF_SymTableEntry + StringTableSize;
 
-   uint32 EndOfNewStringTable = FileHeader->PSymbolTable 
+   uint32 EndOfNewStringTable = FileHeader->PSymbolTable
       + (NumberOfSymbols + NumAddedSymbols) * SIZE_SCOFF_SymTableEntry + NewStringTableSize;
 
    // Check if there is anything after the string table

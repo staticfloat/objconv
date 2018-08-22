@@ -34,21 +34,21 @@ SIntTxt COFF64RelNames[] = {
    {COFF64_RELOC_REL32,   "RIP relative"},     // 32 bit, RIP-relative
    {COFF64_RELOC_REL32_1, "RIP relative-1"},   // 32 bit, relative to RIP - 1. For instruction with immediate byte operand
    {COFF64_RELOC_REL32_2, "RIP relative-2"},   // 32 bit, relative to RIP - 2. For instruction with immediate word operand
-   {COFF64_RELOC_REL32_3, "RIP relative-3"},   // 32 bit, relative to RIP - 3. Useless 
+   {COFF64_RELOC_REL32_3, "RIP relative-3"},   // 32 bit, relative to RIP - 3. Useless
    {COFF64_RELOC_REL32_4, "RIP relative-4"},   // 32 bit, relative to RIP - 4. For instruction with immediate dword operand
    {COFF64_RELOC_REL32_5, "RIP relative-5"},   // 32 bit, relative to RIP - 5. Useless
    {COFF32_RELOC_SECTION, "Section index"},    // 16-bit section index in file
    {COFF64_RELOC_SECREL,  "Section relative"}, // 32-bit section-relative
    {COFF64_RELOC_SECREL7, "7 bit section rel"},//  7-bit section-relative
    {COFF64_RELOC_TOKEN,   "CLR token"},        // 64 bit absolute virtual address without inline addend
-   {COFF64_RELOC_SREL32,  "32b span dependent"},        // 
-   {COFF64_RELOC_PAIR,    "pair after span dependent"}, // 
-   {COFF64_RELOC_PPC_REFHI,"high 16 of 32 bit abs"},    // 
-   {COFF64_RELOC_PPC_REFLO,"low 16 of 32 bit abs"},     // 
-   {COFF64_RELOC_PPC_PAIR, "pair after high 16"},       // 
+   {COFF64_RELOC_SREL32,  "32b span dependent"},        //
+   {COFF64_RELOC_PAIR,    "pair after span dependent"}, //
+   {COFF64_RELOC_PPC_REFHI,"high 16 of 32 bit abs"},    //
+   {COFF64_RELOC_PPC_REFLO,"low 16 of 32 bit abs"},     //
+   {COFF64_RELOC_PPC_PAIR, "pair after high 16"},       //
    {COFF64_RELOC_PPC_SECRELO,"low 16 of 32 bit section relative"},
-   {COFF64_RELOC_PPC_GPREL,  "16 bit GP relative"},     // 
-   {COFF64_RELOC_PPC_TOKEN,  "CLR token"}               // 
+   {COFF64_RELOC_PPC_GPREL,  "16 bit GP relative"},     //
+   {COFF64_RELOC_PPC_TOKEN,  "CLR token"}               //
 };
 
 // Machine names
@@ -61,7 +61,7 @@ SIntTxt COFFMachineNames[] = {
    {0x14C, "I386"},            // x86, 32 bit
    {0x200, "IA64"},            // Intel Itanium
    {0x268, "Motorola68000"},   // Motorola 68000 series
-   {0x266, "MIPS16"},  
+   {0x266, "MIPS16"},
    {0x366, "MIPSwFPU"},
    {0x466, "MIPS16wFPU"},
    {0x1F0, "PowerPC"},
@@ -308,7 +308,7 @@ void CCOFF::Dump(int options) {
 
          for (i = 0; i < NumImageDirs; i++) {
             if (GetImageDir(i, &dir)) {
-               printf("\nDirectory %2i, %s:\n  Address 0x%04X, Size 0x%04X, Section %i, Offset 0x%04X", 
+               printf("\nDirectory %2i, %s:\n  Address 0x%04X, Size 0x%04X, Section %i, Offset 0x%04X",
                   i, dir.Name,
                   dir.VirtualAddress, dir.Size, dir.Section, dir.SectionOffset);
             }
@@ -374,7 +374,7 @@ void CCOFF::Dump(int options) {
                   Reloc.p->VirtualAddress,
                   Reloc.p->SymbolTableIndex,
                   (WordSize == 32) ? Lookup(COFF32RelNames,Reloc.p->Type) : Lookup(COFF64RelNames,Reloc.p->Type));
-               if (Reloc.p->Type < COFF32_RELOC_SEG12) 
+               if (Reloc.p->Type < COFF32_RELOC_SEG12)
                {
                   // Check if address is within file
                   if (SectionHeader->PRawData + Reloc.p->VirtualAddress < GetDataSize()) {
@@ -385,7 +385,7 @@ void CCOFF::Dump(int options) {
                      printf(". Error: Address is outside file");
                   }
                }
-               
+
                PrintSymbolTable(Reloc.p->SymbolTableIndex);
                Reloc.b += SIZE_SCOFF_Relocation; // Next relocation record
             }
@@ -394,7 +394,7 @@ void CCOFF::Dump(int options) {
          if (SectionHeader->NLineNumbers > 0) {
             printf("\nLine number entries: %i", SectionHeader->NLineNumbers);
             printf("  Line number pointer: %i\nLines:", SectionHeader->PLineNumbers);
-            
+
             // Pointer to line number entry
             union {
                SCOFF_LineNumbers * p;  // pointer to record
@@ -408,7 +408,7 @@ void CCOFF::Dump(int options) {
                else { // Record contains function name
                }
                Linnum.b += SIZE_SCOFF_LineNumbers;  // Next line number record
-            }         
+            }
          }
       }
    }
@@ -441,7 +441,7 @@ char const * CCOFF::GetSectionName(int8* Symbol) {
    memcpy(text, Symbol, 8);        // Copy to local buffer
    text[8] = 0;                    // Append terminating zero
    if (text[0] == '/') {
-      // Long name is in string table. 
+      // Long name is in string table.
       // Convert decimal ASCII number to string table index
       uint32 sindex = atoi(text + 1);
       // Get name from string table
@@ -544,7 +544,7 @@ void CCOFF::PrintSymbolTable(int symnum) {
       SCOFF_SymTableEntry *s0;
       printf("\n");
       if (symnum >= 0) printf("  ");
-      printf("Symbol %i - Name: %s\n  Value=%i, ", 
+      printf("Symbol %i - Name: %s\n  Value=%i, ",
          isym, GetSymbolName(Symtab.p->s.Name), Symtab.p->s.Value);
       if (Symtab.p->s.SectionNumber > 0) {
          printf("Section=%i", Symtab.p->s.SectionNumber);
@@ -596,7 +596,7 @@ void CCOFF::PrintSymbolTable(int symnum) {
                printf(", PNext: %i", sa->bfef.PointerToNextFunction);
             }
          }
-         else if (s0->s.StorageClass == COFF_CLASS_EXTERNAL && 
+         else if (s0->s.StorageClass == COFF_CLASS_EXTERNAL &&
             s0->s.SectionNumber == COFF_SECTION_UNDEF &&
             s0->s.Value == 0) {
             // This is a Weak external aux record
@@ -612,7 +612,7 @@ void CCOFF::PrintSymbolTable(int symnum) {
             printf("\n  Aux section definition record:");
             printf("\n  Length: %i, Num. relocations: %i, Num linenums: %i, checksum 0x%X,"
                "\n  Number: %i, Selection: %i",
-               sa->section.Length, sa->section.NumberOfRelocations, sa->section.NumberOfLineNumbers, 
+               sa->section.Length, sa->section.NumberOfRelocations, sa->section.NumberOfLineNumbers,
                sa->section.CheckSum, sa->section.Number, sa->section.Selection);
          }
          else if (s0->s.StorageClass == COFF_CLASS_ALIAS) {
@@ -629,7 +629,7 @@ void CCOFF::PrintSymbolTable(int symnum) {
             default:
                 printf("unknown characteristics 0x%X", sa->weak.Characteristics);
             }
-         }         
+         }
          else {
             // Unknown aux record type
             printf("\n  Unknown Auxiliary record type %i", s0->s.StorageClass);
@@ -666,7 +666,7 @@ void CCOFF::PublicNames(CMemoryBuffer * Strings, CSList<SStringEntry> * Index, i
       }
 
       // Search for public symbol
-      if ((Symtab.p->s.SectionNumber > 0 && Symtab.p->s.StorageClass == COFF_CLASS_EXTERNAL) 
+      if ((Symtab.p->s.SectionNumber > 0 && Symtab.p->s.StorageClass == COFF_CLASS_EXTERNAL)
       || Symtab.p->s.StorageClass == COFF_CLASS_ALIAS) {
          // Public symbol found
          SStringEntry se;
@@ -872,14 +872,14 @@ void CCOFF::PrintImportExport() {
 
          // Loop next
          ImportEntry++;
-      }   
+      }
    }
 }
 
 // Functions for manipulating COFF files
 
 uint32 COFF_PutNameInSymbolTable(SCOFF_SymTableEntry & sym, const char * name, CMemoryBuffer & StringTable) {
-   // Function to put a name into SCOFF_SymTableEntry. 
+   // Function to put a name into SCOFF_SymTableEntry.
    // Put name in string table if longer than 8 characters.
    // Returns index into StringTable if StringTable used
    int len = (int)strlen(name);                  // Length of name
@@ -899,7 +899,7 @@ uint32 COFF_PutNameInSymbolTable(SCOFF_SymTableEntry & sym, const char * name, C
 }
 
 void COFF_PutNameInSectionHeader(SCOFF_SectionHeader & sec, const char * name, CMemoryBuffer & StringTable) {
-   // Function to put a name into SCOFF_SectionHeader. 
+   // Function to put a name into SCOFF_SectionHeader.
    // Put name in string table if longer than 8 characters
    int len = (int)strlen(name);                  // Length of name
    if (len <= 8) {

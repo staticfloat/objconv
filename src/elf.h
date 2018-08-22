@@ -5,7 +5,7 @@
 * Project:       objconv
 * Module:        elf.h
 * Description:
-* Header file for definition of structures in 32 and 64 bit ELF object file 
+* Header file for definition of structures in 32 and 64 bit ELF object file
 * format.
 *
 * Copyright 2006-2009 GNU General Public License http://www.gnu.org/licenses
@@ -238,17 +238,17 @@ struct Elf64_Shdr {
 #define SHT_PREINIT_ARRAY          16  // Array of pre-constructors
 #define SHT_GROUP                  17  // Section group
 #define SHT_SYMTAB_SHNDX           18  // Extended section indeces
-#define SHT_NUM                    19  // Number of defined types. 
+#define SHT_NUM                    19  // Number of defined types.
 #define SHT_LOOS           0x60000000  // Start OS-specific
-#define SHT_CHECKSUM       0x6ffffff8  // Checksum for DSO content. 
-#define SHT_LOSUNW         0x6ffffffa  // Sun-specific low bound. 
+#define SHT_CHECKSUM       0x6ffffff8  // Checksum for DSO content.
+#define SHT_LOSUNW         0x6ffffffa  // Sun-specific low bound.
 #define SHT_SUNW_move      0x6ffffffa
 #define SHT_SUNW_COMDAT    0x6ffffffb
 #define SHT_SUNW_syminfo   0x6ffffffc
-#define SHT_GNU_verdef     0x6ffffffd  // Version definition section. 
-#define SHT_GNU_verneed    0x6ffffffe  // Version needs section. 
-#define SHT_GNU_versym     0x6fffffff  // Version symbol table. 
-#define SHT_HISUNW         0x6fffffff  // Sun-specific high bound. 
+#define SHT_GNU_verdef     0x6ffffffd  // Version definition section.
+#define SHT_GNU_verneed    0x6ffffffe  // Version needs section.
+#define SHT_GNU_versym     0x6fffffff  // Version symbol table.
+#define SHT_HISUNW         0x6fffffff  // Sun-specific high bound.
 #define SHT_HIOS           0x6fffffff  // End OS-specific type
 #define SHT_LOPROC         0x70000000  // Start of processor-specific
 #define SHT_HIPROC         0x7fffffff  // End of processor-specific
@@ -256,7 +256,7 @@ struct Elf64_Shdr {
 #define SHT_HIUSER         0x8fffffff  // End of application-specific
 #define SHT_REMOVE_ME      0xffffff99  // Specific to objconv program: Removed debug or exception handler section
 
-// Legal values for sh_flags (section flags). 
+// Legal values for sh_flags (section flags).
 
 #define SHF_WRITE            (1 << 0)  // Writable
 #define SHF_ALLOC            (1 << 1)  // Occupies memory during execution
@@ -266,7 +266,7 @@ struct Elf64_Shdr {
 #define SHF_INFO_LINK        (1 << 6)  // `sh_info' contains SHT index
 #define SHF_LINK_ORDER       (1 << 7)  // Preserve order after combining
 #define SHF_OS_NONCONFORMING (1 << 8)  // Non-standard OS specific handling required
-#define SHF_MASKOS         0x0ff00000  // OS-specific. 
+#define SHF_MASKOS         0x0ff00000  // OS-specific.
 #define SHF_MASKPROC       0xf0000000  // Processor-specific
 
 /* Section group handling.  */
@@ -341,13 +341,13 @@ struct Elf64_Syminfo {
 #define STB_LOCAL    0    // Local symbol
 #define STB_GLOBAL   1    // Global symbol
 #define STB_WEAK     2    // Weak symbol
-#define STB_NUM      3    // Number of defined types. 
+#define STB_NUM      3    // Number of defined types.
 #define STB_LOOS    10    // Start of OS-specific
 #define STB_HIOS    12    // End of OS-specific
 #define STB_LOPROC  13    // Start of processor-specific
 #define STB_HIPROC  15    // End of processor-specific
 
-// Legal values for ST_TYPE subfield of st_info (symbol type). 
+// Legal values for ST_TYPE subfield of st_info (symbol type).
 
 #define STT_NOTYPE   0    // Symbol type is unspecified
 #define STT_OBJECT   1    // Symbol is a data object
@@ -355,7 +355,7 @@ struct Elf64_Syminfo {
 #define STT_SECTION  3    // Symbol associated with a section
 #define STT_FILE     4    // Symbol's name is file name
 #define STT_COMMON   5    // Symbol is a common data object
-#define STT_NUM      6    // Number of defined types. 
+#define STT_NUM      6    // Number of defined types.
 #define STT_LOOS    10    // Start of OS-specific
 #define STT_GNU_IFUNC 10  // Symbol is an indirect code object (function dispatcher)
 #define STT_HIOS    12    // End of OS-specific
@@ -410,7 +410,7 @@ struct Elf64_Rel {
 
 // Relocation table entry with addend (in section of type SHT_RELA)
 
-// Warning: Elf32_Rela doesn't work in any of the systems I have tried. 
+// Warning: Elf32_Rela doesn't work in any of the systems I have tried.
 // Use Elf32_Rel instead with addend in relocated field.
 // Use Elf64_Rela in 64 bit mode. Elf64_Rel not accepted?
 
@@ -439,14 +439,14 @@ struct Elf64_Rela {
 #define R_386_GLOB_DAT  6    // Create GOT entry
 #define R_386_JMP_SLOT  7    // Create PLT entry
 #define R_386_RELATIVE  8    // Adjust by program base
-#define R_386_GOTOFF    9    // 32 bit offset to GOT 
+#define R_386_GOTOFF    9    // 32 bit offset to GOT
 #define R_386_GOTPC    10    // 32 bit self relative offset to GOT
 #define R_386_IRELATIVE 42   // Reference to PLT entry of indirect function (STT_GNU_IFUNC)
 //#define R_386_NUM      11    // Number of entries
 
 // AMD x86-64 relocation types
 #define R_X86_64_NONE       0  // No reloc
-#define R_X86_64_64         1  // Direct 64 bit 
+#define R_X86_64_64         1  // Direct 64 bit
 #define R_X86_64_PC32       2  // Self relative 32 bit signed (not RIP relative in the sense used in COFF files)
 #define R_X86_64_GOT32      3  // 32 bit GOT entry
 #define R_X86_64_PLT32      4  // 32 bit PLT address

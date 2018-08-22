@@ -29,16 +29,16 @@ SIntTxt FileFormatNames[] = {
     {FILETYPE_LIBRARY,      "Function library"},
     {FILETYPE_OMFLIBRARY,   "Function library (OMF)"},
     {IMPORT_LIBRARY_MEMBER, "Windows import library member"},
-    {FILETYPE_MAC_UNIVBIN,  "MacIntosh universal binary"},   
+    {FILETYPE_MAC_UNIVBIN,  "MacIntosh universal binary"},
     {FILETYPE_MS_WPO,       "Whole program optimization intermediate file, Microsoft specific"},
     {FILETYPE_INTEL_WPO,    "Whole program optimization intermediate file, Intel specific"},
-    {FILETYPE_WIN_UNKNOWN,  "Unknown subtype, Windows"},   
+    {FILETYPE_WIN_UNKNOWN,  "Unknown subtype, Windows"},
     {FILETYPE_ASM,          "Disassembly"}
 };
 
 
 // Members of class CMemoryBuffer
-CMemoryBuffer::CMemoryBuffer() {  
+CMemoryBuffer::CMemoryBuffer() {
     // Constructor
     buffer = 0;
     NumEntries = DataSize = BufferSize = 0;
@@ -88,7 +88,7 @@ void CMemoryBuffer::SetSize(uint32 size) {
 
 uint32 CMemoryBuffer::Push(void const * obj, uint32 size) {
     // Add object to buffer, return offset
-    // Parameters: 
+    // Parameters:
     // obj = pointer to object, 0 if fill with zeroes
     // size = size of object to push
 
@@ -100,7 +100,7 @@ uint32 CMemoryBuffer::Push(void const * obj, uint32 size) {
 
     if (NewOffset > BufferSize) {
         // Buffer too small, allocate more space.
-        // We can use SetSize for this only if it is certain that obj is not 
+        // We can use SetSize for this only if it is certain that obj is not
         // pointing to an object previously allocated in the old buffer
         // because it would be deallocated before copied into the new buffer:
         // SetSize (NewOffset + NewOffset / 2 + 1024);
@@ -123,7 +123,7 @@ uint32 CMemoryBuffer::Push(void const * obj, uint32 size) {
             memcpy (buffer2, buffer, BufferSize);
         }
         BufferSize = NewSize;                      // Save size
-        if (obj && size) {                         
+        if (obj && size) {
             // Copy object to new buffer
             memcpy (buffer2 + OldOffset, obj, size);
             obj = 0;                                // Prevent copying once more
@@ -169,20 +169,20 @@ void CMemoryBuffer::Align(uint32 a) {
 }
 
 // Members of class CFileBuffer
-CFileBuffer::CFileBuffer() : CMemoryBuffer() {  
+CFileBuffer::CFileBuffer() : CMemoryBuffer() {
     // Default constructor
     FileName = 0;
     OutputFileName = 0;
     FileType = WordSize = Executable = 0;
 }
 
-CFileBuffer::CFileBuffer(char const * filename) : CMemoryBuffer() {  
+CFileBuffer::CFileBuffer(char const * filename) : CMemoryBuffer() {
     // Constructor
     FileName = filename;
     FileType = WordSize = 0;
 }
 
-void CFileBuffer::Read(int IgnoreError) {                   
+void CFileBuffer::Read(int IgnoreError) {
     // Read file into buffer
     uint32 status;                             // Error status
 
@@ -233,7 +233,7 @@ void CFileBuffer::Read(int IgnoreError) {
 #endif
 }
 
-void CFileBuffer::Write() {                  
+void CFileBuffer::Write() {
     // Write buffer to file:
     if (OutputFileName) FileName = OutputFileName;
     // Two alternative ways to write a file:
@@ -243,7 +243,7 @@ void CFileBuffer::Write() {
     int fh;                                       // File handle
     uint32 status;                                // Error status
     // Open file in binary mode
-    fh = _open(FileName, O_RDWR | O_BINARY | O_CREAT | O_TRUNC, _S_IREAD | _S_IWRITE); 
+    fh = _open(FileName, O_RDWR | O_BINARY | O_CREAT | O_TRUNC, _S_IREAD | _S_IWRITE);
     // Check if error
     if (fh == -1) {err.submit(2104, FileName);  return;}
     // Write file
@@ -322,7 +322,7 @@ int CFileBuffer::GetFileType() {
         // MacIntosh universal binary
         FileType = FILETYPE_MAC_UNIVBIN;
         WordSize = 0;
-    }   
+    }
     else if (Get<uint32>(0) == 0xFFFF0000 || Get<uint32>(0) == 0x10000) {
         // Windows subtypes:
         if (Get<uint16>(4) == 0) {
@@ -408,8 +408,8 @@ int CFileBuffer::GetFileType() {
     }
     else {
         // Unknown file type
-        int utype = Get<uint32>(0);        
-        err.submit(2018, utype, FileName); 
+        int utype = Get<uint32>(0);
+        err.submit(2018, utype, FileName);
         FileType = 0;
     }
     return FileType;
@@ -506,10 +506,10 @@ void operator >> (CFileBuffer & a, CFileBuffer & b) {
 void CFileBuffer::GetOMFWordSize() {
     // Determine word size for OMF file.
     // There is no simple way to get the word size. Looking for odd-numbered
-    // record types is not sufficient. A 32-bit OMF file may use 16-bit SEGDEF 
+    // record types is not sufficient. A 32-bit OMF file may use 16-bit SEGDEF
     // records. We have to look for segments with the 'P' attribute set. And
     // even this is not completely safe, because MASM may generate empty 32-bit
-    // segments so we have to look only at segments with nonzero size. 
+    // segments so we have to look only at segments with nonzero size.
     // We can still have any mixture of 16- and 32-bit segments, though, so no
     // method is absolutely safe.
 

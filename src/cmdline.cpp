@@ -1,14 +1,14 @@
 /****************************  cmdline.cpp  **********************************
 * Author:        Agner Fog
 * Date created:  2006-07-25
-* Last modified: 2017-04-14
+* Last modified: 2018-01-29
 * Project:       objconv
 * Module:        cmdline.cpp
 * Description:
 * This module is for interpretation of command line options
 * Also contains symbol change function
 *
-* Copyright 2006-2017 GNU General Public License http://www.gnu.org/licenses
+* Copyright 2006-2018 GNU General Public License http://www.gnu.org/licenses
 *****************************************************************************/
 
 #include "stdafx.h"
@@ -55,7 +55,7 @@ const char * StandardNames32[][MaxType+1] = {
 };
 
 // Standard names in 64-bit mode
-// COFF removes an underscore in 32-bit. There is no 64-bit OMF 
+// COFF removes an underscore in 32-bit. There is no 64-bit OMF
 const char * StandardNames64[][MaxType+1] = {
     //  0,    COFF,       OMF,         ELF,                MACHO
     {0,"__ImageBase",  "",    "__executable_start","__mh_execute_header"}
@@ -197,7 +197,7 @@ void CCommandLineInterpreter::ReadCommandFile(char * filename) {
                 buffer = ItemEnd + 1;
                 *ItemEnd = 0;    // Mark end of token
             }
-            // Found token. 
+            // Found token.
             // Check if it is a comment beginning with '#' or '//'
             if (ItemBegin[0] == '#' || (ItemBegin[0] == '/' && ItemBegin[1] == '/' )) {
                 // This is a comment. Skip to end of line
@@ -365,7 +365,7 @@ void CCommandLineInterpreter::InterpretLibraryOption(char * string) {
     }
 
     sym.Name1 = name1;     // Store names in symbol change record
-    sym.Name2 = name2;     
+    sym.Name2 = name2;
 
     switch (string[1]) {
     case 'a': case 'A':      // Add input file to library
@@ -409,8 +409,8 @@ void CCommandLineInterpreter::InterpretLibraryOption(char * string) {
 
 
 void CCommandLineInterpreter::AddObjectToLibrary(char * filename, char * membername) {
-    // Add object file to library 
-    if (!filename || !*filename) {          
+    // Add object file to library
+    if (!filename || !*filename) {
         err.submit(2004, filename-1);  return;     // Empty string
     }
 
@@ -437,7 +437,7 @@ void CCommandLineInterpreter::AddObjectToLibrary(char * filename, char * membern
 
     // Truncate name and store it in MemberNames
     //uint32 Name1Offset = MemberNames.PushString(CLibrary::TruncateMemberName(membername));
-    uint32 Name1Offset = MemberNames.PushString(membername);   
+    uint32 Name1Offset = MemberNames.PushString(membername);
     Sym.Name1 = (char*)(MemberNames.Buf() + Name1Offset);
     CLibrary::StripMemberName(Sym.Name1);
 
@@ -536,7 +536,7 @@ void CCommandLineInterpreter::InterpretDumpOption(char * string) {
         case 'n': case 'N':  // dump string table
             DumpOptions |= DUMP_STRINGTB;  break;
         case 'c': case 'C':  // dump comment records (currently only for OMF)
-            DumpOptions |= DUMP_COMMENT;  break;         
+            DumpOptions |= DUMP_COMMENT;  break;
         default:
             err.submit(2004, string-1);  // Unknown option
         }
@@ -584,7 +584,7 @@ void CCommandLineInterpreter::InterpretErrorOption(char * string) {
     // Interpret warning/error option from command line
     if (strlen(string) < 3) {
         err.submit(2004, string); return; // Unknown option
-    } 
+    }
     int newstatus;   // New status for this error number
 
     switch (string[1]) {
@@ -665,15 +665,15 @@ void CCommandLineInterpreter::InterpretSymbolNameChangeOption(char * string) {
     case 'u': case 'U':  // underscore option
         switch (string[2]) {
         case 0:
-            Underscore = CMDL_UNDERSCORE_CHANGE; 
+            Underscore = CMDL_UNDERSCORE_CHANGE;
             if (string[0] == 'a') Underscore |= CMDL_KEEP_ALIAS;
             break;
-        case '+': case 'a': case 'A': 
-            Underscore = CMDL_UNDERSCORE_ADD; 
+        case '+': case 'a': case 'A':
+            Underscore = CMDL_UNDERSCORE_ADD;
             if (string[0] == 'a') Underscore |= CMDL_KEEP_ALIAS;
             break;
-        case '-': case 'r': case 'R': 
-            Underscore = CMDL_UNDERSCORE_REMOVE; 
+        case '-': case 'r': case 'R':
+            Underscore = CMDL_UNDERSCORE_REMOVE;
             if (string[0] == 'a') Underscore |= CMDL_KEEP_ALIAS;
             break;
         default:
@@ -682,7 +682,7 @@ void CCommandLineInterpreter::InterpretSymbolNameChangeOption(char * string) {
         break;
 
     case 'd': case 'D':  // section name dot option
-        SegmentDot = CMDL_SECTIONDOT_CHANGE; 
+        SegmentDot = CMDL_SECTIONDOT_CHANGE;
         break;
 
     case 'r': case 'R':  // name replace option
@@ -868,7 +868,7 @@ int CCommandLineInterpreter::SymbolChange(char const * oldname, char const ** ne
     if (newname) *newname = 0;
 
     // Convert standard names if type conversion
-    if (cmd.InputType != cmd.OutputType 
+    if (cmd.InputType != cmd.OutputType
         && uint32(cmd.InputType) <= MaxType && uint32(cmd.OutputType) <= MaxType) {
             if (DesiredWordSize == 32) {
                 // Look for standard names to translate, 32-bit
@@ -938,7 +938,7 @@ int CCommandLineInterpreter::SymbolChange(char const * oldname, char const ** ne
             break;
 
         case SYMA_CHANGE_NAME: // Change name of symbol or segment or library member
-            CountSymbolNameChanges++;  psym->Done++;  
+            CountSymbolNameChanges++;  psym->Done++;
             *newname = psym->Name2;
             break;
 
@@ -1048,7 +1048,7 @@ int CCommandLineInterpreter::SymbolChange(char const * oldname, char const ** ne
                 // Note: Microsoft and Intel compilers have . on standard names
                 // and _ on nonstandard names in COFF files
                 // Borland requires _ on all segment names in OMF files
-                /* 
+                /*
                 // Standard section names that should not be changed
                 static char const * StandardSectionNames[] = {
                 ".text", ".data", ".bss", ".comment", ".lib"
@@ -1116,8 +1116,8 @@ int CCommandLineInterpreter::SymbolChange(char const * oldname, char const ** ne
 
 int CCommandLineInterpreter::SymbolChangesRequested() {
     // Any kind of symbol change requested on command line
-    return (Underscore != 0) 
-        | (SegmentDot != 0) << 1 
+    return (Underscore != 0)
+        | (SegmentDot != 0) << 1
         | (SymbolChangeEntries != 0) << 2;
 }
 
@@ -1142,7 +1142,7 @@ void CCommandLineInterpreter::CountSymbolsHidden() {
 
 void CCommandLineInterpreter::ReportStatistics() {
     // Report statistics about name changes etc.
-    if (DebugInfo == CMDL_DEBUG_STRIP || ExeptionInfo == CMDL_EXCEPTION_STRIP 
+    if (DebugInfo == CMDL_DEBUG_STRIP || ExeptionInfo == CMDL_EXCEPTION_STRIP
         || Underscore || SegmentDot || SymbolList.GetNumEntries()) {
             printf ("\n");
     }
@@ -1152,7 +1152,7 @@ void CCommandLineInterpreter::ReportStatistics() {
     if (ExeptionInfo == CMDL_EXCEPTION_STRIP) {
         printf ("\n%3i Exception sections removed", CountExceptionSectionsRemoved);
     }
-    if ((DebugInfo == CMDL_DEBUG_STRIP || ExeptionInfo == CMDL_EXCEPTION_STRIP) 
+    if ((DebugInfo == CMDL_DEBUG_STRIP || ExeptionInfo == CMDL_EXCEPTION_STRIP)
         && CountUnusedSymbolsHidden) {
             printf ("\n%3i Unused external symbol references hidden", CountUnusedSymbolsHidden);
     }
@@ -1186,7 +1186,7 @@ void CCommandLineInterpreter::ReportStatistics() {
 void CCommandLineInterpreter::Help() {
     // Print help message
     printf("\nObject file converter version %.2f for x86 and x86-64 platforms.", OBJCONV_VERSION);
-    printf("\nCopyright (c) 2017 by Agner Fog. Gnu General Public License.");
+    printf("\nCopyright (c) 2018 by Agner Fog. Gnu General Public License.");
     printf("\n\nUsage: objconv options inputfile [outputfile]");
     printf("\n\nOptions:");
     printf("\n-fXXX[SS]  Output file format XXX, word size SS. Supported formats:");

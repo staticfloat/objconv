@@ -1,7 +1,7 @@
 /****************************    omf.cpp    *********************************
 * Author:        Agner Fog
 * Date created:  2007-01-29
-* Last modified: 2009-07-17
+* Last modified: 2018-05-26
 * Project:       objconv
 * Module:        omf.cpp
 * Description:
@@ -9,7 +9,7 @@
 *
 * Class COMF is used for reading, interpreting and dumping OMF files.
 *
-* Copyright 2007-2009 GNU General Public License http://www.gnu.org/licenses
+* Copyright 2007-2018 GNU General Public License http://www.gnu.org/licenses
 *****************************************************************************/
 #include "stdafx.h"
 
@@ -207,7 +207,7 @@ void COMF::Dump(int options) {
 
    if (options & DUMP_STRINGTB) DumpNames(); // Dump names records
 
-   if (options & DUMP_SYMTAB) DumpSymbols(); // Dump public/external name records   
+   if (options & DUMP_SYMTAB) DumpSymbols(); // Dump public/external name records
 
    if (options & DUMP_SECTHDR) DumpSegments(); // Dump segment records
 
@@ -222,7 +222,7 @@ void COMF::DumpRecordTypes() {
    for (uint32 i = 0; i < NumRecords; i++) {
       // Print record type
       printf("\n  Record %02X, %s%s, total length %i", Records[i].Type,
-         Lookup(OMFRecordTypeNames, Records[i].Type2), 
+         Lookup(OMFRecordTypeNames, Records[i].Type2),
          (Records[i].Type & 1) ? ".32" : "",
          Records[i].End+1);
    }
@@ -261,24 +261,24 @@ void COMF::DumpNames() {
          while (Records[i].Index < Records[i].End) {
             printf("\n  \"%s\":", Records[i].GetString());
             printf(" %i", Records[i].GetByte()); // Type index, should be 0
-            DType = Records[i].GetByte(); // Data type            
+            DType = Records[i].GetByte(); // Data type
             switch (DType) {
             case 0x61:
                DNum  = Records[i].GetLength();
                DSize = Records[i].GetLength();
-               printf(" FAR: %i*%i bytes", DNum, DSize); 
+               printf(" FAR: %i*%i bytes", DNum, DSize);
                break;
             case 0x62:
                DSize = Records[i].GetLength();
-               printf(" NEAR: 0x%X bytes", DSize); 
+               printf(" NEAR: 0x%X bytes", DSize);
                break;
             default:
                DSize = Records[i].GetLength();
                if (DType < 0x60) { // Borland segment index
-                  printf(" segment %i, size 0x%X", DType, DSize); 
+                  printf(" segment %i, size 0x%X", DType, DSize);
                   break;
                }
-               printf(" unknown type %i, size 0x%X", DType, DSize); 
+               printf(" unknown type %i, size 0x%X", DType, DSize);
                break;
             }
          }
@@ -326,7 +326,7 @@ void COMF::DumpSymbols() {
             string = Records[i].GetString();
             Offset = Records[i].GetNumeric();
             TypeIndex = Records[i].GetIndex();
-            printf("\n  %s, Segment %s, Group %s, Offset 0x%X, Type %i", 
+            printf("\n  %s, Segment %s, Group %s, Offset 0x%X, Type %i",
                string, GetSegmentName(Segment), GetGroupName(Group), Offset, TypeIndex);
             if (BaseFrame) printf(", Frame %i", BaseFrame);
          }
@@ -359,7 +359,7 @@ void COMF::DumpSegments() {
 
    uint32 i;                                     // Record number
    uint32 SegNum = 0;                            // Segment number
-   
+
    printf("\n\nSegment records:");
    for (i = 0; i < NumRecords; i++) {
       if (Records[i].Type2 == OMF_SEGDEF) {
@@ -379,8 +379,8 @@ void COMF::DumpSegments() {
             OverlayIndex = Records[i].GetIndex();
 
             printf("\n  Segment %2i, Name %s, Class %s, Align %i, %s, %i bit",
-               ++SegNum, GetLocalName(NameIndex), GetLocalName(ClassIndex), 
-               OMFAlignTranslate[Attributes.u.A], 
+               ++SegNum, GetLocalName(NameIndex), GetLocalName(ClassIndex),
+               OMFAlignTranslate[Attributes.u.A],
                Lookup(OMFSegmentCombinationNames, Attributes.u.C),
                Attributes.u.P ? 32 : 16);
             if (Attributes.u.B) printf(", big");
@@ -468,7 +468,7 @@ void COMF::DumpRelocations() {
       if (Records[i].Type2 == OMF_COMDAT) {
          // COMDAT record
          //uint32 Flags = Records[i].GetByte(); // 1 = continuation, 2 = iterated, 4 = local, 8 = data in code segment
-         uint32 Attributes = Records[i].GetByte(); 
+         uint32 Attributes = Records[i].GetByte();
          uint32 Base = 0;
          // 0 = explicit, 1 = far code, 2 = far data, 3 = code32, 4 = data32
          // 0x00 = no match, 0x10 = pick any, 0x20 = same size, 0x30 = exact match
@@ -509,7 +509,7 @@ void COMF::DumpRelocations() {
                FixData.b = Records[i].GetByte();
 
                // print mode and location
-               printf("\n   %s %s, Offset 0x%X", 
+               printf("\n   %s %s, Offset 0x%X",
                   Lookup(OMFRelocationModeNames, Locat.s.M),
                   Lookup(OMFFixupLocationNames, Locat.s.Location),
                   Locat.s.Offset + LastOffset);
@@ -531,7 +531,7 @@ void COMF::DumpRelocations() {
                   case 2:  // F2: external symbol
                      printf(", external frame %s", GetSymbolName(Frame));  break;
 
-                  case 4:  // F4: frame = source, 
+                  case 4:  // F4: frame = source,
                            // or Borland floating point emulation record (undocumented?)
                      printf(", frame = source; or Borland f.p. emulation record");
                      break;
@@ -546,7 +546,7 @@ void COMF::DumpRelocations() {
                else {
                   printf(", frame uses thread %i", FixData.s.Frame);
                }
-               
+
                if (FixData.s.T == 0) {
                   // Target specified
                   Target = Records[i].GetIndex();
@@ -844,7 +844,7 @@ char * SOMFRecordPointer::GetString() {
    // Read string and return as ASCIIZ string in static buffer
    static char String[256];
    uint8 Length = GetByte();
-   if (Length == 0 || Length >= sizeof(String)) {
+   if (Length == 0 /*|| Length >= sizeof(String)*/) {
       String[0] = 0;
    }
    else {

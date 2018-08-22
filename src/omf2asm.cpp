@@ -20,7 +20,7 @@ COMF2ASM::COMF2ASM() {
 // Convert
 void COMF2ASM::Convert() {
    // Do the conversion
-   
+
    // Tell disassembler
    Disasm.Init(0, 0);
 
@@ -43,7 +43,7 @@ void COMF2ASM::Convert() {
    MakeGroupDefinitions();
 
    // Disassemble
-   Disasm.Go();  
+   Disasm.Go();
 
    // Take over output file from Disasm
    *this << Disasm.OutFile;
@@ -61,7 +61,7 @@ void COMF2ASM::CountSegments() {
 
    // Initialize temporary list of segments. Entry 0 is blank
    Segments.PushZero();
-   
+
    // Search for SEGDEF records
    for (i = 0; i < NumRecords; i++) {
       if (Records[i].Type2 == OMF_SEGDEF) {
@@ -207,7 +207,7 @@ void COMF2ASM::CountSegments() {
             SegRecord.Type = 0x1000  | (attribs & 0xFF);
             SegRecord.WordSize = (attribs & 0x2) ? 32 : 16;
          }
-         else {			 
+         else {
             // use value from segdef
             SegRecord.Type = 0x1000 | Segments[publicSegment].Type;
             SegRecord.WordSize = Segments[publicSegment].WordSize;
@@ -238,7 +238,7 @@ void COMF2ASM::CountSegments() {
             // continuation.
             // Add to the length to the previous entry.
             Segments[Segments.GetNumEntries()-1].Size += RecSize;
-         } 
+         }
          else {
             SegRecord.Offset = ofs;
             Segments.Push(SegRecord);
@@ -375,7 +375,7 @@ void COMF2ASM::MakePublicSymbolsTable() {
          while (Records[i].Index < Records[i].End) {
             string = Records[i].GetString();
             Records[i].GetByte(); // Type index, should be 0, ignore
-            DType = Records[i].GetByte(); // Data type            
+            DType = Records[i].GetByte(); // Data type
             switch (DType) {
             case 0x61:
                //DNum  = Records[i].GetLength();
@@ -416,7 +416,7 @@ void COMF2ASM::MakeCommunalSymbolsTable() {
       if (Records[i].Type2 == OMF_CEXTDEF) {
          Records[i].Index = 3;
          // Loop through strings in record
-         while (Records[i].Index < Records[i].End) {			 
+         while (Records[i].Index < Records[i].End) {
             uint32 LIndex = Records[i].GetIndex();
             Records[i].GetIndex(); // Group. Ignore
             string = GetLocalName(LIndex);
@@ -624,7 +624,7 @@ void COMF2ASM::MakeSegmentList() {
                // FIXUPP for last LEDATA record
                // Make relocation records
                MakeRelocations(Segment, RecNum, LastOffset, LastDataRecordSize, (uint8*)TempBuf.Buf());
-            } 
+            }
             else if (Records[RecNum].Index < Records[RecNum].End) {
                // Non-empty FIXUPP record does not refer to LEDATA record
                if (Records[LastDataRecord].Type2 == OMF_COMDAT) {
@@ -793,8 +793,8 @@ void COMF2ASM::MakeRelocations(int32 Segment, uint32 RecNum, uint32 SOffset, uin
 
          // Pointer to relocation source inline in raw data:
          uint8 * inlinep = SData + SOffset + Locat.s.Offset;
-         Inline = 0;  SourceSize = 0; 
-         //InlineSeg = 0;  
+         Inline = 0;  SourceSize = 0;
+         //InlineSeg = 0;
          TargetSegment = 0;  TargetOffset = 0;  TargetSymbol = 0;
 
          // Relocation type
@@ -813,7 +813,7 @@ void COMF2ASM::MakeRelocations(int32 Segment, uint32 RecNum, uint32 SOffset, uin
             Inline = *(int8*)inlinep;
             break;
 
-         case OMF_Fixup_16bit:      // 16 bit 
+         case OMF_Fixup_16bit:      // 16 bit
             SourceSize = 2;
             Inline = *(int16*)inlinep;
             break;
@@ -884,7 +884,7 @@ void COMF2ASM::MakeRelocations(int32 Segment, uint32 RecNum, uint32 SOffset, uin
          case 0: // T0 and T4: Target = segment
             // Local or public symbol
             TargetSegment = Target;              // Target segment
-            TargetOffset = TargetDisplacement;   // Target offset 
+            TargetOffset = TargetDisplacement;   // Target offset
             if (RelType != 0x100) {
                // Add inline to target address, except if target is a segment only
                TargetOffset += Inline;
@@ -896,7 +896,7 @@ void COMF2ASM::MakeRelocations(int32 Segment, uint32 RecNum, uint32 SOffset, uin
             // Warning: this method has not occurred. Not tested!
             // Groups are numbered in sequence after segments in Disasm. Add number of segments to group index
             TargetSegment = Target + NumSegments;// Target group
-            TargetOffset = TargetDisplacement;   // Target offset 
+            TargetOffset = TargetDisplacement;   // Target offset
             if (RelType != 0x100) {
                // Add inline to target address, except if target is a segment only
                TargetOffset += Inline;
@@ -927,13 +927,13 @@ void COMF2ASM::MakeRelocations(int32 Segment, uint32 RecNum, uint32 SOffset, uin
             // 8087 processor is present. I can't find this documented anywhere.
             // I don't know what the exact criterion is for indicating that a FIXUP
             // subrecord is not a relocation record but a f.p. emulating record.
-            // I have chosen to consider all subrecords with frame method F4 and 
+            // I have chosen to consider all subrecords with frame method F4 and
             // target method T6 to be ignored.
             ;
          }
          else {
             // This is a proper relocation subrecord
-            Disasm.AddRelocation(Segment, SourceOffset, Addend, RelType, SourceSize, TargetSymbol, ReferenceIndex); 
+            Disasm.AddRelocation(Segment, SourceOffset, Addend, RelType, SourceSize, TargetSymbol, ReferenceIndex);
          }
       }
       else {
@@ -941,7 +941,7 @@ void COMF2ASM::MakeRelocations(int32 Segment, uint32 RecNum, uint32 SOffset, uin
          // I don't think this feature for compressing fixup data is
          // used any more, if it ever was. I am not supporting it here.
          // Frame threads can be safely ignored. A target thread cannot
-         // be ignored if there is any reference to it. The error is 
+         // be ignored if there is any reference to it. The error is
          // reported above at the reference to a target thread, not here.
          TrdDat.b = byte1;              // Put byte into bitfield
          if (TrdDat.s.Method < 4) {     // Make sure we read this correctly, even if ignored

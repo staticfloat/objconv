@@ -1,13 +1,13 @@
 /****************************  omf2cof.cpp   *********************************
 * Author:        Agner Fog
 * Date created:  2007-02-08
-* Last modified: 2013-10-16
+* Last modified: 2018-08-15
 * Project:       objconv
 * Module:        omf2cof.cpp
 * Description:
 * Module for converting OMF file to PE/COFF file
 *
-* Copyright 2007-2013 GNU General Public License http://www.gnu.org/licenses
+* Copyright 2007-2018 GNU General Public License http://www.gnu.org/licenses
 *****************************************************************************/
 #include "stdafx.h"
 
@@ -103,7 +103,7 @@ void COMF2COF::MakeSymbolTable1() {
                 Attributes.b = Records[i].GetByte(); // Read attributes
                 if (Attributes.u.A == 0) {
                     // Frame and Offset only included if A = 0
-                    Records[i].GetWord();             // Frame ignored                    
+                    Records[i].GetWord();             // Frame ignored
                     Records[i].GetByte();
                 }
                 //else Offset = 0;
@@ -154,7 +154,7 @@ void COMF2COF::MakeSymbolTable1() {
                 // Store auxiliary symbol table entry
                 NewSymbolTable.Push(sym);
 
-                // Make section header            
+                // Make section header
                 memset(&sec, 0, sizeof(sec));        // Reset section header
 
                 // Put name into section header
@@ -410,7 +410,7 @@ void COMF2COF::MakeSymbolTable5() {
                         // Make entry in LocalSymbols.
                         // PushUnique will not make an entry if this target address already
                         // has an entry in LocalSymbols and possibly a public name
-                        LocalSymbols.PushUnique(localsym);       
+                        LocalSymbols.PushUnique(localsym);
                     }
                 }
                 else {
@@ -516,7 +516,7 @@ void COMF2COF::MakeSections() {
                 Offset  = Records[RecNum].GetNumeric();// Read offset
                 Size    = Records[RecNum].End - Records[RecNum].Index; // Calculate size of data
                 LastDataRecord = RecNum;             // Save for later FIXUPP that refers to this record
-                
+
                 // Check if data within segment
                 if (Offset + Size > SegmentSize) {
                     err.submit(2309, GetSegmentName(Segment));
@@ -622,7 +622,7 @@ void COMF2COF::MakeSections() {
                     if (byte1 & 0x80) {
 
                         // This is a FIXUP subrecord
-                        //Frame = 0; 
+                        //Frame = 0;
                         Target = 0; TargetDisplacement = 0;
 
                         // read second byte
@@ -668,13 +668,13 @@ void COMF2COF::MakeSections() {
                                 // The OMF format may indicate a relocation target by an
                                 // offset stored inline in the relocation source.
                                 // We prefer to store the target address explicitly in a
-                                // symbol table entry. 
+                                // symbol table entry.
 
                                 // Add the inline offset to the explicit offset
                                 TargetDisplacement += *(uint32*)inlinep;
 
                                 // Remove the inline addend to avoid adding it twice:
-                                // We have to do this in the new buffer TempBuf because 
+                                // We have to do this in the new buffer TempBuf because
                                 // the data have already been copied to TempBuf
                                 if (*(uint32*)(TempBuf.Buf() + LastOffset + Locat.s.Offset) != *(uint32*)inlinep) {
                                     // Check that the data in Buf() and TempBuf.Buf() are the same
@@ -700,14 +700,14 @@ void COMF2COF::MakeSections() {
 
                         // Make relocation record
                         // Offset of relocation source
-                        rel.VirtualAddress = Locat.s.Offset + LastOffset; 
+                        rel.VirtualAddress = Locat.s.Offset + LastOffset;
 
                         SOMFLocalSymbol locsym; // Symbol record for search in LocalSymbols table
                         int32 LocalSymbolsIndex; // Index into LocalSymbols table
 
                         // Relocation type: direct or EIP-relative
-                        // (The displacement between relocation source and EIP for 
-                        // self-relative relocations is implicit in both OMF and COFF 
+                        // (The displacement between relocation source and EIP for
+                        // self-relative relocations is implicit in both OMF and COFF
                         // files. No need for correction)
                         rel.Type = Locat.s.M ? COFF32_RELOC_DIR32 : COFF32_RELOC_REL32;
 
@@ -733,6 +733,10 @@ void COMF2COF::MakeSections() {
                         case 2: // T2 and T6: Target = external symbol
 
                             // Translate old EXTDEF index to new symbol table index
+                            if (Target >= ExtdefTranslation.GetNumEntries()) {
+                                Target = 0; err.submit(2312);
+                                continue;
+                            }
                             rel.SymbolTableIndex = ExtdefTranslation[Target];
 
                             // Put addend inline in new file
@@ -754,7 +758,7 @@ void COMF2COF::MakeSections() {
                         // I don't think this feature for compressing fixup data is
                         // used any more, if it ever was. I am not supporting it here.
                         // Frame threads can be safely ignored. A target thread cannot
-                        // be ignored if there is any reference to it. The error is 
+                        // be ignored if there is any reference to it. The error is
                         // reported above at the reference to a target thread, not here.
                         TrdDat.b = byte1;              // Put byte into bitfield
                         if (TrdDat.s.Method < 4) {     // Make sure we read this correctly, even if ignored
@@ -789,7 +793,7 @@ void COMF2COF::MakeSections() {
         // Search for the symbol table entry for this section:
         for (uint32 sym = 0; sym < NewSymbolTable.GetNumEntries(); sym++) {
             if ((uint32)NewSymbolTable[sym].s.SectionNumber == DesiredSegment
-                && NewSymbolTable[sym].s.StorageClass == COFF_CLASS_STATIC 
+                && NewSymbolTable[sym].s.StorageClass == COFF_CLASS_STATIC
                 && NewSymbolTable[sym].s.NumAuxSymbols == 1) {
                     // Found right symbol table entry. Insert NumberOfRelocations
                     NewSymbolTable[sym+1].section.NumberOfRelocations = NewSectionHeaders[SegNum].NRelocations;
@@ -823,7 +827,7 @@ void COMF2COF::CheckUnsupportedRecords() {
         case OMF_COMDAT: case OMF_LCOMDEF: case OMF_CEXTDEF:
             NumComdat++;  break;                    // Count COMDAT records
 
-        case OMF_COMENT: 
+        case OMF_COMENT:
             NumComent++;  break;                    // Count COMENT records
 
         default:                                   // Warning for unknown record type

@@ -13,7 +13,7 @@
 /*****************************************************************************
 This header file declares various container classes for dynamic allocation
 of memory for files and other types of data with unpredictable sizes.
-These classes have private access to the memory buffer in order to prevent 
+These classes have private access to the memory buffer in order to prevent
 memory leaks. It is important to use these classes for all dynamic memory
 allocation.
 
@@ -22,7 +22,7 @@ storage of data with a size that is not known in advance. CMemoryBuffer
 allows the size of its data to grow when new data are appended with the
 Push() member function.
 
-The class CFileBuffer, which is derived from CMemoryBuffer, is used for 
+The class CFileBuffer, which is derived from CMemoryBuffer, is used for
 reading, writing and storing object files and other files.
 
 There are many different classes for different things you can do with
@@ -34,21 +34,21 @@ from one object to another by the operator
 
 where A and B are both objects of classes that descend from CFileBuffer.
 The file buffer that was owned by A is transferred to B and A is left empty
-after the A >> B operation. This makes sure that a memory buffer is always 
-owned by one, and only one, object. The opposite operator B << A does the 
+after the A >> B operation. This makes sure that a memory buffer is always
+owned by one, and only one, object. The opposite operator B << A does the
 same thing.
 
 The >> operator is used whenever we want to do something to a file buffer
 that requires a specialized class. The file buffer is transferred from the
 object that owns it to an object of the specialized class and transferred
-back again to the original owner when the object of the specialized class 
+back again to the original owner when the object of the specialized class
 has done its job.
 
 You may say that the descendants of CFileBuffer have a chameleonic nature:
-You can change the nature of a piece of data owned by an object by 
+You can change the nature of a piece of data owned by an object by
 transferring it to an object of a different class. This couldn't be done
 by traditional polymorphism because it is not possible to change the class
-of an object after it is created, and there are too many different things 
+of an object after it is created, and there are too many different things
 you can do with object files for a single class to handle them all.
 
 The container class CMemoryBuffer is useful for storing data of mixed types.
@@ -58,20 +58,20 @@ Buf() + offset.
 If all items in a dynamic array are of the same type then it is easier to
 use one of the template classes CArrayBuf<> or CSList<>. These can be
 used in the same way as normal arrays with the operator [].
-CArrayBuf<> and CSList<> both have a member function SetNum() to allocate 
-the size. The size of CArrayBuf<> can be set only once, while the size of 
-CSList<> can be changed at any time. CSList<> also has a member function 
-Push() that adds records sequentially. CSList can be sorted if operators 
+CArrayBuf<> and CSList<> both have a member function SetNum() to allocate
+the size. The size of CArrayBuf<> can be set only once, while the size of
+CSList<> can be changed at any time. CSList<> also has a member function
+Push() that adds records sequentially. CSList can be sorted if operators
 < and == are defined for the record type.
 
 Warning:
 It is necessary to use CArrayBuf<> rather than CSList<> if the record type
 has a constructor or destructor.
 
-Warning: 
-It is not safe to make pointers to data inside a dynamic array of type 
-CMemoryBuffer or CSList<> because the buffer may be re-allocated when the 
-size grows. Such pointers will only work if we are finished with all push 
+Warning:
+It is not safe to make pointers to data inside a dynamic array of type
+CMemoryBuffer or CSList<> because the buffer may be re-allocated when the
+size grows. Such pointers will only work if we are finished with all push
 operations. It is safer to address data inside the buffer by their index
 or offset relative to the buffer.
 
@@ -215,23 +215,23 @@ public:
 // Class CSList<RecordType> is used for dynamic arrays where all records
 // have the same type RecordType. The list can be sorted if desired.
 //
-// An array defined as 
-//       CSList<RecordType> list; 
+// An array defined as
+//       CSList<RecordType> list;
 // can be used in several ways:
 //
-// 1. The size can be set with list.SetNum(n) where n is the maximum number of 
+// 1. The size can be set with list.SetNum(n) where n is the maximum number of
 //    entries. New entries can then be added in random order with list[i] = x;
 //    where i < n. Unused entries will be zero.
-// 2. Entries can be added sequentially with 
+// 2. Entries can be added sequentially with
 //    list.Push(x);
 //    The first entry will be list[0]
-// 3. Entries added with method 1 or 2 can be sorted in ascending order by 
+// 3. Entries added with method 1 or 2 can be sorted in ascending order by
 //    calling list.Sort();
-// 4. The list can be kept sorted at all times if records are added with 
+// 4. The list can be kept sorted at all times if records are added with
 //    list.PushSort(x);
 //    The list will be kept sorted in ascending order, provided that it
 //    was sorted before the call to PushSort.
-// 5. The list can be kept sorted at all times and without duplicates if 
+// 5. The list can be kept sorted at all times and without duplicates if
 //    records are added with list.PushUnique(x);
 //    The list will be sorted and without duplicates after PushUnique if
 //    it was so before the call to PushUnique.
@@ -245,7 +245,7 @@ public:
 // If RecordType has a constructor or destructor then they will not be
 // called properly. Use CArrayBuf instead of CSList if RecordType has
 // a constructor or destructor.
-// The operator < const must be defined for RecordType if any of the sorting 
+// The operator < const must be defined for RecordType if any of the sorting
 // features are used, i.e. Sort(), PushSort(), FindFirst(), Exists().
 //
 // Example:
@@ -258,7 +258,7 @@ public:
 // S1 a;  a.Index = 5;                           // Make record
 // list.PushUnique(a);                           // Put record into list
 
-template <class RecordType> 
+template <class RecordType>
 class CSList : private CMemoryBuffer {
 public:
    void Push(RecordType const & x) {
@@ -284,7 +284,7 @@ public:
          err.submit(9003); i = 0;}               // Error: index out of range
       return *(RecordType*)(Buf() + i * sizeof(RecordType));
    }
-   void Sort() {                                 
+   void Sort() {
       // Sort list by ascending RecordType items
       // Operator < must be defined for RecordType
       // Simple Bubble sort:
@@ -294,7 +294,7 @@ public:
          for (j = 0; j < (int32)NumEntries - i - 1; j++) {
             p1 = (RecordType*)(Buf() + j * sizeof(RecordType));
             p2 = (RecordType*)(Buf() + (j+1) * sizeof(RecordType));
-            if (*p2 < *p1) {                     
+            if (*p2 < *p1) {
                // Swap records
                temp = *p1;  *p1 = *p2;  *p2 = temp;
             }
@@ -330,7 +330,7 @@ public:
    }
    int32 PushSort(RecordType const & x) {
       // Add member to list and keep the list sorted.
-      // If the list is sorted before calling PushSort then it will also be 
+      // If the list is sorted before calling PushSort then it will also be
       // sorted after the call. If x is equal to an existing entry then x
       // will be inserted before the existing entry.
       // Operator < must be defined for RecordType.
@@ -339,7 +339,7 @@ public:
       SetNum(NumEntries + 1);                    // Make space for one more record
       // Move subsequent entries up one place
       if (RecordsToMove > 0) {
-         memmove(Buf() + i * sizeof(RecordType) + sizeof(RecordType), 
+         memmove(Buf() + i * sizeof(RecordType) + sizeof(RecordType),
             Buf() + i * sizeof(RecordType),
             RecordsToMove * sizeof(RecordType));
       }
@@ -350,11 +350,11 @@ public:
    int32 PushUnique(RecordType const & x) {
       // Add member to list and keep the list sorted. Avoids duplicate entries.
       // PushUnique will insert x in the list and keep the list sorted.
-      // If an entry equal to x already exists in the list then x is not 
+      // If an entry equal to x already exists in the list then x is not
       // inserted, and the return value will be the index to the existing entry.
-      // If no entry equal to x existed then x is inserted and the return 
+      // If no entry equal to x existed then x is inserted and the return
       // value is the index to the new entry.
-      // This list must be sorted and without duplicates before calling 
+      // This list must be sorted and without duplicates before calling
       // PushUnique.
       // Operator < must be defined for RecordType.
       int32 i = FindFirst(x);                    // Find where to insert x
@@ -365,7 +365,7 @@ public:
       SetNum(NumEntries + 1);                    // Make space for one more record
       // Move subsequent entries up one place
       if (RecordsToMove > 0) {
-         memmove(Buf() + i * sizeof(RecordType) + sizeof(RecordType), 
+         memmove(Buf() + i * sizeof(RecordType) + sizeof(RecordType),
             Buf() + i * sizeof(RecordType),
             RecordsToMove * sizeof(RecordType));
       }

@@ -1,19 +1,19 @@
 /****************************  maindef.h   **********************************
 * Author:        Agner Fog
 * Date created:  2006-08-26
-* Last modified: 2017-10-18
+* Last modified: 2018-08-15
 * Project:       objconv
 * Module:        maindef.h
 * Description:
 * Header file for type definitions and other main definitions.
 *
-* Copyright 2006-2017 GNU General Public License http://www.gnu.org/licenses
+* Copyright 2006-2018 GNU General Public License http://www.gnu.org/licenses
 *****************************************************************************/
 #ifndef MAINDEF_H
 #define MAINDEF_H
 
 // Program version
-#define OBJCONV_VERSION         2.48
+#define OBJCONV_VERSION         2.50
 
 
 // Integer type definitions with platform-independent sizes:
@@ -61,8 +61,8 @@ static inline uint32 HighDWord (uint64 x) {
    return (uint32)(x >> 32);
 }
 
-// Check if compiling for big-endian machine 
-// (__BIG_ENDIAN__ may not be defined even on big endian systems, so this check is not 
+// Check if compiling for big-endian machine
+// (__BIG_ENDIAN__ may not be defined even on big endian systems, so this check is not
 // sufficient. A further check is done in CheckEndianness() in main.cpp)
 #if defined(__BIG_ENDIAN__) && (__BIG_ENDIAN__ != 4321)
    #error This machine has big-endian memory organization. Objconv program will not work
@@ -72,7 +72,7 @@ static inline uint32 HighDWord (uint64 x) {
 #define MAXFILENAMELENGTH        256
 
 
-// File types 
+// File types
 #define FILETYPE_COFF              1         // Windows COFF/PE file
 #define FILETYPE_OMF               2         // Windows OMF file
 #define FILETYPE_ELF               3         // Linux or BSD ELF file

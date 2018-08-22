@@ -90,9 +90,9 @@ void CELF2ELF<ELFSTRUCTURES>::MakeSymbolTable() {
    // Loop through possibly two symbol tables
    for (isymt = 0; isymt < 2; isymt++) {
 
-      if (isymtab[isymt] && isymtab[isymt] < this->NSections 
+      if (isymtab[isymt] && isymtab[isymt] < this->NSections
       &&  istrtab[isymt] && istrtab[isymt] < this->NSections) {
-         
+
          // Symbol table header
          uint32 SymTabHeaderOffset = uint32(this->FileHeader.e_shoff + isymtab[isymt] * this->SectionHeaderSize);
          //TELF_SectionHeader SymTabHeader = this->Get<TELF_SectionHeader>(SymTabHeaderOffset);
@@ -183,7 +183,7 @@ void CELF2ELF<ELFSTRUCTURES>::MakeSymbolTable() {
                name1 = name2;  name2 = 0;
                break;
 
-            case SYMA_ALIAS: 
+            case SYMA_ALIAS:
                // Make alias and keep old name
                if (isymt != 0) err.submit(1033, name1); // alias in dynsym not supported yet
                AliasEntry = sym;

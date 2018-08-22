@@ -106,8 +106,8 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeSegments() {
 
    if (newsec != NumSectionsNew) {
       // Check my program for internal consistency
-      // If you get this error then change the value of NumSectionsNew in 
-      // the constructor CCOF2ELF::CCOF2ELF to equal the number of entries in 
+      // If you get this error then change the value of NumSectionsNew in
+      // the constructor CCOF2ELF::CCOF2ELF to equal the number of entries in
       // SpecialSegmentNames, including the Null segment
       err.submit(9000);
    }
@@ -153,7 +153,7 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeSegments() {
             err.submit(1030); // Warn that exception information is incompatible
          }
       }
-      
+
       if (strnicmp(SecName,".cormeta", 8) == 0) {
          // This is a .NET Common Language Runtime section
          err.submit(2014);
@@ -223,7 +223,7 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeSegments() {
       newsec++;
 
       if (SectionHeader->NRelocations > 0) {
-         // Source section has relocations. 
+         // Source section has relocations.
          // Make a relocation section in destination file
 
          // Put data into relocation section header:
@@ -321,7 +321,7 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeSymbolTable() {
          if (OldSectionIndex > 0 && OldSectionIndex <= this->NSections) {
             // Subtract 1 from OldSectionIndex because NewSectIndex[] is zero-based while OldSectionIndex is 1-based
             // Get new section index from translation table
-            NewSectionIndex = NewSectIndex[OldSectionIndex-1]; 
+            NewSectionIndex = NewSectIndex[OldSectionIndex-1];
          }
          if (NewSectionIndex == COFF_SECTION_REMOVE_ME) {
             continue; // Section has been removed. Remove symbol too
@@ -427,7 +427,7 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeSymbolTable() {
          if (OldSectionIndex > 0 && OldSectionIndex <= NSections) {
             // Subtract 1 from OldSectionIndex because NewSectIndex[] is zero-based while OldSectionIndex is 1-based
             // Get new section index from translation table
-            NewSectionIndex = NewSectIndex[OldSectionIndex-1]; 
+            NewSectionIndex = NewSectIndex[OldSectionIndex-1];
          }
          if (NewSectionIndex == COFF_SECTION_REMOVE_ME) {
             continue; // Section has been removed. Remove symbol too
@@ -451,7 +451,7 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeSymbolTable() {
                sym.st_size = sa->func.TotalSize;
             }
             if (sym.st_size == 0) {
-               // The size is not specified in the COFF file. 
+               // The size is not specified in the COFF file.
                // We may give it an arbitrary size:
                // sym.size = 1;
             }
@@ -590,7 +590,7 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeRelocationTables() {
                case COFF32_RELOC_REL32:   // 32-bit self-relative
                   NewRelocEntry.r_type = R_386_PC32;
                   // Difference between EIP-relative and self-relative relocation = size of address field
-                  NewRelocEntry.r_addend = -4;  break; 
+                  NewRelocEntry.r_addend = -4;  break;
                   /* !! error  if self-relative relocation with offset
                    !! test data that fails = testpic32.obj */
 
@@ -603,7 +603,7 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeRelocationTables() {
                      err.submit(1010);
                   }
                   break;
-                  
+
                default:
                   err.submit(2030, OldReloc.p->Type);  break; // Error: Unknown relocation type (%i) ignored
                }
@@ -656,21 +656,21 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeRelocationTables() {
                case COFF64_RELOC_REL32_5:    // 32 bit, relative to RIP - 5. (useless)
                   NewRelocEntry.r_type = R_X86_64_PC32;
                   // Note:
-                  // The microprocessor calculates RIP-relative addresses 
-                  // relative to the value of the instruction pointer AFTER 
-                  // the instruction. This is equal to the address of the 
-                  // relocated field plus the size of the relocated field 
-                  // itself plus the size of any immediate operand coming 
+                  // The microprocessor calculates RIP-relative addresses
+                  // relative to the value of the instruction pointer AFTER
+                  // the instruction. This is equal to the address of the
+                  // relocated field plus the size of the relocated field
+                  // itself plus the size of any immediate operand coming
                   // after the relocated field.
-                  // The COFF format makes the correction for this offset in 
-                  // the linker by using a differet relocation type for 
+                  // The COFF format makes the correction for this offset in
+                  // the linker by using a differet relocation type for
                   // immediate operand size = 0, 1, 2 or 4.
-                  // The ELF format makes the same correction by an explicit 
+                  // The ELF format makes the same correction by an explicit
                   // addend, which is -4, -5, -6 or -8, respectively.
-                  // The difference between RIP-relative and self-relative 
+                  // The difference between RIP-relative and self-relative
                   // relocation is equal to the size of the address field plus
                   // the size of any immediate operand:
-                  NewRelocEntry.r_addend = -(4 + OldReloc.p->Type - COFF64_RELOC_REL32);                  
+                  NewRelocEntry.r_addend = -(4 + OldReloc.p->Type - COFF64_RELOC_REL32);
                   break;
 
                case COFF64_RELOC_SECTION:   // 16-bit section index in file
@@ -682,7 +682,7 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeRelocationTables() {
                      // Issue warning. Ignore if stripping debug info
                      err.submit(1010);
                   }
-                  break; 
+                  break;
 
                default:
                   err.submit(2030, OldReloc.p->Type);  break; // Error: Unknown relocation type (%i) ignored
@@ -698,9 +698,9 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeRelocationTables() {
                }
             else {
                // Make pointer to inline addend
-               paddend = (int32*)(NewSections[newsec].Buf() 
+               paddend = (int32*)(NewSections[newsec].Buf()
                   + NewSectionHeaders[newsec].sh_offset + OldReloc.p->VirtualAddress);
-            } 
+            }
 
             // Put relocation record into table
             if (WordSize == 32) {
@@ -745,7 +745,7 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeBinaryFile() {
 
    // Set file type in ToFile
    ToFile.SetFileType(FILETYPE_ELF);
-   
+
    // Make space for file header in ToFile, but don't fill data into it yet
    ToFile.Push(0, sizeof(TELF_Header));
 

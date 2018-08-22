@@ -48,7 +48,7 @@ void CELF2COF<ELFSTRUCTURES>::Convert() {
 // MakeFileHeader(): Convert subfunction to make file header
 template <class TELF_Header, class TELF_SectionHeader, class TELF_Symbol, class TELF_Relocation>
 void CELF2COF<ELFSTRUCTURES>::MakeFileHeader() {
-   
+
    // Make PE file header
    NewFileHeader.Machine = (this->WordSize == 32) ? PE_MACHINE_I386 : PE_MACHINE_X8664;
    NewFileHeader.TimeDateStamp = (uint32)time(0);
@@ -106,7 +106,7 @@ void CELF2COF<ELFSTRUCTURES>::MakeSectionsIndex() {
       }
 
       // Search for program data sections only
-      if (this->SectionHeaders[oldsec].sh_type == SHT_PROGBITS 
+      if (this->SectionHeaders[oldsec].sh_type == SHT_PROGBITS
       ||  this->SectionHeaders[oldsec].sh_type == SHT_NOBITS) {
          // Section index translation table
          NewSectIndex[oldsec] = newsec++;
@@ -169,7 +169,7 @@ void CELF2COF<ELFSTRUCTURES>::MakeSections() {
             NewHeader.PRawData = NewRawData.GetDataSize() + RawDataOffset;
 
             // Copy raw data
-            NewRawData.Push(this->Buf()+(uint32)(OldHeader.sh_offset), (uint32)(OldHeader.sh_size)); 
+            NewRawData.Push(this->Buf()+(uint32)(OldHeader.sh_offset), (uint32)(OldHeader.sh_size));
             NewRawData.Align(4);
          }
 
@@ -180,7 +180,7 @@ void CELF2COF<ELFSTRUCTURES>::MakeSections() {
             NewHeader.Flags |= PE_SCN_MEM_EXECUTE | PE_SCN_CNT_CODE;
          }
          else {
-            NewHeader.Flags |= (OldHeader.sh_type == SHT_PROGBITS) ? 
+            NewHeader.Flags |= (OldHeader.sh_type == SHT_PROGBITS) ?
             PE_SCN_CNT_INIT_DATA : PE_SCN_CNT_UNINIT_DATA;
          }
          // Alignment
@@ -204,7 +204,7 @@ void CELF2COF<ELFSTRUCTURES>::MakeSections() {
 
                // Get entry size
                int entrysize = uint32(OldRelHeader.sh_entsize);
-               int expectedentrysize = (OldRelHeader.sh_type == SHT_RELA) ? 
+               int expectedentrysize = (OldRelHeader.sh_type == SHT_RELA) ?
                   sizeof(TELF_Relocation) :                    // Elf32_Rela, Elf64_Rela
                   sizeof(TELF_Relocation) - this->WordSize/8;  // Elf32_Rel,  Elf64_Rel
                if (entrysize < expectedentrysize) {err.submit(2033); entrysize = expectedentrysize;}
@@ -217,7 +217,7 @@ void CELF2COF<ELFSTRUCTURES>::MakeSections() {
 
                   // Copy relocation table entry with or without addend
                   OldRelocation.r_addend = 0;
-                  memcpy(&OldRelocation, reltab, entrysize); 
+                  memcpy(&OldRelocation, reltab, entrysize);
 
                   // Find inline addend
                   uint32 InlinePosition = (uint32)(NewHeader.PRawData - RawDataOffset + OldRelocation.r_offset);
@@ -236,7 +236,7 @@ void CELF2COF<ELFSTRUCTURES>::MakeSections() {
                   NewRelocation.VirtualAddress = uint32(OldRelocation.r_offset);
 
                   // Symbol table index
-                  if (OldRelocation.r_sym < NewSymbolIndex.GetNumEntries()) { 
+                  if (OldRelocation.r_sym < NewSymbolIndex.GetNumEntries()) {
                      NewRelocation.SymbolTableIndex = NewSymbolIndex[OldRelocation.r_sym];
                   }
                   else {
@@ -253,12 +253,12 @@ void CELF2COF<ELFSTRUCTURES>::MakeSections() {
                         err.submit(1063); // Warning: Gnu indirect function cannot be converted
                         // continue in next case?:
                      case R_386_32:      // 32-bit absolute virtual address
-                        NewRelocation.Type = COFF32_RELOC_DIR32;  
-                        *piaddend += uint32(OldRelocation.r_addend);  
+                        NewRelocation.Type = COFF32_RELOC_DIR32;
+                        *piaddend += uint32(OldRelocation.r_addend);
                         break;
 
                      case R_386_PC32:   // 32-bit self-relative
-                        NewRelocation.Type = COFF32_RELOC_REL32;  
+                        NewRelocation.Type = COFF32_RELOC_REL32;
                         // Difference between EIP-relative and self-relative relocation = size of address field
                         // Adjust inline addend for different relocation method:
                         *piaddend += 4 + uint32(OldRelocation.r_addend);
@@ -271,7 +271,7 @@ void CELF2COF<ELFSTRUCTURES>::MakeSections() {
                         NewRelocation.Type = 0;
                         break;
 
-                     case R_386_PLT32: case R_386_JMP_SLOT: 
+                     case R_386_PLT32: case R_386_JMP_SLOT:
                         // procedure linkage table
                         err.submit(2043);     // cannot convert import table
                         err.ClearError(2043); // report this error only once
@@ -280,21 +280,21 @@ void CELF2COF<ELFSTRUCTURES>::MakeSections() {
 
                      case R_386_RELATIVE:  // adjust by program base
                      default:              // Unknown or unsupported relocation method
-                        err.submit(2030, OldRelocation.r_type); 
+                        err.submit(2030, OldRelocation.r_type);
                         err.ClearError(2030); // report this error only once
-                        NewRelocation.Type = 0; 
+                        NewRelocation.Type = 0;
                         break;
                      }
                   }
                   else { // WordSize == 64
                      switch(OldRelocation.r_type) {
                      case R_X86_64_NONE:     // Ignored
-                        NewRelocation.Type = COFF64_RELOC_ABS;  
+                        NewRelocation.Type = COFF64_RELOC_ABS;
                         break;
 
                      case R_X86_64_64:      // 64 bit absolute virtual addres
-                        NewRelocation.Type = COFF64_RELOC_ABS64;  
-                        *(int64*)piaddend += OldRelocation.r_addend;  
+                        NewRelocation.Type = COFF64_RELOC_ABS64;
+                        *(int64*)piaddend += OldRelocation.r_addend;
                         break;
 
                      case R_X86_64_IRELATIVE:
@@ -302,8 +302,8 @@ void CELF2COF<ELFSTRUCTURES>::MakeSections() {
                         // continue in next case?:
                      case R_X86_64_32S:     // 32 bit absolute virtual address, sign extended
                      case R_X86_64_32:      // 32 bit absolute virtual address, zero extended
-                        NewRelocation.Type = COFF64_RELOC_ABS32;  
-                        *piaddend += uint32(OldRelocation.r_addend);  
+                        NewRelocation.Type = COFF64_RELOC_ABS32;
+                        *piaddend += uint32(OldRelocation.r_addend);
                         break;
 
                      case R_X86_64_PC32:    // 32 bit, self-relative
@@ -311,7 +311,7 @@ void CELF2COF<ELFSTRUCTURES>::MakeSections() {
                         // COFF and ELF relative relocation methods
                         *piaddend += uint32(OldRelocation.r_addend);
                         if (*piaddend >= -8 && *piaddend <= -4) {
-                           NewRelocation.Type = (uint16)(COFF64_RELOC_REL32 - *piaddend - 4);  
+                           NewRelocation.Type = (uint16)(COFF64_RELOC_REL32 - *piaddend - 4);
                            *piaddend = 0;
                         }
                         else {
@@ -321,7 +321,7 @@ void CELF2COF<ELFSTRUCTURES>::MakeSections() {
                         break;
 
                      case R_X86_64_RELATIVE:  // Adjust by program base
-                        err.submit(2030, OldRelocation.r_type); 
+                        err.submit(2030, OldRelocation.r_type);
                         err.ClearError(2030); // report this error only once
                         NewRelocation.Type = 0;
                         break;
@@ -333,7 +333,7 @@ void CELF2COF<ELFSTRUCTURES>::MakeSections() {
                         NewRelocation.Type = 0;
                         break;
 
-                     case R_X86_64_PLT32: case R_X86_64_JUMP_SLOT: 
+                     case R_X86_64_PLT32: case R_X86_64_JUMP_SLOT:
                         // procedure linkage table
                         err.submit(2042);     // cannot convert import table
                         err.ClearError(2043); // report this error only once
@@ -341,9 +341,9 @@ void CELF2COF<ELFSTRUCTURES>::MakeSections() {
                         break;
 
                      default:              // Unknown or unsupported relocation method
-                        err.submit(2030, OldRelocation.r_type); 
+                        err.submit(2030, OldRelocation.r_type);
                         err.ClearError(2030); // report this error only once
-                        NewRelocation.Type = 0; 
+                        NewRelocation.Type = 0;
                         break;
                      }
                   }
@@ -355,7 +355,7 @@ void CELF2COF<ELFSTRUCTURES>::MakeSections() {
                   // Remember that symbol is used
                   if (OldRelocation.r_type) {
                      SymbolsUsed[NewRelocation.SymbolTableIndex]++;
-                  }                                  
+                  }
 
                } // End of relocations loop
 
@@ -417,7 +417,7 @@ void CELF2COF<ELFSTRUCTURES>::MakeSymbolTable() {
    for (oldsec = 0; oldsec < this->NSections; oldsec++) {
 
       // Search for program data sections only
-      if (this->SectionHeaders[oldsec].sh_type == SHT_SYMTAB 
+      if (this->SectionHeaders[oldsec].sh_type == SHT_SYMTAB
       || this->SectionHeaders[oldsec].sh_type==SHT_DYNSYM) {
          FoundSymTab++;  numaux = 0;
 
@@ -428,7 +428,7 @@ void CELF2COF<ELFSTRUCTURES>::MakeSymbolTable() {
          if (OldHeader.sh_link >= this->NSections) {err.submit(2035); OldHeader.sh_link = 0;}
          strtab = this->Buf() + uint32(this->SectionHeaders[OldHeader.sh_link].sh_offset);
          stringtabsize = uint32(this->SectionHeaders[OldHeader.sh_link].sh_size);
-            
+
 
          // Find old symbol table
          entrysize = uint32(OldHeader.sh_entsize);
@@ -448,7 +448,7 @@ void CELF2COF<ELFSTRUCTURES>::MakeSymbolTable() {
             memset(&NewSym, 0, sizeof(NewSym));
 
             // New symbol index
-            NewSymI = NewSymbolTable.GetNumEntries(); 
+            NewSymI = NewSymbolTable.GetNumEntries();
 
             // Symbol type
             int type = OldSym.st_type;
@@ -472,7 +472,7 @@ void CELF2COF<ELFSTRUCTURES>::MakeSymbolTable() {
             // Value
             NewSym.s.Value = uint32(OldSym.st_value);
             // Check for overflow if converting 64 bit symbol value to 32 bits
-            if (SymbolOverflow(OldSym.st_value)) err.submit(2020, symname); 
+            if (SymbolOverflow(OldSym.st_value)) err.submit(2020, symname);
 
             // Section
             if (OldSym.st_shndx == SHN_UNDEF) {
@@ -485,7 +485,7 @@ void CELF2COF<ELFSTRUCTURES>::MakeSymbolTable() {
                err.submit(2036, OldSym.st_shndx); // Special/unknown section index or out of range
             }
             else {
-               // Normal section index. 
+               // Normal section index.
                // Look up in section index translation table and add 1 because it is 1-based
                NewSym.s.SectionNumber = (int16)(NewSectIndex[OldSym.st_shndx] + 1);
             }
@@ -502,7 +502,7 @@ void CELF2COF<ELFSTRUCTURES>::MakeSymbolTable() {
                err.submit(1051, symname); // Weak public symbol not supported
                NewSym.s.StorageClass = COFF_CLASS_WEAK_EXTERNAL; break;
 
-            default: 
+            default:
                err.submit(2037, binding); // Other. Not supported
             }
 
@@ -510,7 +510,7 @@ void CELF2COF<ELFSTRUCTURES>::MakeSymbolTable() {
             switch (type) {
             case STT_OBJECT: case STT_NOTYPE:
                // Data object
-               NewSym.s.Type = COFF_TYPE_NOT_FUNCTION;  
+               NewSym.s.Type = COFF_TYPE_NOT_FUNCTION;
                if (OldSymI > 0) { // First symbol entry in ELF file is unused
                   NewSymbolTable.Push(&NewSym, SIZE_SCOFF_SymTableEntry);
                }
@@ -521,7 +521,7 @@ void CELF2COF<ELFSTRUCTURES>::MakeSymbolTable() {
                // continue in next case:
             case STT_FUNC:
                // Function
-               NewSym.s.Type = COFF_TYPE_FUNCTION;  
+               NewSym.s.Type = COFF_TYPE_FUNCTION;
                NewSymbolTable.Push(&NewSym, SIZE_SCOFF_SymTableEntry);
                // Aux records needed only if debug information included
                break;
@@ -552,7 +552,7 @@ void CELF2COF<ELFSTRUCTURES>::MakeSymbolTable() {
                numaux = (len + SIZE_SCOFF_SymTableEntry - 1) / SIZE_SCOFF_SymTableEntry;
                NewSym.s.NumAuxSymbols = (uint8)numaux;
                // Store regular record
-               NewSymbolTable.Push(&NewSym, SIZE_SCOFF_SymTableEntry);               
+               NewSymbolTable.Push(&NewSym, SIZE_SCOFF_SymTableEntry);
                // Store numaux auxiliary records for file name
                for (uint32 i = 0; i < numaux; i++) { // Can't push all in one operation because NumEntries will be wrong
                   NewSymbolTable.Push(0, SIZE_SCOFF_SymTableEntry);
@@ -584,7 +584,7 @@ void CELF2COF<ELFSTRUCTURES>::MakeSymbolTable() {
                }
 
                // Store regular record
-               NewSymbolTable.Push(&NewSym, SIZE_SCOFF_SymTableEntry);               
+               NewSymbolTable.Push(&NewSym, SIZE_SCOFF_SymTableEntry);
 
                // Make auxiliary record
                memset(&AuxSym, 0, sizeof(AuxSym));
@@ -601,7 +601,7 @@ void CELF2COF<ELFSTRUCTURES>::MakeSymbolTable() {
                   }
                }
                // Store auxiliary record
-               NewSymbolTable.Push(&AuxSym, SIZE_SCOFF_SymTableEntry);               
+               NewSymbolTable.Push(&AuxSym, SIZE_SCOFF_SymTableEntry);
                break;}
 
             case STT_COMMON:

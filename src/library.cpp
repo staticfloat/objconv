@@ -49,7 +49,7 @@ void CLibrary::Go() {
 
     // Remove path form member names and check member type before extracting or adding members
     AlignBy = 2;
-    if (GetDataSize()) FixNames();    
+    if (GetDataSize()) FixNames();
 
     if (err.Number()) return; // Stop if error
 
@@ -82,11 +82,11 @@ void CLibrary::Go() {
     if (cmd.OutputType == FILETYPE_MACHO_LE) AlignBy = 8;
 
     // Determine library type and subtype
-    if (cmd.LibrarySubtype == 0) {    
+    if (cmd.LibrarySubtype == 0) {
         switch (cmd.OutputType) {
         case FILETYPE_OMF: case FILETYPE_OMFLIBRARY:
             cmd.LibrarySubtype = LIBTYPE_OMF;  break;
-        case FILETYPE_COFF: case FILETYPE_DOS: 
+        case FILETYPE_COFF: case FILETYPE_DOS:
             cmd.LibrarySubtype = LIBTYPE_WINDOWS;  break;
         case FILETYPE_ELF:
             cmd.LibrarySubtype = LIBTYPE_LINUX;  break;
@@ -94,7 +94,7 @@ void CLibrary::Go() {
             cmd.LibrarySubtype = LIBTYPE_BSD_MAC;  break;
         case FILETYPE_LIBRARY:
             switch (cmd.InputType) {
-            case FILETYPE_COFF: case FILETYPE_DOS: 
+            case FILETYPE_COFF: case FILETYPE_DOS:
                 cmd.LibrarySubtype = LIBTYPE_WINDOWS;  break;
             case FILETYPE_ELF:
                 cmd.LibrarySubtype = LIBTYPE_LINUX;  break;
@@ -124,7 +124,7 @@ void CLibrary::Go() {
             printf("\nInput library: %s", FileName);
             if (cmd.InputType != cmd.OutputType) {
                 // Converting library type. Print input file type
-                int InType = cmd.InputType; 
+                int InType = cmd.InputType;
                 if (InType == FILETYPE_LIBRARY || InType == FILETYPE_OMFLIBRARY) InType = cmd.MemberType;
                 printf(", Format: %s", GetFileFormatName(InType));
                 if (cmd.DesiredWordSize) printf("%i", cmd.DesiredWordSize);
@@ -197,7 +197,7 @@ void CLibrary::Go() {
             }
             else {
                 // Library members have different type or word size
-                err.submit(1102); 
+                err.submit(1102);
             }
         }
 
@@ -260,7 +260,7 @@ void CLibrary::Go() {
         }
     } // End of loop through library
     // Stop if error
-    if (err.Number()) return; 
+    if (err.Number()) return;
 
     if (cmd.LibraryOptions & CMDL_LIBRARY_ADDMEMBER) {
         // Add object files to library
@@ -274,7 +274,7 @@ void CLibrary::Go() {
             // Read object file
             MemberBuffer.Read();
             // Stop if read failed
-            if (err.Number()) continue; 
+            if (err.Number()) continue;
             // Detect file type
             int NewMemberType = MemberBuffer.GetFileType();
             if (cmd.Verbose) {
@@ -294,26 +294,26 @@ void CLibrary::Go() {
             MemberBuffer.Go();
 
             // Stop if error
-            if (err.Number()) continue; 
+            if (err.Number()) continue;
 
             // Check if file type is right after conversion
             MemberFileType = MemberBuffer.FileType;
             if (WordSize == 0) WordSize = MemberBuffer.WordSize;
             if (MemberFileType != cmd.OutputType) {
                 // Library members have different type
-                err.submit(2504, GetFileFormatName(MemberBuffer.FileType)); continue; 
+                err.submit(2504, GetFileFormatName(MemberBuffer.FileType)); continue;
             }
             if (MemberBuffer.WordSize != WordSize) {
                 // Library members have different word size
-                err.submit(2505, MemberBuffer.WordSize); continue; 
+                err.submit(2505, MemberBuffer.WordSize); continue;
             }
             // Put into library
             MemberBuffer.FileName = MemberBuffer.OutputFileName;
             InsertMember(&MemberBuffer);
         } // End of loop through object file names
-    } 
+    }
     // Stop if error
-    if (err.Number()) return; 
+    if (err.Number()) return;
 
     if (cmd.LibraryOptions & CMDL_LIBRARY_EXTRACTMEM) {
         cmd.CheckExtractSuccess();  // Check if members to extract were found
@@ -389,7 +389,7 @@ void CLibrary::RebuildUNIX() {
         InsertMember(&MemberBuffer);
     }
     // Avoid getting warnings twice for duplicate symbols
-    RepressWarnings = 1; 
+    RepressWarnings = 1;
     // Make library header etc. and add all members to OutFile
     MakeBinaryFile();
     RepressWarnings = 0;
@@ -624,7 +624,7 @@ void CLibrary::DumpOMF() {
 
             // Get public names from member
             FirstPublic = MemberIndex.GetNumEntries();
-            Member.PublicNames(&Strings, &MemberIndex, ++MemberNum); 
+            Member.PublicNames(&Strings, &MemberIndex, ++MemberNum);
 
             // Print public names
             for (i = FirstPublic; i < MemberIndex.GetNumEntries(); i++) {
@@ -640,7 +640,7 @@ void CLibrary::DumpOMF() {
             RecordEnd = rec.FileOffset + rec.End + 1;// End of record
             if (RecordEnd != DictionaryOffset) err.submit(2602);
             break;
-        }     
+        }
     }  // Go to next record
     while (rec.GetNext());                        // End of loop through records
 
@@ -667,7 +667,7 @@ void CLibrary::DumpOMF() {
         }
         else {
             // Unknown format
-            printf("\nExtended dictionary size %i, unknown type 0x%02X", 
+            printf("\nExtended dictionary size %i, unknown type 0x%02X",
                 ExtendedDictionarySize, DictionaryType);
         }
     }
@@ -709,7 +709,7 @@ void CLibrary::DumpUNIX() {
             if (i == 16) Name[i] = 0;
 
             if (strncmp(Name, "//", 2) == 0) {
-                // This is the long names member. 
+                // This is the long names member.
                 printf("\nLongnames header \"%s\". Offset 0x%X, size 0x%X", Name,
                     CurrentOffset + (uint32)sizeof(SUNIXLibraryHeader), MemberSize);
             }
@@ -735,7 +735,7 @@ void CLibrary::DumpUNIX() {
             // Point to next member
             CurrentOffset = NextHeader(CurrentOffset);
         }
-        CurrentOffset = 8;  CurrentNumber = 0; 
+        CurrentOffset = 8;  CurrentNumber = 0;
     }
 
     printf("\n\nExported symbols by member:\n");
@@ -768,7 +768,7 @@ void CLibrary::DumpUNIX() {
 
         // Get symbol table for specific file type
         switch (MemberFileType) {
-        case FILETYPE_ELF: 
+        case FILETYPE_ELF:
             if (WordSize == 32) {
                 // Make instance of file parser, 32 bit template
                 CELF<ELF32STRUCTURES> elf;
@@ -810,7 +810,7 @@ void CLibrary::DumpUNIX() {
             // This is an import library
             char * name1 = MemberBuffer.Buf() + 20;
             printf("\n  Import %s from %s", name1, name1 + strlen(name1) + 1);
-            break;} 
+            break;}
 
         default:
             printf("\n   Cannot extract symbol names from this file type");
@@ -866,7 +866,7 @@ uint32 CLibrary::NextHeader(uint32 Offset) {
 
 
 void CLibrary::StartExtracting() {
-    // Initialize before ExtractMember() 
+    // Initialize before ExtractMember()
     if (cmd.InputType == FILETYPE_OMFLIBRARY) {
         SOMFRecordPointer rec;                     // OMF records
         rec.Start(Buf(), 0, GetDataSize());        // Initialize record pointer
@@ -956,7 +956,7 @@ char * CLibrary::ExtractMemberOMF(CFileBuffer * Destination) {
 
             // No more members:
             return 0;
-        }     
+        }
     }  // Go to next record
     while (rec.GetNext());                        // End of loop through records
 
@@ -1033,7 +1033,7 @@ char * CLibrary::ExtractMemberUNIX(CFileBuffer * Destination) {
             HeaderExtra = atoi(Name+3);
             Name += sizeof(SUNIXLibraryHeader);
             if (MemberSize > HeaderExtra) {
-                // The length of the name, HeaderExtra, is included in the 
+                // The length of the name, HeaderExtra, is included in the
                 // Header->FileSize field. Subtract to get the real file size
                 MemberSize -= HeaderExtra;
             }
@@ -1121,7 +1121,7 @@ void CLibrary::InsertMemberUNIX(CFileBuffer * member) {
     uint32 AlignmentPadding = 0;        // Padding after file
     char * name = 0;                    // Name of member
     int NameLength = 0;                 // length of name
-    int NameAfter = 0;                  // length of name after MachO header 
+    int NameAfter = 0;                  // length of name after MachO header
     int i;                              // loop counter, index
 
     // Get word size
@@ -1154,7 +1154,7 @@ void CLibrary::InsertMemberUNIX(CFileBuffer * member) {
     else {
         // ELF and COFF library store names < 16 characters in the name field
         if (NameLength < 16) {
-            // (Don't use sprintf to write header.Name here: It seems that Gnu sprintf checks the size of the 
+            // (Don't use sprintf to write header.Name here: It seems that Gnu sprintf checks the size of the
             // buffer it is writing to. Gives buffer overrun error when termniating zero goes beyond the name field)
             memset(header.Name, ' ', 16);
             memcpy(header.Name, name, NameLength);
@@ -1210,11 +1210,11 @@ void CLibrary::InsertMemberUNIX(CFileBuffer * member) {
     // Store member header
     DataBuffer.Push(&header, sizeof(header));
 
-    if (cmd.OutputType == FILETYPE_MACHO_LE) {    
+    if (cmd.OutputType == FILETYPE_MACHO_LE) {
         // Store member name after header if Mach-O
         if (NameAfter) {
             // Mach-O library stores name after header record.
-            DataBuffer.PushString(name); 
+            DataBuffer.PushString(name);
         }
         DataBuffer.Align(AlignBy);
     }
@@ -1293,7 +1293,7 @@ char * CLibrary::TruncateMemberName(char const * name) {
     // Remove path and truncate object file name to 15 characters
     // This function removes any path from the member name,
     // changes the extension to the default for the the output file type,
-    // changes any spaces to underscores, and 
+    // changes any spaces to underscores, and
     // truncates the member name to 15 characters for the sake of compatibility.
     // The return value is an ASCII string in a static buffer
     static char TruncName[32];          // Truncated name
@@ -1323,7 +1323,7 @@ char * CLibrary::TruncateMemberName(char const * name) {
     // Check if any name remains
     if (len == 0) {     // No name. Make one
         sprintf(TruncName, "NoName%i", ++DummyNumber);
-        p1 = TruncName;  len = (int)strlen(p1); 
+        p1 = TruncName;  len = (int)strlen(p1);
     }
 
     // Get file type
@@ -1354,7 +1354,7 @@ char * CLibrary::TruncateMemberName(char const * name) {
     strcpy(TruncName+strlen(TruncName), extension);
 
     // Terminate
-    TruncName[15] = 0;  
+    TruncName[15] = 0;
     return TruncName;
 }
 */
@@ -1386,7 +1386,7 @@ char * CLibrary::StripMemberName(char * name) {
     if (p1 > name) {
         strcpy(name, p1);
     }
-        
+
     // Get file type
     if (cmd.MemberType) {
         FileType = cmd.MemberType;
@@ -1394,7 +1394,7 @@ char * CLibrary::StripMemberName(char * name) {
     else if (cmd.LibraryOptions & CMDL_LIBRARY_EXTRACTMEM) {
         FileType = cmd.InputType;
     }
-    else {    
+    else {
         FileType = cmd.OutputType;
     }
     if (FileType == CMDL_OUTPUT_DUMP || FileType == 0) FileType = cmd.InputType;
@@ -1425,7 +1425,7 @@ char * CLibrary::StripMemberName(char * name) {
     // Check if any name remains
     if ((len == 0 && len0 > 12) || nlen == 0) {     // No name. Make one
         sprintf(name, "NoName%i", ++DummyNumber);
-        len = (int)strlen(name); 
+        len = (int)strlen(name);
     }
 
     // Replace extension
@@ -1485,7 +1485,7 @@ char * CLibrary::ShortenMemberName(char const *name) {
     // Check if any name remains
     if (len0 == 0) {     // No name. Make one
         sprintf(fixedName, "NoName_%X", RunningNumber++);
-        len0 = (int)strlen(fixedName); 
+        len0 = (int)strlen(fixedName);
     }
 
     // Get file type
@@ -1656,13 +1656,13 @@ void CLibrary::MakeSymbolTableUnix() {
     // FILETYPE_MACHO_LE   = 4: Mac, unsorted
     //              0x10000004: Mac, sorted
     // Newer Mac tools require the sorted type, unless there are multiple publics with same name
-    if (SymbolTableType == FILETYPE_MACHO_LE) SymbolTableType |= 0x10000000; 
+    if (SymbolTableType == FILETYPE_MACHO_LE) SymbolTableType |= 0x10000000;
 
     // Make symbol table header
     SUNIXLibraryHeader SymTab;             // Symbol table header
     memset(&SymTab, ' ', sizeof(SymTab));  // Fill with spaces
     SymTab.Name[0] = '/';                  // Name = '/'
-    // The silly Mac linker requires that the symbol table has a date stamp not 
+    // The silly Mac linker requires that the symbol table has a date stamp not
     // older than the .a file. Fix this by post-dating the symbol table:
     uint32 PostDate = 0;
     if (SymbolTableType & 0x10000000) PostDate = 100; // Post-date if mac sorted symbol table
@@ -1702,11 +1702,11 @@ void CLibrary::MakeSymbolTableUnix() {
     uint32 FirstMemberOffset = 0;
     switch (SymbolTableType) {
     case FILETYPE_COFF:
-        FirstMemberOffset = 8 + 2*sizeof(SUNIXLibraryHeader) + RoundEven(Index1Size) 
+        FirstMemberOffset = 8 + 2*sizeof(SUNIXLibraryHeader) + RoundEven(Index1Size)
             + RoundEven(Index2Size) + RoundEven(LongnamesMemberSize);
         break;
     case FILETYPE_ELF:
-        FirstMemberOffset = 8 + sizeof(SUNIXLibraryHeader) + RoundEven(Index1Size) 
+        FirstMemberOffset = 8 + sizeof(SUNIXLibraryHeader) + RoundEven(Index1Size)
             + RoundEven(LongnamesMemberSize);
         break;
     case FILETYPE_MACHO_LE:
@@ -1715,7 +1715,7 @@ void CLibrary::MakeSymbolTableUnix() {
     case FILETYPE_MACHO_LE | 0x10000000: // Mac, sorted
         LongNameSize = 20;
         FirstMemberOffset = 8 + sizeof(SUNIXLibraryHeader) + Index3Size + LongNameSize;
-        break;      
+        break;
     default:
         err.submit(2501, GetFileFormatName(cmd.OutputType));
     }
@@ -1879,7 +1879,7 @@ void CLibrary::MakeSymbolTableUnix() {
         OutFile.Push(StringBuffer.Buf(), StringBuffer.GetDataSize());
         // Align by 4
         OutFile.Align(4);
-        // Cross check precalculated size (8 is the size of "!<arch>\n" file identifier) 
+        // Cross check precalculated size (8 is the size of "!<arch>\n" file identifier)
         if (OutFile.GetDataSize() != Index3Size + sizeof(SymTab) + 8 + LongNameSize) err.submit(9000);
     }
 }
@@ -1937,7 +1937,7 @@ void CLibrary::MakeBinaryFileOMF() {
     // Insert members
     for (MemberI = 0; MemberI < Indexes.GetNumEntries(); MemberI++) {
 
-        // Find member in DataBuffer 
+        // Find member in DataBuffer
         MemberStart = Indexes[MemberI];            // Start of member in DataBuffer
         if (MemberI+1 < Indexes.GetNumEntries()) {
             // Not last member
@@ -2000,7 +2000,7 @@ void CLibrary::MakeBinaryFileUNIX() {
     OutFile.SetSize(GetBufferSize());
 
     if (cmd.OutputType == FILETYPE_COFF || cmd.OutputType == FILETYPE_ELF || cmd.OutputType == FILETYPE_MACHO_LE) {
-        // COFF, ELF and MAach-O libraries all use Unix-style archive with 
+        // COFF, ELF and MAach-O libraries all use Unix-style archive with
         // differences in symbol table format
 
         // Make symbol table

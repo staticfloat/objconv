@@ -42,7 +42,7 @@ SErrorText ErrorTexts[] = {
    {1024, 1, "Cannot change prefix on name %s, not a symbol"},
    {1029, 1, "Debug information may be incompatible"},
    {1030, 1, "Exception information may be incompatible"},
-   {1031, 1, "Windows resource information not translated"},   
+   {1031, 1, "Windows resource information not translated"},
    {1032, 1, "More than one symbol table found in ELF file"},
    {1033, 1, "Sorry, cannot currently make alias in dynamic symbol table. Symbol = %s"},
    {1040, 1, "Name of section %s too long. Truncating to 16 characters"},
@@ -229,7 +229,7 @@ void CErrorReporter::submit(int ErrorNumber) {
    HandleError(err, err->Text);
 }
 
-void CErrorReporter::submit(int ErrorNumber, int extra) { 
+void CErrorReporter::submit(int ErrorNumber, int extra) {
    // Print error message with extra numeric info
    // ErrorTexts[ErrorNumber] must contain %i where extra is to be inserted
    char text[MAX_ERROR_TEXT_LENGTH];
@@ -238,7 +238,7 @@ void CErrorReporter::submit(int ErrorNumber, int extra) {
    HandleError(err, text);
 }
 
-void CErrorReporter::submit(int ErrorNumber, int extra1, int extra2) { 
+void CErrorReporter::submit(int ErrorNumber, int extra1, int extra2) {
    // Print error message with 2 extra numeric values inserted
    // ErrorTexts[ErrorNumber] must contain two %i fields where extra numbers are to be inserted
    char text[MAX_ERROR_TEXT_LENGTH];

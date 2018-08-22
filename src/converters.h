@@ -13,10 +13,10 @@
 /*******************************   Classes   ********************************
 
 This header file declares various classes for interpreting and converting
-different types of object files. These classes are all derived from the 
+different types of object files. These classes are all derived from the
 container class CFileBuffer, declared in containers.h.
 
-See containers.h for an explanation of the container classes and the 
+See containers.h for an explanation of the container classes and the
 operators >> and << which can transfer a data buffer from an object of one
 class to an object of another class.
 
@@ -182,9 +182,9 @@ protected:
    uint32 StringTabOffset;                       // File offset of string table
    uint32 StringTabSize;                         // Size of string table
    uint32 ilocalsym;	                            // index to local symbols
-   uint32 nlocalsym;	                            // number of local symbols 
+   uint32 nlocalsym;	                            // number of local symbols
    uint32 iextdefsym;	                         // index to public symbols
-   uint32 nextdefsym;	                         // number of public symbols 
+   uint32 nextdefsym;	                         // number of public symbols
    uint32 iundefsym;	                            // index to external symbols
    uint32 nundefsym;	                            // number of external symbols
    uint32 IndirectSymTabOffset;                  // file offset to the indirect symbol table
@@ -437,9 +437,9 @@ protected:
    CFileBuffer ToFile;                           // File buffer for modified PE file
    uint32 NumOldSymbols;                         // Size of NewSymbolIndex table
    uint32 NewIlocalsym;	                         // index to local symbols
-   uint32 NewNlocalsym;	                         // number of local symbols 
+   uint32 NewNlocalsym;	                         // number of local symbols
    uint32 NewIextdefsym;	                      // index to public symbols
-   uint32 NewNextdefsym;	                      // number of public symbols 
+   uint32 NewNextdefsym;	                      // number of public symbols
    uint32 NewIundefsym;	                         // index to external symbols
    uint32 NewNundefsym;	                         // number of external symbols
    uint32 NewSymtabOffset;                       // Offset to new symbol table

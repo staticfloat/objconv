@@ -50,7 +50,7 @@ void CMAC2MAC<MACSTRUCTURES>::MakeSymbolTable() {
    TMAC_nlist * symp = (TMAC_nlist*)(this->Buf() + this->SymTabOffset);
 
    // pointer to string table
-   char * strtab = (char*)(this->Buf() + this->StringTabOffset); 
+   char * strtab = (char*)(this->Buf() + this->StringTabOffset);
 
    // loop through symbol table
    for (symi = 0; symi < this->SymTabNumber; symi++, symp++) {
@@ -118,7 +118,7 @@ void CMAC2MAC<MACSTRUCTURES>::MakeSymbolTable() {
          Name1 = Name2;  Name2 = 0;
          break;
 
-      case SYMA_ALIAS: 
+      case SYMA_ALIAS:
          // Make alias and keep old name
          if (OldScope != 1) {
             err.submit(1022, Name1); break;
@@ -143,15 +143,15 @@ void CMAC2MAC<MACSTRUCTURES>::MakeSymbolTable() {
 
    // Indices to local, public and external symbols
    NewIlocalsym = 0;	                            // index to local symbols
-   NewNlocalsym = NewSymbols[0].GetNumEntries(); // number of local symbols 
+   NewNlocalsym = NewSymbols[0].GetNumEntries(); // number of local symbols
    NewIextdefsym = NewNlocalsym;	                // index to public symbols
-   NewNextdefsym = NewSymbols[1].GetNumEntries();// number of public symbols 
+   NewNextdefsym = NewSymbols[1].GetNumEntries();// number of public symbols
    NewIundefsym = NewNlocalsym + NewNextdefsym;  // index to external symbols
    NewNundefsym = NewSymbols[2].GetNumEntries(); // number of external symbols
 
    // Calculate difference in size of new tables versus old tables
    // (this calculation is moved to MakeBinaryFile)
-   // SizeDifference = NewSymbolTable.GetDataSize + NewStringTable.GetDataSize() 
+   // SizeDifference = NewSymbolTable.GetDataSize + NewStringTable.GetDataSize()
    // - this->SymTabNumber * sizeof(TMAC_nlist) - this->StringTabSize;
 }
 
@@ -186,7 +186,7 @@ uint32 CMAC2MAC<MACSTRUCTURES>::NewFileOffset(uint32 OldOffset) {
       // After string table. Add size difference
       return OldOffset + SizeDifference;
    }
-   // Between symbol table and string table. 
+   // Between symbol table and string table.
    // The possibility of something between these two tables has not been accounted for
    err.submit(2052);
    return 0;
@@ -208,7 +208,7 @@ void CMAC2MAC<MACSTRUCTURES>::MakeBinaryFile() {
    // Copy all headers and all data until TablesOffset
    ToFile.Push(this->Buf(), NewSymtabOffset);
    ToFile.Align(WordSize/8);
-   NewSymtabOffset = ToFile.GetDataSize(); 
+   NewSymtabOffset = ToFile.GetDataSize();
 
    // Copy new symbol table
    ToFile.Push(NewSymbolTable.Buf(), NewSymbolTable.GetDataSize());
@@ -302,7 +302,7 @@ void CMAC2MAC<MACSTRUCTURES>::ChangeSegments() {
          sh->nlocalsym = NewNlocalsym;
          sh->iextdefsym = NewIextdefsym;
          sh->nextdefsym = NewNextdefsym;
-         sh->iundefsym = NewIundefsym;            
+         sh->iundefsym = NewIundefsym;
          sh->nundefsym = NewNundefsym;
 
          // Change table addresses

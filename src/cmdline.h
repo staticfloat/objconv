@@ -91,7 +91,7 @@
 #define SYMT_EXTERNAL                4     // External symbol (imported)
 #define SYMT_LIBRARYMEMBER      0x1000     // Name of library member
 
-// Constants for symbol change action as defined in SSymbolChange::Action 
+// Constants for symbol change action as defined in SSymbolChange::Action
 // and output from CCommandLineInterpreter::SymbolChange()
 #define SYMA_NOCHANGE                0     // Do nothing
 #define SYMA_MAKE_WEAK               1     // Make symbol weak
@@ -99,7 +99,7 @@
 #define SYMA_CHANGE_NAME          0x10     // Change name of symbol
 #define SYMA_CHANGE_PREFIX        0x11     // Change beginning of symbol name
 #define SYMA_CHANGE_SUFFIX        0x12     // Change end of symbol name
-#define SYMA_ALIAS               0x100     // Make alias of public symbol and keep old name, must be combined 
+#define SYMA_ALIAS               0x100     // Make alias of public symbol and keep old name, must be combined
                                            // with SYMA_CHANGE_NAME, SYMA_CHANGE_PREFIX or SYMA_CHANGE_SUFFIX
 #define SYMA_ADD_MEMBER         0x1001     // Add member to library
 #define SYMA_DELETE_MEMBER      0x1002     // Remove member from library

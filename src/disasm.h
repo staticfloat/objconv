@@ -281,14 +281,14 @@ the values for these two operands are OR'ed (e.g. imul eax,ebx,9; shrd eax,ebx,c
 
 EVEX:
 --------
-This field indicates the meaning of the z, L'L, b and aaa bits of an EVEX prefix. 
+This field indicates the meaning of the z, L'L, b and aaa bits of an EVEX prefix.
 (The EVEX field may also be used in the future for indicating an extra operand
 if it is not needed for its current purpose).
 
 Bit 0-3 indicate meaning of L'L, b field:
   0x01  broadcast allowed for memory operand, LL indicate vector length
   0x02  SAE allowed for register operands, no rounding control, LL indicate vector length
-  0x06  rounding control and SAE allowed for register operands  
+  0x06  rounding control and SAE allowed for register operands
   0x08  Scalar. LL ignored
 
 Bit 4-7 indicate mask use in aaa/kkk field
@@ -308,7 +308,7 @@ Bit 12-15 indicate offset multiplier
 
 MVEX:
 --------
-This field indicates the meaning of the sss, e and kkk bits of an MVEX prefix. 
+This field indicates the meaning of the sss, e and kkk bits of an MVEX prefix.
 (The MVEX field may also be used in the future for indicating an extra operand
 if it is not needed for its current purpose).
 Bit 0-4 indicate meaning of sss field:
@@ -356,9 +356,9 @@ The multiplier for single-byte address offsets is derived from the meaning of th
 
 TableLink:
 ----------
-Used for linking to another opcode table when more than one opcode begins 
+Used for linking to another opcode table when more than one opcode begins
 with the same bytes or when different specifications are needed in different
-cases. When TableLink is nonzero then InstructionSet is an index into 
+cases. When TableLink is nonzero then InstructionSet is an index into
 OpcodeTables pointing to a subtable. The subtable is indexed according to
 the criterion defined by TableLink.
 
@@ -448,7 +448,7 @@ struct SOpcodeProp {
    void   Reset() {                              // Set everything to zero
       memset(this, 0, sizeof(*this));}
 };
-// The meaning of each bit in s.Warnings and s.Errors is given in 
+// The meaning of each bit in s.Warnings and s.Errors is given in
 // AsmErrorTexts and AsmWarningTexts in the beginning of disasm.cpp
 
 // Prefix categories used by s.Prefixes[category]
@@ -478,19 +478,19 @@ struct SATracer {
    uint8  Regist[16];                            // Defines the type of information contained in each g.p. register
    uint32 Value[16];                             // Meaning depends on the value of Regist[i]
    void Reset() {                                // Set to zero
-      *(uint64*)Regist = 0; *(uint64*)(Regist+8) = 0; 
+      *(uint64*)Regist = 0; *(uint64*)(Regist+8) = 0;
    }
 };
 
-// Structure for defining section 
+// Structure for defining section
 struct SASection {
    uint8 * Start;                                // Point to start of binary data
    uint32  SectionAddress;                       // Address of section (image relative)
    uint32  InitSize;                             // Size of initialized data in section
    uint32  TotalSize;                            // Size of initialized and uninitialized data in section
-   uint32  Type;                                 // 0 = unknown, 1 = code, 
-                                                 // 2 = data, 3 = uninitialized data only, 4 = constant data, 
-                                                 // 0x10 = debug info, 0x11 = exception info. 
+   uint32  Type;                                 // 0 = unknown, 1 = code,
+                                                 // 2 = data, 3 = uninitialized data only, 4 = constant data,
+                                                 // 0x10 = debug info, 0x11 = exception info.
                                                  // 0x800 = segment group
                                                  // 0x1000 = communal section
    uint32  Align;                                // Alignment = 1 << Align
@@ -504,17 +504,17 @@ struct SARelocation {
    int32   Section;                              // Section of relocation source
    uint32  Offset;                               // Offset of relocation source into section
    uint32  Type;                                 // Relocation types:
-   // 0 = unknown, 1 = direct, 2 = self-relative, 4 = image-relative, 
-   // 8 = segment relative, 0x10 = relative to arbitrary ref. point, 
+   // 0 = unknown, 1 = direct, 2 = self-relative, 4 = image-relative,
+   // 8 = segment relative, 0x10 = relative to arbitrary ref. point,
    // 0x21 = direct, has already been relocated to image base (executable files only)
    // 0x41 = direct, make entry in procedure linkage table. Ignore addend (executable files only)
    // 0x81 = direct to Gnu indirect function PLT entry
-   // 0x100 = segment address/descriptor, 0x200 = segment of symbol, 
+   // 0x100 = segment address/descriptor, 0x200 = segment of symbol,
    // 0x400 = segment:offset far
    // 0x1001 = reference to GOT entry relative to GOT. 0x1002 = self-relative reference to GOT or GOT-entry
    // 0x2002 = self-relative to PLT
    uint32  Size;                                 // 1 = byte, 2 = word, 4 = dword, 6 = fword, 8 = qword
-   int32   Addend;                               // Addend to add to target address, 
+   int32   Addend;                               // Addend to add to target address,
                                                  // including distance from source to instruction pointer in self-relative addresses,
                                                  // not including inline addend.
    uint32  TargetOldIndex;                       // Old symbol table index of target
@@ -556,7 +556,7 @@ class CSymbolTable {
 public:
    CSymbolTable();                               // Constructor
    uint32 AddSymbol(int32 Section, uint32 Offset,// Add a symbol from original file
-      uint32 Size, uint32 Type, uint32 Scope, 
+      uint32 Size, uint32 Type, uint32 Scope,
       uint32 OldIndex, const char * Name, const char * DLLName = 0);
    uint32 NewSymbol(int32 Section, uint32 Offset, uint32 Scope); // Add symbol to list
    uint32 NewSymbol(SASymbol & sym);             // Add symbol to list
@@ -598,8 +598,8 @@ public:
 // Then call Go().
 // Go() and its subfunctions will sort Symbols and Relocations, add all
 // nameless symbols to its symbol table and give them names, assign types
-// to all symbols as good as possible from the available information, and 
-// find where each function begins and ends. Then it will disassemble the 
+// to all symbols as good as possible from the available information, and
+// find where each function begins and ends. Then it will disassemble the
 // code and fill OutFile with the disassembly.
 
 class CDisassembler {
@@ -625,17 +625,17 @@ public:
       uint32  Size,                              // Number of bytes used by symbol or function. 0 = unknown
       uint32  Type,                              // Symbol type. Use values listed above for SOpcodeDef operands. 0 = unknown type
       uint32  Scope,                             // 1 = function local, 2 = file local, 4 = public, 8 = weak public, 0x10 = communal, 0x20 = external
-      uint32  OldIndex,                          // Unique identifier used in relocation entries. Value must be > 0 and limited because an array is created with this as index. 
+      uint32  OldIndex,                          // Unique identifier used in relocation entries. Value must be > 0 and limited because an array is created with this as index.
                                                  // A value will be assigned and returned if 0.
       const char * Name,                         // Name of symbol. Zero-terminated ASCII string. A name will be assigned if 0.
-      const char * DLLName = 0);                 // Name of DLL if imported dynamically                    
+      const char * DLLName = 0);                 // Name of DLL if imported dynamically
    void AddRelocation(                           // Define relocation or cross-reference for disassembler
       int32   Section,                           // Section of relocation source:
                                                  // Sections (and groups) are numbered in the order they are defined, starting at 1
                                                  // 0 = none or external, -1 = absolute symbol
                                                  // -16 = Offset contains image-relative address
       uint32  Offset,                            // Offset of relocation source into section
-      int32   Addend,                            // Addend to add to target address, 
+      int32   Addend,                            // Addend to add to target address,
                                                  // including distance from source to instruction pointer in self-relative addresses,
                                                  // not including inline addend.
       uint32  Type,                              // see above at SARelocation for definition of relocation types
@@ -654,12 +654,12 @@ protected:
    CSList<SASection> Sections;                   // List of sections. First is 0
    CSList<SARelocation> Relocations;             // List of cross references. First is 0
    CMemoryBuffer NameBuffer;                     // String buffer for names of sections. First is 0.
-   CSList<SFunctionRecord> FunctionList;         // List of functions 
+   CSList<SFunctionRecord> FunctionList;         // List of functions
    int64   ImageBase;                            // Image base for executable files
    uint32  ExeType;                              // File type: 0 = object, 1 = position independent shared object, 2 = executable
    uint32  RelocationsInSource;                  // Number of relocations in source file
 
-   // Code parser: The following members are used for parsing 
+   // Code parser: The following members are used for parsing
    // an opcode and identifying its components
    uint8 * Buffer;                               // Point to start of binary data
    SOpcodeProp s;                                // Properties of current opcode
@@ -680,7 +680,7 @@ protected:
    uint32  IEnd;                                 // End of current instruction
    uint32  DataType;                             // Type of current data
    uint32  DataSize;                             // Size of current data
-   uint32  FlagPrevious;                         // 1: previous instruction was a NOP. 
+   uint32  FlagPrevious;                         // 1: previous instruction was a NOP.
                                                  // 2: previous instruction was unconditional jump. 6: instruction was ud2
                                                  // 0x100: previous data aligned by 16
                                                  // 0x200: previous data aligned by 32

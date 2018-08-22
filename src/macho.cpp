@@ -180,9 +180,9 @@ void CMACHO<MACSTRUCTURES>::ParseFile(){
          case MAC_LC_DYSYMTAB: {
             MAC_dysymtab_command * sh = (MAC_dysymtab_command*)currentp;
             ilocalsym = sh->ilocalsym;	               // index to local symbols
-            nlocalsym = sh->nlocalsym;	               // number of local symbols 
+            nlocalsym = sh->nlocalsym;	               // number of local symbols
             iextdefsym = sh->iextdefsym;	            // index to externally defined symbols
-            nextdefsym = sh->nextdefsym;	            // number of externally defined symbols 
+            nextdefsym = sh->nextdefsym;	            // number of externally defined symbols
             iundefsym = sh->iundefsym;	               // index to undefined symbols
             nundefsym = sh->nundefsym;	               // number of undefined symbols
             IndirectSymTabOffset = sh->indirectsymoff;// file offset to the indirect symbol table
@@ -208,10 +208,10 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
       printf("\nFile size: 0x%X", this->GetDataSize());
       printf("\nFile header:");
       printf("\n  CPU type: %s, subtype: %s",
-         Lookup(MacMachineNames, FileHeader.cputype), 
+         Lookup(MacMachineNames, FileHeader.cputype),
          Lookup(MacCPUSubtypeNames, FileHeader.cpusubtype));
-      
-      printf("\n  File type: %s - %s", 
+
+      printf("\n  File type: %s - %s",
          GetFileFormatName(FileType), Lookup(MacFileTypeNames, FileHeader.filetype));
 
       printf("\n  Number of load commands: %i, Size of commands: 0x%X, Flags: %X",
@@ -241,7 +241,7 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
                   "\n  File offset 0x%X, File size 0x%X, Maxprot 0x%X, Initprot 0x%X"
                   "\n  Number of sections %i, Flags 0x%X",
                   sh->segname, sh->vmaddr, sh->vmsize,
-                  sh->fileoff, sh->filesize, sh->maxprot, sh->initprot, 
+                  sh->fileoff, sh->filesize, sh->maxprot, sh->initprot,
                   sh->nsects, sh->flags);
                break;}
 
@@ -250,11 +250,11 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
                printf("\n  Name: %s, \n  Memory address 0x%08X%08X, Memory size 0x%08X%08X"
                   "\n  File offset 0x%08X%08X, File size 0x%08X%08X\n  Maxprot 0x%X, Initprot 0x%X"
                   "\n  Number of sections %i, Flags 0x%X",
-                  sh->segname, (uint32)(sh->vmaddr>>32), (uint32)sh->vmaddr, 
+                  sh->segname, (uint32)(sh->vmaddr>>32), (uint32)sh->vmaddr,
                   (uint32)(sh->vmsize>>32), (uint32)sh->vmsize,
-                  (uint32)(sh->fileoff>>32), (uint32)sh->fileoff, 
-                  (uint32)(sh->filesize>>32), (uint32)sh->filesize, 
-                  sh->maxprot, sh->initprot, 
+                  (uint32)(sh->fileoff>>32), (uint32)sh->fileoff,
+                  (uint32)(sh->filesize>>32), (uint32)sh->filesize,
+                  sh->maxprot, sh->initprot,
                   sh->nsects, sh->flags);
                break;}
 
@@ -271,16 +271,16 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
                   "\n  Index to external symbols %i, number of external symbols %i,"
                   "\n  Index to undefined symbols %i, number of undefined symbols %i,"
                   "\n  File offset to TOC 0x%X, number of entries in TOC %i,",
-                  sh->ilocalsym, sh->nlocalsym, sh->iextdefsym, sh->nextdefsym, 
+                  sh->ilocalsym, sh->nlocalsym, sh->iextdefsym, sh->nextdefsym,
                   sh->iundefsym, sh->nundefsym, sh->tocoff, sh->ntoc);
                printf("\n  File offset to module table 0x%X, Number of module table entries %i,"
                   "\n  Offset to referenced symbol table 0x%X, Number of referenced symtab entries %i"
                   "\n  Offset to indirect symbol table 0x%X, Number of indirect symtab entries %i"
                   "\n  Offset to external relocation entries 0x%X, Number of external reloc. entries %i"
                   "\n  Offset to local relocation entries 0x%X, Number of local reloc. entries %i",
-                  sh->modtaboff, sh->nmodtab, sh->extrefsymoff, sh->nextrefsyms, 
+                  sh->modtaboff, sh->nmodtab, sh->extrefsymoff, sh->nextrefsyms,
                   sh->indirectsymoff, sh->nindirectsyms, sh->extreloff, sh->nextrel,
-                  sh->locreloff, sh->nlocrel);	
+                  sh->locreloff, sh->nlocrel);
                break;}
          }
 
@@ -311,13 +311,13 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
 
             // Loop through section headers
             for (isec1 = 1; isec1 <= nsect; isec1++, sectp++) {
-               printf("\n\nSection %i: Name: %s, Segment: %s.", 
+               printf("\n\nSection %i: Name: %s, Segment: %s.",
                   ++isec2, sectp->sectname, sectp->segname);
                printf("\n  Memory address 0x%X, Size 0x%X, File offset 0x%X"
                   "\n  Alignment %i, Reloc. ent. offset 0x%X, Num reloc. %i"
                   "\n  Flags 0x%X, reserved1 0x%X, reserved2 0x%X",
                   sectp->addr, sectp->size, sectp->offset, 1 << sectp->align,
-                  sectp->reloff, sectp->nreloc, sectp->flags, 
+                  sectp->reloff, sectp->nreloc, sectp->flags,
                   sectp->reserved1, sectp->reserved2);
 
                if (sectp->nreloc && (options & DUMP_RELTAB)) {
@@ -332,7 +332,7 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
 
                         if (!(scatp->r_type & MAC32_RELOC_PAIR)) {
                            printf ("\n    Offset: 0x%X, Value: 0x%X, Length: %i, Scat. Type: %s",
-                              scatp->r_address, scatp->r_value, 1 << scatp->r_length, 
+                              scatp->r_address, scatp->r_value, 1 << scatp->r_length,
                               Lookup(Mac32RelocationTypeNames, scatp->r_type));
                            if (scatp->r_address < sectp->size) {
                               printf(", Inline: 0x%X", *(int32*)(Buf()+sectp->offset+scatp->r_address));
@@ -372,13 +372,13 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
 
             // Loop through section headers
             for (isec1 = 1; isec1 <= nsect; isec1++, sectp++) {
-               printf("\n\nSection %i: Name: %s, Segment: %s.", 
+               printf("\n\nSection %i: Name: %s, Segment: %s.",
                   ++isec2, sectp->sectname, sectp->segname);
                printf("\n  Memory address 0x%X, Size 0x%X, File offset 0x%X"
                   "\n  Alignment %i, Reloc. ent. offset 0x%X, Num reloc. %i"
                   "\n  Flags 0x%X, reserved1 0x%X, reserved2 0x%X",
                   (uint32)sectp->addr, (uint32)sectp->size, sectp->offset, 1 << sectp->align,
-                  sectp->reloff, sectp->nreloc, sectp->flags, 
+                  sectp->reloff, sectp->nreloc, sectp->flags,
                   sectp->reserved1, sectp->reserved2);
 
                if (sectp->nreloc && (options & DUMP_RELTAB)) {
@@ -391,7 +391,7 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
                         MAC_scattered_relocation_info * scatp = (MAC_scattered_relocation_info*)relp;
                         if (!(scatp->r_type & MAC32_RELOC_PAIR)) {
                            printf ("\n    Unexpected scattered relocation. Offset: 0x%X, Value: 0x%X, Length: %i, Scat. Type: %s",
-                              scatp->r_address, scatp->r_value, 1 << scatp->r_length, 
+                              scatp->r_address, scatp->r_value, 1 << scatp->r_length,
                               Lookup(Mac64RelocationTypeNames, scatp->r_type));
                            if (scatp->r_address < sectp->size) {
                               printf(", Inline: 0x%X", *(int32*)(Buf()+sectp->offset+scatp->r_address));
@@ -434,7 +434,7 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
    }
 
    // pointer to string table
-   char * strtab = (char*)(Buf() + StringTabOffset); 
+   char * strtab = (char*)(Buf() + StringTabOffset);
    // pointer to symbol table
    TMAC_nlist * symp0 = (TMAC_nlist*)(Buf() + SymTabOffset);
 
@@ -490,7 +490,7 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
 
             // Check if index within symbol table
             if (*IndSymip >= SymTabNumber) {
-               //err.submit(2016); 
+               //err.submit(2016);
                printf("\n   Unknown(0x%X)", *IndSymip);
                continue;
             }
@@ -533,7 +533,7 @@ void CMACHO<MACSTRUCTURES>::PublicNames(CMemoryBuffer * Strings, CSList<SStringE
    ParseFile();
 
    // pointer to string table
-   char * strtab = (char*)(Buf() + StringTabOffset); 
+   char * strtab = (char*)(Buf() + StringTabOffset);
 
    // loop through public symbol table
    TMAC_nlist * symp = (TMAC_nlist*)(Buf() + SymTabOffset + iextdefsym * sizeof(TMAC_nlist));
@@ -542,7 +542,7 @@ void CMACHO<MACSTRUCTURES>::PublicNames(CMemoryBuffer * Strings, CSList<SStringE
          // Public symbol found
          se.Member = m;
          // Store name
-         se.String = Strings->PushString(strtab + symp->n_strx);         
+         se.String = Strings->PushString(strtab + symp->n_strx);
          // Store name index
          Index->Push(se);
       }

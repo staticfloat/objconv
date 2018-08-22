@@ -365,7 +365,7 @@ void CMAC2ASM<MACSTRUCTURES>::MakeRelocations() {
             switch (R_Type) {
             case MAC64_RELOC_UNSIGNED:
                // Absolute address
-               RelType = 1;  
+               RelType = 1;
                break;
             case MAC64_RELOC_BRANCH:
                // Signed 32-bit displacement with implicit -4 addend
@@ -377,18 +377,18 @@ void CMAC2ASM<MACSTRUCTURES>::MakeRelocations() {
                // Signed 32-bit displacement with implicit -4 addend and explicit -2 addend
             case MAC64_RELOC_SIGNED_4:
                // Signed 32-bit displacement with implicit -4 addend and explicit -4 addend
-               RelType = 2;  Addend -= 4;  
+               RelType = 2;  Addend -= 4;
                break;
             case MAC64_RELOC_GOT:
                // Absolute or relative reference to GOT?
                // RelType = 0x1001; break;
-            case MAC64_RELOC_GOT_LOAD: 
+            case MAC64_RELOC_GOT_LOAD:
                // Signed 32-bit displacement to GOT
-               RelType = 0x1002;  Addend -= 4;  
+               RelType = 0x1002;  Addend -= 4;
                break;
             case MAC64_RELOC_SUBTRACTOR:
                // 32 or 64 bit relative to arbitrary reference point
-               RelType = 0x10;  
+               RelType = 0x10;
                break;
             default:
                // Unknown type
@@ -398,7 +398,7 @@ void CMAC2ASM<MACSTRUCTURES>::MakeRelocations() {
          }
 
          // Make relocation record
-         Disasm.AddRelocation(Section, SourceOffset, Addend, 
+         Disasm.AddRelocation(Section, SourceOffset, Addend,
             RelType, SourceSize, TargetSymbol, ReferenceSymbol);
       }
    }
@@ -417,7 +417,7 @@ void CMAC2ASM<MACSTRUCTURES>::MakeSymbolList() {
    uint32 Scope;                       // 1 = function local, 2 = file local, 4 = public, 8 = weak public, 0x10 = communal, 0x20 = external
 
    // pointer to string table
-   char * strtab = (char*)(this->Buf() + this->StringTabOffset); 
+   char * strtab = (char*)(this->Buf() + this->StringTabOffset);
 
    // loop through symbol table
    TMAC_nlist * symp = (TMAC_nlist*)(this->Buf() + this->SymTabOffset);
@@ -545,7 +545,7 @@ void CMAC2ASM<MACSTRUCTURES>::MakeImports() {
             Type = 3;  break;
          case MAC_S_SYMBOL_STUBS:
             // jump to function
-            Type = 0x83;  
+            Type = 0x83;
             // Make appear as direct call
             DLLName = 0;
             break;
@@ -559,12 +559,12 @@ void CMAC2ASM<MACSTRUCTURES>::MakeImports() {
          }
       }
       else if (SectionType == MAC_S_4BYTE_LITERALS) {
-         // Section contains 4-byte float constants. 
+         // Section contains 4-byte float constants.
          // Make symbol
          Disasm.AddSymbol(ASM_SEGMENT_IMGREL, (uint32)sectp->addr, 4, 0x43, 2, 0, "Float_constants");
       }
       else if (SectionType == MAC_S_8BYTE_LITERALS) {
-         // Section contains 8-byte double constants. 
+         // Section contains 8-byte double constants.
          // Make symbol
          Disasm.AddSymbol(ASM_SEGMENT_IMGREL, (uint32)sectp->addr, 8, 0x44, 2, 0, "Double_constants");
       }

@@ -163,7 +163,7 @@ void CCOF2OMF::MakeSegmentList() {
 
          // Segment type
          flags = pSectionHeader->Flags;
-      
+
          // Get segment class
          if (flags & (PE_SCN_CNT_CODE | PE_SCN_MEM_EXECUTE)) {
             // Code segment
@@ -311,7 +311,7 @@ void CCOF2OMF::MakeRelocationsList() {
             continue;
 
          default:                                // Other. Not supported
-            NewRel.Mode = -1;                    // -1 = unsupported. 
+            NewRel.Mode = -1;                    // -1 = unsupported.
             // Postpone error message in case it refers to a debug section that is being removed
             NewRel.TargetOffset = Reloc.p->Type; // Remember relocation type
             //err.submit(2030, Reloc.p->Type); continue;  // Unsupported relocation type
@@ -331,16 +331,16 @@ void CCOF2OMF::MakeRelocationsList() {
                err.submit(2035);  continue;
             }
             // Segment index of target in new file:
-            NewRel.TargetSegment = SectionBuffer[TargetOldSection].NewNumber; 
+            NewRel.TargetSegment = SectionBuffer[TargetOldSection].NewNumber;
             // Offset relative to old section
-            NewRel.TargetOffset = Symtab.p->s.Value;          
+            NewRel.TargetOffset = Symtab.p->s.Value;
             // Add offset relative to first section with same name to get offset relative to new segment
-            NewRel.TargetOffset += SectionBuffer[TargetOldSection].Offset; 
+            NewRel.TargetOffset += SectionBuffer[TargetOldSection].Offset;
          }
          else {
             // External
             NewRel.Scope  = S_EXTERNAL;               // 0 = local, 2 = external
-            NewRel.TargetOffset = 0;                  // Any addend is inline    
+            NewRel.TargetOffset = 0;                  // Any addend is inline
             // Find EXTDEF index in SymbolBuffer
             NewRel.TargetSegment = SymbolBuffer[isym].NewIndex;
          }
@@ -378,7 +378,7 @@ void CCOF2OMF::MakeLNAMES() {
    // Make first record in output file = Translator header
    ToFile.StartRecord(OMF_THEADR);
    // Remove path from file name and limit length
-   char * ShortName = CLibrary::ShortenMemberName(OutputFileName);   
+   char * ShortName = CLibrary::ShortenMemberName(OutputFileName);
    ToFile.PutString(ShortName);
    ToFile.EndRecord();
 
@@ -428,7 +428,7 @@ void CCOF2OMF::MakeSEGDEF() {
          // New segment found
          SegNum++;                               // Segment number
 
-         // Make a SEGDEF record for this segment 
+         // Make a SEGDEF record for this segment
          ToFile.StartRecord(OMF_SEGDEF + 1);     // Odd record number = 32 bit
 
          // Attributes bitfield
@@ -502,7 +502,7 @@ void CCOF2OMF::MakeEXTDEF() {
       for (j = 0; j < SymbolBuffer.GetNumEntries(); j++) {
          if (SymbolBuffer[j].Scope == S_EXTERNAL && SymbolBuffer[j].NewIndex == ExtSymNum+1) {
             // Found external symbol
-            ExtSymNum++;                         // Symbol number   
+            ExtSymNum++;                         // Symbol number
 
             // Check if current record too big
             if (ToFile.GetSize() >= 1024 - 257) {// Max size = 1024
@@ -530,7 +530,7 @@ void CCOF2OMF::MakePUBDEF() {
    for (j = 0; j < SymbolBuffer.GetNumEntries(); j++) {
       if (SymbolBuffer[j].Scope == S_PUBLIC && SymbolBuffer[j].NewIndex == PubSymNum+1) {
          // Found public symbol
-         PubSymNum++;                            // Symbol number   
+         PubSymNum++;                            // Symbol number
 
          // Make PUBDEF record for this symbol
          ToFile.StartRecord(OMF_PUBDEF + 1);     // Start new PUBDEF record, 32 bit
@@ -562,11 +562,11 @@ void CCOF2OMF::MakePUBDEF() {
 
 
 void CCOF2OMF::MakeLEDATA() {
-/* 
+/*
 This function makes both LEDATA records, containing binary data, and FIXUPP
 records, containing relocations.
 
-The function is quite complicated because the LEDATA and FIXUPP records are 
+The function is quite complicated because the LEDATA and FIXUPP records are
 mutually interdependent. Some explanation is in place here.
 
 I am using the word segment for the collection of all sections in the old file
@@ -577,7 +577,7 @@ into multiple LEDATA records. The sections must be aligned according to the
 specified alignment for the segment. The LEDATA records need not be aligned,
 and they may be misaligned for reasons explained below.
 
-Each LEDATA record is followed by a FIXUPP record containing all relocations 
+Each LEDATA record is followed by a FIXUPP record containing all relocations
 referring to a source in the LEDATA record, if any.
 
 The size of a LEDATA record is limited to 1024 bytes because each entry in
@@ -629,14 +629,14 @@ relocations with a source address in the current LEDATA record.
             }
             SectOffset = 0;                      // Offset of LEDATA record relative to section start
 
-            if (AlignmentFiller > 0 
+            if (AlignmentFiller > 0
             && AlignmentFiller < 4096 && AlignmentFiller < (1u << SectionBuffer[OldSection].Align)
             && SectionBuffer[OldSection].Class == OMF_LNAME_CODE) {
                // This is a code segment and there is a space from previous section
                // Fill the alignment space with NOP's
                // Make LIDATA record with NOP's
                ToFile.StartRecord(OMF_LIDATA);             // Start new LEDATA record
-               ToFile.PutIndex(Segment);                   // Segment index 
+               ToFile.PutIndex(Segment);                   // Segment index
                ToFile.PutNumeric(SegOffset);               // Offset of LIDATA relative to segment
                ToFile.PutNumeric(AlignmentFiller);         // Repeat count
                ToFile.PutWord(0);                          // Block count
@@ -650,7 +650,7 @@ relocations with a source address in the current LEDATA record.
             // Search for relocations for this section
             Reloc0.Section = OldSection;
             Reloc0.SourceOffset = 0;
-            RelFirst = RelocationBuffer.FindFirst(Reloc0); // Points to first relocation for this section            
+            RelFirst = RelocationBuffer.FindFirst(Reloc0); // Points to first relocation for this section
             RelLast = RelFirst;
 
             // Loop for possibly more than one LEDATA records for this section
@@ -670,11 +670,11 @@ relocations with a source address in the current LEDATA record.
                      break; // Reached size limit of LEDATA record
                   }
                   if (RelocationBuffer[RelLast].SourceOffset + 4 > CutOff + SectOffset) {
-                     // Relocation crosses LEDATA boundary. 
+                     // Relocation crosses LEDATA boundary.
                      // Reduce limit of LEDATA to before this relocation source
                      CutOff = RelocationBuffer[RelLast].SourceOffset - SectOffset;
                      if (CutOff == 0) {
-                        err.submit(2302); // Relocation source extends beyond end of section. 
+                        err.submit(2302); // Relocation source extends beyond end of section.
                         CutOff = 4;       // Prevent infinite loop
                      }
                      break;
@@ -701,7 +701,7 @@ relocations with a source address in the current LEDATA record.
                   ToFile.StartRecord(OMF_LEDATA + 1);// Start new LEDATA record, 32 bit
 
                   // Segment index
-                  ToFile.PutIndex(Segment);         
+                  ToFile.PutIndex(Segment);
 
                   // Offset of LEDATA relative to segment
                   ToFile.PutNumeric(SegOffset + SectOffset);
@@ -726,7 +726,7 @@ relocations with a source address in the current LEDATA record.
                            continue;
                         }
 
-                        // Make Locat word bitfield 
+                        // Make Locat word bitfield
                         Locat.s.one = 1;              // Indicates FIXUP subrecord
                         Locat.s.M = RelocationBuffer[Rel].Mode; // Direct / EIP-relative
                         Locat.s.Location = 9;              // Indicates 32-bit offset
@@ -763,12 +763,12 @@ relocations with a source address in the current LEDATA record.
 
                         // Put these data into record
                         // Locat bytes in reverse order:
-                        ToFile.PutByte(Locat.bytes[1]);  
+                        ToFile.PutByte(Locat.bytes[1]);
                         ToFile.PutByte(Locat.bytes[0]);
                         // FixData byte
-                        ToFile.PutByte(FixData.b);      
+                        ToFile.PutByte(FixData.b);
                         // Frame datum field only if FixData.F = 0 and Frame < 4
-                        if (FixData.s.Frame < 4) ToFile.PutIndex(FrameDatum); 
+                        if (FixData.s.Frame < 4) ToFile.PutIndex(FrameDatum);
                         // Target datum field if FixData.T = 0, which it is here
                         ToFile.PutIndex(TargetDatum);
                         // Target displacement field if FixData.P = 0
