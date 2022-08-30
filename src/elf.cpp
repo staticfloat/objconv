@@ -234,12 +234,12 @@ CELF<ELFSTRUCTURES>::CELF() {
 template <class TELF_Header, class TELF_SectionHeader, class TELF_Symbol, class TELF_Relocation>
 void CELF<ELFSTRUCTURES>::ParseFile(){
    // Load and parse file buffer
-   uint32 i;
+   uint32_t i;
    FileHeader = *(TELF_Header*)Buf();   // Copy file header
    NSections = FileHeader.e_shnum;
    SectionHeaders.SetNum(NSections);    // Allocate space for section headers
    SectionHeaders.SetZero();
-   uint32 Symtabi = 0;                  // Index to symbol table
+   uint32_t Symtabi = 0;                  // Index to symbol table
 
    // check header integrity
    if (FileHeader.e_phoff > GetDataSize() || FileHeader.e_phoff + FileHeader.e_phentsize > GetDataSize()) err.submit(2035);
@@ -248,7 +248,7 @@ void CELF<ELFSTRUCTURES>::ParseFile(){
    // Find section headers
    SectionHeaderSize = FileHeader.e_shentsize;
    if (SectionHeaderSize <= 0) err.submit(2033);
-   uint32 SectionOffset = uint32(FileHeader.e_shoff);
+   uint32_t SectionOffset = uint32_t(FileHeader.e_shoff);
 
    for (i = 0; i < NSections; i++) {
       SectionHeaders[i] = Get<TELF_SectionHeader>(SectionOffset);
@@ -267,23 +267,23 @@ void CELF<ELFSTRUCTURES>::ParseFile(){
 
    // if (Buf() && GetNumEntries()) {
    if (Buf() && GetDataSize()) {
-       SecStringTable = Buf() + uint32(SectionHeaders[FileHeader.e_shstrndx].sh_offset);
-       SecStringTableLen = uint32(SectionHeaders[FileHeader.e_shstrndx].sh_size);
+       SecStringTable = (char*)Buf() + uint32_t(SectionHeaders[FileHeader.e_shstrndx].sh_offset);
+       SecStringTableLen = uint32_t(SectionHeaders[FileHeader.e_shstrndx].sh_size);
    }
    if (SectionOffset > GetDataSize()) {
       err.submit(2110);     // Section table points to outside file
    }
    if (Symtabi) {
       // Save offset to symbol table
-      SymbolTableOffset = (uint32)(SectionHeaders[Symtabi].sh_offset);
-      SymbolTableEntrySize = (uint32)(SectionHeaders[Symtabi].sh_entsize); // Entry size of symbol table
+      SymbolTableOffset = (uint32_t)(SectionHeaders[Symtabi].sh_offset);
+      SymbolTableEntrySize = (uint32_t)(SectionHeaders[Symtabi].sh_entsize); // Entry size of symbol table
       if (SymbolTableEntrySize == 0) {err.submit(2034); return;} // Avoid division by zero
-      SymbolTableEntries = uint32(SectionHeaders[Symtabi].sh_size) / SymbolTableEntrySize;
+      SymbolTableEntries = uint32_t(SectionHeaders[Symtabi].sh_size) / SymbolTableEntrySize;
       // Find associated string table
-      uint32 Stringtabi = SectionHeaders[Symtabi].sh_link;
+      uint32_t Stringtabi = SectionHeaders[Symtabi].sh_link;
       if (Stringtabi < NSections) {
-         SymbolStringTableOffset = (uint32)(SectionHeaders[Stringtabi].sh_offset);
-         SymbolStringTableSize = (uint32)(SectionHeaders[Stringtabi].sh_size);
+         SymbolStringTableOffset = (uint32_t)(SectionHeaders[Stringtabi].sh_offset);
+         SymbolStringTableSize = (uint32_t)(SectionHeaders[Stringtabi].sh_size);
       }
       else {
          Symtabi = 0;  // Error
@@ -295,7 +295,7 @@ void CELF<ELFSTRUCTURES>::ParseFile(){
 // Dump
 template <class TELF_Header, class TELF_SectionHeader, class TELF_Symbol, class TELF_Relocation>
 void CELF<ELFSTRUCTURES>::Dump(int options) {
-   uint32 i;
+   uint32_t i;
    if (options & DUMP_FILEHDR) {
       // File header
       printf("\nDump of ELF file %s", FileName);
@@ -319,10 +319,10 @@ void CELF<ELFSTRUCTURES>::Dump(int options) {
 
    if ((options & DUMP_SECTHDR) && FileHeader.e_phnum) {
        // Dump program headers
-       uint32 nProgramHeaders = FileHeader.e_phnum;
-       uint32 programHeaderSize = FileHeader.e_phentsize;
+       uint32_t nProgramHeaders = FileHeader.e_phnum;
+       uint32_t programHeaderSize = FileHeader.e_phentsize;
        if (programHeaderSize <= 0) err.submit(2033);
-       uint32 programHeaderOffset = (uint32)FileHeader.e_phoff;
+       uint32_t programHeaderOffset = (uint32_t)FileHeader.e_phoff;
        Elf64_Phdr pHeader;
        for (i = 0; i < nProgramHeaders; i++) {
            if (WordSize == 32) {
@@ -340,12 +340,12 @@ void CELF<ELFSTRUCTURES>::Dump(int options) {
                pHeader = Get<Elf64_Phdr>(programHeaderOffset);
            }
            printf("\nProgram header Type: %s, flags 0x%X",
-               Lookup(ELFPTypeNames, (uint32)pHeader.p_type), (uint32)pHeader.p_flags);
+               Lookup(ELFPTypeNames, (uint32_t)pHeader.p_type), (uint32_t)pHeader.p_flags);
            printf("\noffset = 0x%X, vaddr = 0x%X, paddr = 0x%X, filesize = 0x%X, memsize = 0x%X, align = 0x%X",
-               (uint32)pHeader.p_offset, (uint32)pHeader.p_vaddr, (uint32)pHeader.p_paddr, (uint32)pHeader.p_filesz, (uint32)pHeader.p_memsz, (uint32)pHeader.p_align);
+               (uint32_t)pHeader.p_offset, (uint32_t)pHeader.p_vaddr, (uint32_t)pHeader.p_paddr, (uint32_t)pHeader.p_filesz, (uint32_t)pHeader.p_memsz, (uint32_t)pHeader.p_align);
            programHeaderOffset += programHeaderSize;
-           if (pHeader.p_filesz < 0x100 && (int32)pHeader.p_offset < GetDataSize() && memchr(Buf()+pHeader.p_offset, 0, (uint32)pHeader.p_filesz)) {
-               printf("\nContents: %s", Buf()+(int32)pHeader.p_offset);
+           if (pHeader.p_filesz < 0x100 && (int32_t)pHeader.p_offset < GetDataSize() && memchr(Buf()+pHeader.p_offset, 0, (uint32_t)pHeader.p_filesz)) {
+               printf("\nContents: %s", Buf()+(int32_t)pHeader.p_offset);
            }
        }
    }
@@ -353,34 +353,34 @@ void CELF<ELFSTRUCTURES>::Dump(int options) {
    if (options & DUMP_SECTHDR) {
       // Dump section headers
       printf("\n\nSection headers:");
-      for (uint32 sc = 0; sc < NSections; sc++) {
+      for (uint32_t sc = 0; sc < NSections; sc++) {
          // Get copy of 32-bit header or converted 64-bit header
          TELF_SectionHeader sheader = SectionHeaders[sc];
-         uint32 entrysize = (uint32)(sheader.sh_entsize);
-         uint32 namei = sheader.sh_name;
+         uint32_t entrysize = (uint32_t)(sheader.sh_entsize);
+         uint32_t namei = sheader.sh_name;
          if (namei >= SecStringTableLen) {err.submit(2112); break;}
          printf("\n%2i Name: %-18s Type: %s", sc, SecStringTable + namei,
             Lookup(ELFSectionTypeNames, sheader.sh_type));
          if (sheader.sh_flags) {
-            printf("\n  Flags: 0x%X:", uint32(sheader.sh_flags));
+            printf("\n  Flags: 0x%X:", uint32_t(sheader.sh_flags));
             for (int fi = 1; fi < (1 << 30); fi <<= 1) {
-               if (uint32(sheader.sh_flags) & fi) {
+               if (uint32_t(sheader.sh_flags) & fi) {
                   printf(" %s", Lookup(ELFSectionFlagNames,fi));
                }
             }
          }
          if (sheader.sh_addr) {
-            printf("\n  Address: 0x%X", uint32(sheader.sh_addr));
+            printf("\n  Address: 0x%X", uint32_t(sheader.sh_addr));
          }
          if (sheader.sh_offset || sheader.sh_size) {
             printf("\n  FileOffset: 0x%X, Size: 0x%X",
-               uint32(sheader.sh_offset), uint32(sheader.sh_size));
+               uint32_t(sheader.sh_offset), uint32_t(sheader.sh_size));
          }
          if (sheader.sh_addralign) {
-            printf("\n  Alignment: 0x%X", uint32(sheader.sh_addralign));
+            printf("\n  Alignment: 0x%X", uint32_t(sheader.sh_addralign));
          }
          if (sheader.sh_entsize) {
-            printf("\n  Entry size: 0x%X", uint32(sheader.sh_entsize));
+            printf("\n  Entry size: 0x%X", uint32_t(sheader.sh_entsize));
             switch (sheader.sh_type) {
             case SHT_DYNAMIC:
                printf("\n  String table: %i", sheader.sh_link);
@@ -408,10 +408,10 @@ void CELF<ELFSTRUCTURES>::Dump(int options) {
          if (sheader.sh_type == SHT_STRTAB && (options & DUMP_STRINGTB)) {
             // Print string table
             printf("\n  String table:");
-            char * p = Buf() + uint32(sheader.sh_offset) + 1;
-            uint32 nread = 1, len;
-            while (nread < uint32(sheader.sh_size)) {
-               len = (uint32)strlen(p);
+            char * p = (char*)Buf() + uint32_t(sheader.sh_offset) + 1;
+            uint32_t nread = 1, len;
+            while (nread < uint32_t(sheader.sh_size)) {
+               len = (uint32_t)strlen(p);
                printf(" >>%s<<", p);
                nread += len + 1;
                p += len + 1;
@@ -421,13 +421,13 @@ void CELF<ELFSTRUCTURES>::Dump(int options) {
             // Dump symbol table
 
             // Find associated string table
-            if (sheader.sh_link >= (uint32)NSections) {err.submit(2035); sheader.sh_link = 0;}
-            int8 * strtab = Buf() + uint32(SectionHeaders[sheader.sh_link].sh_offset);
+            if (sheader.sh_link >= (uint32_t)NSections) {err.submit(2035); sheader.sh_link = 0;}
+            int8_t * strtab = Buf() + uint32_t(SectionHeaders[sheader.sh_link].sh_offset);
 
             // Find symbol table
-            uint32 symtabsize = (uint32)(sheader.sh_size);
-            int8 * symtab = Buf() + uint32(sheader.sh_offset);
-            int8 * symtabend = symtab + symtabsize;
+            uint32_t symtabsize = (uint32_t)(sheader.sh_size);
+            int8_t * symtab = Buf() + uint32_t(sheader.sh_offset);
+            int8_t * symtabend = symtab + symtabsize;
             if (entrysize < sizeof(TELF_Symbol)) {err.submit(2033); entrysize = sizeof(TELF_Symbol);}
 
             printf("\n  Symbols:");
@@ -442,13 +442,13 @@ void CELF<ELFSTRUCTURES>::Dump(int options) {
                   printf("\n  %2i Name: %s,", symi, strtab + sym.st_name);}
                else {
                   printf("\n  %2i Unnamed,", symi);}
-               if (sym.st_value || type == STT_OBJECT || type == STT_FUNC || type == STT_GNU_IFUNC || int16(sym.st_shndx) < 0)
-                  printf(" Value: 0x%X", uint32(sym.st_value));
-               if (sym.st_size)  printf(" Size: %i", uint32(sym.st_size));
+               if (sym.st_value || type == STT_OBJECT || type == STT_FUNC || type == STT_GNU_IFUNC || int16_t(sym.st_shndx) < 0)
+                  printf(" Value: 0x%X", uint32_t(sym.st_value));
+               if (sym.st_size)  printf(" Size: %i", uint32_t(sym.st_size));
                if (sym.st_other) printf(" Other: 0x%X", sym.st_other);
-               if (int16(sym.st_shndx) >= 0) printf(" Section: %i", sym.st_shndx);
+               if (int16_t(sym.st_shndx) >= 0) printf(" Section: %i", sym.st_shndx);
                else { // Special segment values
-                  switch (int16(sym.st_shndx)) {
+                  switch (int16_t(sym.st_shndx)) {
                   case SHN_ABS:
                      printf(" Absolute,"); break;
                   case SHN_COMMON:
@@ -468,9 +468,9 @@ void CELF<ELFSTRUCTURES>::Dump(int options) {
          }
          if ((sheader.sh_type==SHT_REL || sheader.sh_type==SHT_RELA ) && (options & DUMP_RELTAB)) {
             printf("\n  Relocations:");
-            int8 * reltab = Buf() + uint32(sheader.sh_offset);
-            int8 * reltabend = reltab + uint32(sheader.sh_size);
-            uint32 expectedentrysize = sheader.sh_type == SHT_RELA ?
+            int8_t * reltab = Buf() + uint32_t(sheader.sh_offset);
+            int8_t * reltabend = reltab + uint32_t(sheader.sh_size);
+            uint32_t expectedentrysize = sheader.sh_type == SHT_RELA ?
                sizeof(TELF_Relocation) :              // Elf32_Rela, Elf64_Rela
                sizeof(TELF_Relocation) - WordSize/8;  // Elf32_Rel,  Elf64_Rel
             if (entrysize < expectedentrysize) {err.submit(2033); entrysize = expectedentrysize;}
@@ -481,17 +481,17 @@ void CELF<ELFSTRUCTURES>::Dump(int options) {
                TELF_Relocation rel;  rel.r_addend = 0;
                memcpy(&rel, reltab, entrysize);
                printf ("\n  Offset: 0x%X, Symbol: %i, Name: %s\n   Type: %s",
-                  uint32(rel.r_offset), rel.r_sym, SymbolName(rel.r_sym),
+                  uint32_t(rel.r_offset), rel.r_sym, SymbolName(rel.r_sym),
                   (WordSize == 32) ?
                   Lookup (ELF32RelocationNames, rel.r_type) :
                   Lookup (ELF64RelocationNames, rel.r_type));
-               if (rel.r_addend) printf (", Addend: 0x%X", uint32(rel.r_addend));
+               if (rel.r_addend) printf (", Addend: 0x%X", uint32_t(rel.r_addend));
 
                // Find inline addend
                TELF_SectionHeader relsheader = SectionHeaders[sheader.sh_info];
-               uint32 relsoffset = uint32(relsheader.sh_offset);
+               uint32_t relsoffset = uint32_t(relsheader.sh_offset);
                if (relsoffset+rel.r_offset < GetDataSize()) {
-                  int32 * piaddend = (int32*)(Buf()+relsoffset+rel.r_offset);
+                  int32_t * piaddend = (int32_t*)(Buf()+relsoffset+rel.r_offset);
                   if (* piaddend) printf (", Inline addend: 0x%X", * piaddend);
                }
             }
@@ -509,22 +509,22 @@ void CELF<ELFSTRUCTURES>::PublicNames(CMemoryBuffer * Strings, CSList<SStringEnt
    ParseFile();
 
    // Loop through section headers
-   for (uint32 sc = 0; sc < NSections; sc++) {
+   for (uint32_t sc = 0; sc < NSections; sc++) {
       // Get copy of 32-bit header or converted 64-bit header
       TELF_SectionHeader sheader = SectionHeaders[sc];
-      uint32 entrysize = uint32(sheader.sh_entsize);
+      uint32_t entrysize = uint32_t(sheader.sh_entsize);
 
       if (sheader.sh_type==SHT_SYMTAB || sheader.sh_type==SHT_DYNSYM) {
          // Dump symbol table
 
          // Find associated string table
-         if (sheader.sh_link >= (uint32)NSections) {err.submit(2035); sheader.sh_link = 0;}
-         int8 * strtab = Buf() + uint32(SectionHeaders[sheader.sh_link].sh_offset);
+         if (sheader.sh_link >= (uint32_t)NSections) {err.submit(2035); sheader.sh_link = 0;}
+         char * strtab = (char*)Buf() + uint32_t(SectionHeaders[sheader.sh_link].sh_offset);
 
          // Find symbol table
-         uint32 symtabsize = uint32(sheader.sh_size);
-         int8 * symtab = Buf() + uint32(sheader.sh_offset);
-         int8 * symtabend = symtab + symtabsize;
+         uint32_t symtabsize = uint32_t(sheader.sh_size);
+         int8_t * symtab = Buf() + uint32_t(sheader.sh_offset);
+         int8_t * symtabend = symtab + symtabsize;
          if (entrysize < sizeof(TELF_Symbol)) {err.submit(2033); entrysize = sizeof(TELF_Symbol);}
 
          // Loop through symbol table
@@ -533,7 +533,7 @@ void CELF<ELFSTRUCTURES>::PublicNames(CMemoryBuffer * Strings, CSList<SStringEnt
             TELF_Symbol sym = *(TELF_Symbol*)symtab;
             int type = sym.st_type;
             int binding = sym.st_bind;
-            if (int16(sym.st_shndx) > 0
+            if (int16_t(sym.st_shndx) > 0
             && type != STT_SECTION && type != STT_FILE
             && (binding == STB_GLOBAL || binding == STB_WEAK)) {
                // Public symbol found
@@ -551,17 +551,17 @@ void CELF<ELFSTRUCTURES>::PublicNames(CMemoryBuffer * Strings, CSList<SStringEnt
 
 // SymbolName
 template <class TELF_Header, class TELF_SectionHeader, class TELF_Symbol, class TELF_Relocation>
-const char * CELF<ELFSTRUCTURES>::SymbolName(uint32 index) {
+const char * CELF<ELFSTRUCTURES>::SymbolName(uint32_t index) {
    // Get name of symbol. (ParseFile() must be called first)
    const char * symname = "?";  // Symbol name
-   uint32 symi;           // Symbol index
-   uint32 stri;           // String index
+   uint32_t symi;           // Symbol index
+   uint32_t stri;           // String index
    if (SymbolTableOffset) {
       symi = SymbolTableOffset + index * SymbolTableEntrySize;
       if (symi < GetDataSize()) {
          stri = Get<TELF_Symbol>(symi).st_name;
          if (stri < SymbolStringTableSize) {
-            symname = Buf() + SymbolStringTableOffset + stri;
+            symname = (char*)Buf() + SymbolStringTableOffset + stri;
          }
       }
    }

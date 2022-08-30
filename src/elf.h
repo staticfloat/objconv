@@ -16,37 +16,37 @@
 /********************** FILE HEADER **********************/
 
 struct Elf32_Ehdr {
-  uint8   e_ident[16];   // Magic number and other info
-  uint16  e_type;        // Object file type
-  uint16  e_machine;     // Architecture
-  uint32  e_version;     // Object file version
-  uint32  e_entry;       // Entry point virtual address
-  uint32  e_phoff;       // Program header table file offset
-  uint32  e_shoff;       // Section header table file offset
-  uint32  e_flags;       // Processor-specific flags
-  uint16  e_ehsize;      // ELF header size in bytes
-  uint16  e_phentsize;   // Program header table entry size
-  uint16  e_phnum;       // Program header table entry count
-  uint16  e_shentsize;   // Section header table entry size
-  uint16  e_shnum;       // Section header table entry count
-  uint16  e_shstrndx;    // Section header string table index
+  uint8_t   e_ident[16];   // Magic number and other info
+  uint16_t  e_type;        // Object file type
+  uint16_t  e_machine;     // Architecture
+  uint32_t  e_version;     // Object file version
+  uint32_t  e_entry;       // Entry point virtual address
+  uint32_t  e_phoff;       // Program header table file offset
+  uint32_t  e_shoff;       // Section header table file offset
+  uint32_t  e_flags;       // Processor-specific flags
+  uint16_t  e_ehsize;      // ELF header size in bytes
+  uint16_t  e_phentsize;   // Program header table entry size
+  uint16_t  e_phnum;       // Program header table entry count
+  uint16_t  e_shentsize;   // Section header table entry size
+  uint16_t  e_shnum;       // Section header table entry count
+  uint16_t  e_shstrndx;    // Section header string table index
 };
 
 struct Elf64_Ehdr {
-  uint8   e_ident[16];   // Magic number and other info
-  uint16  e_type;        // Object file type
-  uint16  e_machine;     // Architecture
-  uint32  e_version;     // Object file version
-  uint64  e_entry;       // Entry point virtual address
-  uint64  e_phoff;       // Program header table file offset
-  uint64  e_shoff;       // Section header table file offset
-  uint32  e_flags;       // Processor-specific flags
-  uint16  e_ehsize;      // ELF header size in bytes
-  uint16  e_phentsize;   // Program header table entry size
-  uint16  e_phnum;       // Program header table entry count
-  uint16  e_shentsize;   // Section header table entry size
-  uint16  e_shnum;       // Section header table entry count
-  uint16  e_shstrndx;    // Section header string table index
+  uint8_t   e_ident[16];   // Magic number and other info
+  uint16_t  e_type;        // Object file type
+  uint16_t  e_machine;     // Architecture
+  uint32_t  e_version;     // Object file version
+  uint64_t  e_entry;       // Entry point virtual address
+  uint64_t  e_phoff;       // Program header table file offset
+  uint64_t  e_shoff;       // Section header table file offset
+  uint32_t  e_flags;       // Processor-specific flags
+  uint16_t  e_ehsize;      // ELF header size in bytes
+  uint16_t  e_phentsize;   // Program header table entry size
+  uint16_t  e_phnum;       // Program header table entry count
+  uint16_t  e_shentsize;   // Section header table entry size
+  uint16_t  e_shnum;       // Section header table entry count
+  uint16_t  e_shstrndx;    // Section header string table index
 };
 
 
@@ -180,44 +180,44 @@ struct Elf64_Ehdr {
 /* Section header.  */
 
 struct Elf32_Shdr {
-  uint32  sh_name;      // Section name (string tbl index)
-  uint32  sh_type;      // Section type
-  uint32  sh_flags;     // Section flags
-  uint32  sh_addr;      // Section virtual addr at execution
-  uint32  sh_offset;    // Section file offset
-  uint32  sh_size;      // Section size in bytes
-  uint32  sh_link;      // Link to another section
-  uint32  sh_info;      // Additional section information
-  uint32  sh_addralign; // Section alignment
-  uint32  sh_entsize;   // Entry size if section holds table
+  uint32_t  sh_name;      // Section name (string tbl index)
+  uint32_t  sh_type;      // Section type
+  uint32_t  sh_flags;     // Section flags
+  uint32_t  sh_addr;      // Section virtual addr at execution
+  uint32_t  sh_offset;    // Section file offset
+  uint32_t  sh_size;      // Section size in bytes
+  uint32_t  sh_link;      // Link to another section
+  uint32_t  sh_info;      // Additional section information
+  uint32_t  sh_addralign; // Section alignment
+  uint32_t  sh_entsize;   // Entry size if section holds table
 };
 
 struct Elf64_Shdr {
-  uint32  sh_name;      // Section name (string tbl index)
-  uint32  sh_type;      // Section type
-  uint64  sh_flags;     // Section flags
-  uint64  sh_addr;      // Section virtual addr at execution
-  uint64  sh_offset;    // Section file offset
-  uint64  sh_size;      // Section size in bytes
-  uint32  sh_link;      // Link to another section
-  uint32  sh_info;      // Additional section information
-  uint64  sh_addralign; // Section alignment
-  uint64  sh_entsize;   // Entry size if section holds table
+  uint32_t  sh_name;      // Section name (string tbl index)
+  uint32_t  sh_type;      // Section type
+  uint64_t  sh_flags;     // Section flags
+  uint64_t  sh_addr;      // Section virtual addr at execution
+  uint64_t  sh_offset;    // Section file offset
+  uint64_t  sh_size;      // Section size in bytes
+  uint32_t  sh_link;      // Link to another section
+  uint32_t  sh_info;      // Additional section information
+  uint64_t  sh_addralign; // Section alignment
+  uint64_t  sh_entsize;   // Entry size if section holds table
 };
 
 
 /* Special section indices.  */
 
 #define SHN_UNDEF                   0  // Undefined section
-#define SHN_LORESERVE  ((int16)0xff00) // Start of reserved indices
-#define SHN_LOPROC     ((int16)0xff00) // Start of processor-specific
-#define SHN_HIPROC     ((int16)0xff1f) // End of processor-specific
-#define SHN_LOOS       ((int16)0xff20) // Start of OS-specific
-#define SHN_HIOS       ((int16)0xff3f) // End of OS-specific
-#define SHN_ABS        ((int16)0xfff1) // Associated symbol is absolute
-#define SHN_COMMON     ((int16)0xfff2) // Associated symbol is common
-#define SHN_XINDEX     ((int16)0xffff) // Index is in extra table
-#define SHN_HIRESERVE  ((int16)0xffff) // End of reserved indices
+#define SHN_LORESERVE  ((int16_t)0xff00) // Start of reserved indices
+#define SHN_LOPROC     ((int16_t)0xff00) // Start of processor-specific
+#define SHN_HIPROC     ((int16_t)0xff1f) // End of processor-specific
+#define SHN_LOOS       ((int16_t)0xff20) // Start of OS-specific
+#define SHN_HIOS       ((int16_t)0xff3f) // End of OS-specific
+#define SHN_ABS        ((int16_t)0xfff1) // Associated symbol is absolute
+#define SHN_COMMON     ((int16_t)0xfff2) // Associated symbol is common
+#define SHN_XINDEX     ((int16_t)0xffff) // Index is in extra table
+#define SHN_HIRESERVE  ((int16_t)0xffff) // End of reserved indices
 
 // Legal values for sh_type (section type).
 
@@ -276,23 +276,23 @@ struct Elf64_Shdr {
 /* Symbol table entry.  */
 
 struct Elf32_Sym {
-  uint32  st_name;       // Symbol name (string tbl index)
-  uint32  st_value;      // Symbol value
-  uint32  st_size;       // Symbol size
-  uint8   st_type: 4,    // Symbol type
+  uint32_t  st_name;       // Symbol name (string tbl index)
+  uint32_t  st_value;      // Symbol value
+  uint32_t  st_size;       // Symbol size
+  uint8_t   st_type: 4,    // Symbol type
           st_bind: 4;    // Symbol binding
-  uint8   st_other;      // Symbol visibility
-  uint16  st_shndx;      // Section index
+  uint8_t   st_other;      // Symbol visibility
+  uint16_t  st_shndx;      // Section index
 };
 
 struct Elf64_Sym {
-  uint32  st_name;       // Symbol name (string tbl index)
-  uint8   st_type: 4,    // Symbol type
+  uint32_t  st_name;       // Symbol name (string tbl index)
+  uint8_t   st_type: 4,    // Symbol type
           st_bind: 4;    // Symbol binding
-  uint8   st_other;      // Symbol visibility
-  uint16  st_shndx;      // Section index
-  uint64  st_value;      // Symbol value
-  uint64  st_size;       // Symbol size
+  uint8_t   st_other;      // Symbol visibility
+  uint16_t  st_shndx;      // Section index
+  uint64_t  st_value;      // Symbol value
+  uint64_t  st_size;       // Symbol size
 };
 
 
@@ -300,13 +300,13 @@ struct Elf64_Sym {
    every dynamic symbol.  */
 
 struct Elf32_Syminfo {
-  uint16 si_boundto;    /* Direct bindings, symbol bound to */
-  uint16 si_flags;      /* Per symbol flags */
+  uint16_t si_boundto;    /* Direct bindings, symbol bound to */
+  uint16_t si_flags;      /* Per symbol flags */
 };
 
 struct Elf64_Syminfo {
-  uint16 si_boundto;    /* Direct bindings, symbol bound to */
-  uint16 si_flags;      /* Per symbol flags */
+  uint16_t si_boundto;    /* Direct bindings, symbol bound to */
+  uint16_t si_flags;      /* Per symbol flags */
 };
 
 /* Possible values for si_boundto.  */
@@ -332,7 +332,7 @@ struct Elf64_Syminfo {
 // How to extract and insert information held in the st_info field.
 // Both Elf32_Sym and Elf64_Sym use the same one-byte st_info field.
 
-//#define ELF32_ST_BIND(val)        (((uint8) (val)) >> 4)
+//#define ELF32_ST_BIND(val)        (((uint8_t) (val)) >> 4)
 //#define ELF32_ST_TYPE(val)        ((val) & 0xf)
 //#define ELF32_ST_INFO(bind,type)  (((bind) << 4) + ((type) & 0xf))
 
@@ -390,22 +390,22 @@ struct Elf64_Syminfo {
 //#define ELF32_R_TYPE(val)       ((val) & 0xff)
 //#define ELF32_R_INFO(sym,type)  (((sym) << 8) + ((type) & 0xff))
 
-//#define ELF64_R_SYM(i)          ((uint32)((i) >> 32))
+//#define ELF64_R_SYM(i)          ((uint32_t)((i) >> 32))
 //#define ELF64_R_TYPE(i)         ((i) & 0xffffffff)
-//#define ELF64_R_INFO(sym,type)  ((((uint64) (sym)) << 32) + (type))
+//#define ELF64_R_INFO(sym,type)  ((((uint64_t) (sym)) << 32) + (type))
 
 
 // Relocation table entry without addend (in section of type SHT_REL)
 struct Elf32_Rel {
-  uint32  r_offset;             // Address
-  uint32  r_type: 8,            // Relocation type
+  uint32_t  r_offset;             // Address
+  uint32_t  r_type: 8,            // Relocation type
           r_sym: 24;            // Symbol index
 };
 
 struct Elf64_Rel {
-  uint64  r_offset;             // Address
-  uint32  r_type;               // Relocation type
-  uint32  r_sym;                // Symbol index
+  uint64_t  r_offset;             // Address
+  uint32_t  r_type;               // Relocation type
+  uint32_t  r_sym;                // Symbol index
 };
 
 // Relocation table entry with addend (in section of type SHT_RELA)
@@ -415,17 +415,17 @@ struct Elf64_Rel {
 // Use Elf64_Rela in 64 bit mode. Elf64_Rel not accepted?
 
 struct Elf32_Rela {
-  uint32  r_offset;               // Address
-  uint32  r_type: 8,              // Relocation type
+  uint32_t  r_offset;               // Address
+  uint32_t  r_type: 8,              // Relocation type
           r_sym: 24;              // Symbol index
-  int32   r_addend;               // Addend
+  int32_t   r_addend;               // Addend
 };
 
 struct Elf64_Rela {
-  uint64  r_offset;               // Address
-  uint32  r_type;                 // Relocation type
-  uint32  r_sym;                  // Symbol index
-  int64   r_addend;               // Addend
+  uint64_t  r_offset;               // Address
+  uint32_t  r_type;                 // Relocation type
+  uint32_t  r_sym;                  // Symbol index
+  int64_t   r_addend;               // Addend
 };
 
 // i386 Relocation types
@@ -471,25 +471,25 @@ struct Elf64_Rela {
 // Program segment header.
 
 struct Elf32_Phdr {
-  uint32  p_type;      /* Segment type */
-  uint32  p_offset;    /* Segment file offset */
-  uint32  p_vaddr;     /* Segment virtual address */
-  uint32  p_paddr;     /* Segment physical address */
-  uint32  p_filesz;    /* Segment size in file */
-  uint32  p_memsz;     /* Segment size in memory */
-  uint32  p_flags;     /* Segment flags */
-  uint32  p_align;     /* Segment alignment */
+  uint32_t  p_type;      /* Segment type */
+  uint32_t  p_offset;    /* Segment file offset */
+  uint32_t  p_vaddr;     /* Segment virtual address */
+  uint32_t  p_paddr;     /* Segment physical address */
+  uint32_t  p_filesz;    /* Segment size in file */
+  uint32_t  p_memsz;     /* Segment size in memory */
+  uint32_t  p_flags;     /* Segment flags */
+  uint32_t  p_align;     /* Segment alignment */
 };
 
 struct Elf64_Phdr {
-  uint32  p_type;      /* Segment type */
-  uint32  p_flags;     /* Segment flags */
-  uint64  p_offset;    /* Segment file offset */
-  uint64  p_vaddr;     /* Segment virtual address */
-  uint64  p_paddr;     /* Segment physical address */
-  uint64  p_filesz;    /* Segment size in file */
-  uint64  p_memsz;     /* Segment size in memory */
-  uint64  p_align;     /* Segment alignment */
+  uint32_t  p_type;      /* Segment type */
+  uint32_t  p_flags;     /* Segment flags */
+  uint64_t  p_offset;    /* Segment file offset */
+  uint64_t  p_vaddr;     /* Segment virtual address */
+  uint64_t  p_paddr;     /* Segment physical address */
+  uint64_t  p_filesz;    /* Segment size in file */
+  uint64_t  p_memsz;     /* Segment size in memory */
+  uint64_t  p_align;     /* Segment alignment */
 };
 
 /* Legal values for p_type (segment type).  */
@@ -540,18 +540,18 @@ struct Elf64_Phdr {
 /* Dynamic section entry.  */
 
 struct Elf32_Dyn {
-  int32  d_tag;          /* Dynamic entry type */
+  int32_t  d_tag;          /* Dynamic entry type */
   union   {
-      uint32 d_val;      /* Integer value */
-      uint32 d_ptr;      /* Address value */
+      uint32_t d_val;      /* Integer value */
+      uint32_t d_ptr;      /* Address value */
     } d_un;
 };
 
 struct Elf64_Dyn {
-  int64  d_tag;          /* Dynamic entry type */
+  int64_t  d_tag;          /* Dynamic entry type */
   union    {
-      uint64 d_val;      /* Integer value */
-      uint64 d_ptr;      /* Address value */
+      uint64_t d_val;      /* Integer value */
+      uint64_t d_ptr;      /* Address value */
     } d_un;
 };
 
@@ -640,7 +640,7 @@ struct Elf64_Dyn {
    range.  Be compatible.  */
 #define DT_AUXILIARY    0x7ffffffd      /* Shared object to load before self */
 #define DT_FILTER       0x7fffffff      /* Shared object to get values from */
-#define DT_EXTRATAGIDX(tag)  ((uint32)-((int32) (tag) <<1>>1)-1)
+#define DT_EXTRATAGIDX(tag)  ((uint32_t)-((int32_t) (tag) <<1>>1)-1)
 #define DT_EXTRANUM  3
 
 /* Values of `d_un.d_val' in the DT_FLAGS entry.  */
@@ -678,23 +678,23 @@ struct Elf64_Dyn {
 /* Version definition sections.  */
 
 struct Elf32_Verdef  {
-  uint16  vd_version;  /* Version revision */
-  uint16  vd_flags;    /* Version information */
-  uint16  vd_ndx;      /* Version Index */
-  uint16  vd_cnt;      /* Number of associated aux entries */
-  uint32  vd_hash;     /* Version name hash value */
-  uint32  vd_aux;      /* Offset in bytes to verdaux array */
-  uint32  vd_next;     /* Offset in bytes to next verdef entry */
+  uint16_t  vd_version;  /* Version revision */
+  uint16_t  vd_flags;    /* Version information */
+  uint16_t  vd_ndx;      /* Version Index */
+  uint16_t  vd_cnt;      /* Number of associated aux entries */
+  uint32_t  vd_hash;     /* Version name hash value */
+  uint32_t  vd_aux;      /* Offset in bytes to verdaux array */
+  uint32_t  vd_next;     /* Offset in bytes to next verdef entry */
 };
 
 struct Elf64_Verdef {
-  uint16  vd_version;  /* Version revision */
-  uint16  vd_flags;    /* Version information */
-  uint16  vd_ndx;      /* Version Index */
-  uint16  vd_cnt;      /* Number of associated aux entries */
-  uint32  vd_hash;     /* Version name hash value */
-  uint32  vd_aux;      /* Offset in bytes to verdaux array */
-  uint32  vd_next;     /* Offset in bytes to next verdef entry */
+  uint16_t  vd_version;  /* Version revision */
+  uint16_t  vd_flags;    /* Version information */
+  uint16_t  vd_ndx;      /* Version Index */
+  uint16_t  vd_cnt;      /* Number of associated aux entries */
+  uint32_t  vd_hash;     /* Version name hash value */
+  uint32_t  vd_aux;      /* Offset in bytes to verdaux array */
+  uint32_t  vd_next;     /* Offset in bytes to next verdef entry */
 };
 
 
@@ -710,32 +710,32 @@ struct Elf64_Verdef {
 /* Auxialiary version information.  */
 
 struct Elf32_Verdaux {
-  uint32  vda_name;    /* Version or dependency names */
-  uint32  vda_next;    /* Offset in bytes to next verdaux entry */
+  uint32_t  vda_name;    /* Version or dependency names */
+  uint32_t  vda_next;    /* Offset in bytes to next verdaux entry */
 };
 
 struct Elf64_Verdaux {
-  uint32  vda_name;    /* Version or dependency names */
-  uint32  vda_next;    /* Offset in bytes to next verdaux entry */
+  uint32_t  vda_name;    /* Version or dependency names */
+  uint32_t  vda_next;    /* Offset in bytes to next verdaux entry */
 };
 
 
 /* Version dependency section.  */
 
 struct Elf32_Verneed {
-  uint16  vn_version;    /* Version of structure */
-  uint16  vn_cnt;        /* Number of associated aux entries */
-  uint32  vn_file;       /* Offset of filename for this dependency */
-  uint32  vn_aux;        /* Offset in bytes to vernaux array */
-  uint32  vn_next;       /* Offset in bytes to next verneed entry */
+  uint16_t  vn_version;    /* Version of structure */
+  uint16_t  vn_cnt;        /* Number of associated aux entries */
+  uint32_t  vn_file;       /* Offset of filename for this dependency */
+  uint32_t  vn_aux;        /* Offset in bytes to vernaux array */
+  uint32_t  vn_next;       /* Offset in bytes to next verneed entry */
 };
 
 struct Elf64_Verneed {
-  uint16  vn_version;    /* Version of structure */
-  uint16  vn_cnt;        /* Number of associated aux entries */
-  uint32  vn_file;       /* Offset of filename for this dependency */
-  uint32  vn_aux;        /* Offset in bytes to vernaux array */
-  uint32  vn_next;       /* Offset in bytes to next verneed entry */
+  uint16_t  vn_version;    /* Version of structure */
+  uint16_t  vn_cnt;        /* Number of associated aux entries */
+  uint32_t  vn_file;       /* Offset of filename for this dependency */
+  uint32_t  vn_aux;        /* Offset in bytes to vernaux array */
+  uint32_t  vn_next;       /* Offset in bytes to next verneed entry */
 };
 
 
@@ -747,19 +747,19 @@ struct Elf64_Verneed {
 /* Auxiliary needed version information.  */
 
 struct Elf32_Vernaux {
-  uint32  vna_hash;     /* Hash value of dependency name */
-  uint16  vna_flags;    /* Dependency specific information */
-  uint16  vna_other;    /* Unused */
-  uint32  vna_name;     /* Dependency name string offset */
-  uint32  vna_next;     /* Offset in bytes to next vernaux entry */
+  uint32_t  vna_hash;     /* Hash value of dependency name */
+  uint16_t  vna_flags;    /* Dependency specific information */
+  uint16_t  vna_other;    /* Unused */
+  uint32_t  vna_name;     /* Dependency name string offset */
+  uint32_t  vna_next;     /* Offset in bytes to next vernaux entry */
 };
 
 struct Elf64_Vernaux {
-  uint32  vna_hash;     /* Hash value of dependency name */
-  uint16  vna_flags;    /* Dependency specific information */
-  uint16  vna_other;    /* Unused */
-  uint32  vna_name;     /* Dependency name string offset */
-  uint32  vna_next;     /* Offset in bytes to next vernaux entry */
+  uint32_t  vna_hash;     /* Hash value of dependency name */
+  uint16_t  vna_flags;    /* Dependency specific information */
+  uint16_t  vna_other;    /* Unused */
+  uint32_t  vna_name;     /* Dependency name string offset */
+  uint32_t  vna_next;     /* Offset in bytes to next vernaux entry */
 };
 
 
@@ -771,15 +771,15 @@ struct Elf64_Vernaux {
    a header of a fixed form.  */
 
 struct Elf32_Nhdr {
-  uint32 n_namesz;      /* Length of the note's name.  */
-  uint32 n_descsz;      /* Length of the note's descriptor.  */
-  uint32 n_type;        /* Type of the note.  */
+  uint32_t n_namesz;      /* Length of the note's name.  */
+  uint32_t n_descsz;      /* Length of the note's descriptor.  */
+  uint32_t n_type;        /* Type of the note.  */
 };
 
 struct Elf64_Nhdr {
-  uint32 n_namesz;      /* Length of the note's name.  */
-  uint32 n_descsz;      /* Length of the note's descriptor.  */
-  uint32 n_type;        /* Type of the note.  */
+  uint32_t n_namesz;      /* Length of the note's name.  */
+  uint32_t n_descsz;      /* Length of the note's descriptor.  */
+  uint32_t n_type;        /* Type of the note.  */
 };
 
 /* Known names of notes.  */
@@ -816,25 +816,25 @@ struct Elf64_Nhdr {
 
 /* Move records.  */
 struct Elf32_Move {
-  uint64 m_value;      /* Symbol value.  */
-  uint32 m_info;       /* Size and index.  */
-  uint32 m_poffset;    /* Symbol offset.  */
-  uint16 m_repeat;     /* Repeat count.  */
-  uint16 m_stride;     /* Stride info.  */
+  uint64_t m_value;      /* Symbol value.  */
+  uint32_t m_info;       /* Size and index.  */
+  uint32_t m_poffset;    /* Symbol offset.  */
+  uint16_t m_repeat;     /* Repeat count.  */
+  uint16_t m_stride;     /* Stride info.  */
 };
 
 struct Elf64_Move {
-  uint64 m_value;     /* Symbol value.  */
-  uint64 m_info;      /* Size and index.  */
-  uint64 m_poffset;   /* Symbol offset.  */
-  uint16 m_repeat;    /* Repeat count.  */
-  uint16 m_stride;    /* Stride info.  */
+  uint64_t m_value;     /* Symbol value.  */
+  uint64_t m_info;      /* Size and index.  */
+  uint64_t m_poffset;   /* Symbol offset.  */
+  uint16_t m_repeat;    /* Repeat count.  */
+  uint16_t m_stride;    /* Stride info.  */
 };
 
 /* Macro to construct move records.  */
 #define ELF32_M_SYM(info)        ((info) >> 8)
-#define ELF32_M_SIZE(info)       ((uint8) (info))
-#define ELF32_M_INFO(sym, size)  (((sym) << 8) + (uint8) (size))
+#define ELF32_M_SIZE(info)       ((uint8_t) (info))
+#define ELF32_M_INFO(sym, size)  (((sym) << 8) + (uint8_t) (size))
 
 #define ELF64_M_SYM(info)        ELF32_M_SYM (info)
 #define ELF64_M_SIZE(info)       ELF32_M_SIZE (info)

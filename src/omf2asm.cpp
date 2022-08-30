@@ -51,9 +51,9 @@ void COMF2ASM::Convert() {
 
 void COMF2ASM::CountSegments() {
    // Make temporary Segments table
-   uint32 i;                                     // Record number
-   uint32 NameIndex;                             // Name index
-   uint32 ClassIndex;                            // Class name index
+   uint32_t i;                                     // Record number
+   uint32_t NameIndex;                             // Name index
+   uint32_t ClassIndex;                            // Class name index
    SOMFSegment SegRecord;                        // Segment record
 
    // Define structure of attributes
@@ -131,8 +131,8 @@ void COMF2ASM::CountSegments() {
             char * ClassName = GetLocalName(ClassIndex);
 
             // Convert class name to upper case
-            uint32 n = (uint32)strlen(ClassName);
-            for (uint32 j = 0; j < n; j++) ClassName[j] &= ~0x20;
+            uint32_t n = (uint32_t)strlen(ClassName);
+            for (uint32_t j = 0; j < n; j++) ClassName[j] &= ~0x20;
 
             // Search for known class names.
             // Standard names are CODE, DATA, BSS, CONST, STACK
@@ -175,18 +175,18 @@ void COMF2ASM::CountSegments() {
       if (Records[i].Type2 == OMF_COMDAT) {
          Records[i].Index = 3;
 
-         uint8 flags = Records[i].GetByte();
+         uint8_t flags = Records[i].GetByte();
          if ((flags & 2) != 0) {
             // don't support iterated data yet
             err.submit(2318);           // Error message: not supported
             continue;
          }
-         uint8 attribs = Records[i].GetByte();
-         uint8 align = Records[i].GetByte();
-         uint32 ofs  = Records[i].GetNumeric();
+         uint8_t attribs = Records[i].GetByte();
+         uint8_t align = Records[i].GetByte();
+         uint32_t ofs  = Records[i].GetNumeric();
          Records[i].GetIndex(); // type (ignore)
-         //uint16 publicBase = 0;
-         uint16 publicSegment = 0;
+         //uint16_t publicBase = 0;
+         uint16_t publicSegment = 0;
          // From the OMF Spec 1.1: "If alloc type is EXPLICIT, public base is present and is
          // identical to public base fields BaseGroup, Base Segment & BaseFrame in the PUBDEF."
          // BUT: In the diagram in the spec it is described as 1-2 bytes (ie, an Index field).
@@ -201,13 +201,13 @@ void COMF2ASM::CountSegments() {
                 publicSegment = Records[i].GetIndex(); // ??
             }
          }
-         uint16 publicName = Records[i].GetIndex();
-         uint32 RecSize = Records[i].End - Records[i].Index; // Calculate size of data
+         uint16_t publicName = Records[i].GetIndex();
+         uint32_t RecSize = Records[i].End - Records[i].Index; // Calculate size of data
          if (attribs & 0xF) {
             SegRecord.Type = 0x1000  | (attribs & 0xFF);
             SegRecord.WordSize = (attribs & 0x2) ? 32 : 16;
          }
-         else {
+         else {			
             // use value from segdef
             SegRecord.Type = 0x1000 | Segments[publicSegment].Type;
             SegRecord.WordSize = Segments[publicSegment].WordSize;
@@ -229,7 +229,7 @@ void COMF2ASM::CountSegments() {
          const char * name = GetLocalName(publicName);
 
          // Make a section name by putting _text$ before function name
-         uint32 ComdatSectionNameIndex = NameBuffer.Push("_text$", 6);
+         uint32_t ComdatSectionNameIndex = NameBuffer.Push("_text$", 6);
          NameBuffer.PushString(name); // append function name
          SegRecord.NameO = ComdatSectionNameIndex;
          SegRecord.NameIndex = publicName;
@@ -249,8 +249,8 @@ void COMF2ASM::CountSegments() {
    // Communal sections (as used by Borland):
    for (i = 0; i < NumRecords; i++) {
       if (Records[i].Type2 == OMF_COMDEF) {
-         uint32 DType, DSize = 0, DNum;
-         uint16 Segment = 0;
+         uint32_t DType, DSize = 0, DNum;
+         uint16_t Segment = 0;
          const char * FuncName = 0;
 
          // Loop through possibly multiple entries in record
@@ -283,8 +283,8 @@ void COMF2ASM::CountSegments() {
          SegRecord = Segments[Segment];
 
          // Make a section name as SEGMENTNAME$FUNCTIONNAME
-         const char * SegmentName = NameBuffer.Buf() + SegRecord.NameO;
-         uint32 ComdatSectionNameIndex = NameBuffer.Push(SegmentName, strlen(SegmentName));
+         const char * SegmentName = (char*)NameBuffer.Buf() + SegRecord.NameO;
+         uint32_t ComdatSectionNameIndex = NameBuffer.Push(SegmentName, (uint32_t)strlen(SegmentName));
          NameBuffer.Push("$", 1);
          NameBuffer.PushString(FuncName); // append function name
          SegRecord.NameO = ComdatSectionNameIndex;
@@ -305,9 +305,9 @@ void COMF2ASM::CountSegments() {
 
 void COMF2ASM::MakeExternalSymbolsTable() {
    // Make symbol table and string table entries for external symbols
-   uint32 iextsym;                               // External symbol index
-   uint32 isymo;                                 // Symbol index in disassembler
-   uint32 NumExtSym = SymbolNameOffset.GetNumEntries(); // Number of external symbols
+   uint32_t iextsym;                               // External symbol index
+   uint32_t isymo;                                 // Symbol index in disassembler
+   uint32_t NumExtSym = SymbolNameOffset.GetNumEntries(); // Number of external symbols
    ExtdefTranslation.SetNum(NumExtSym+1);        // Allocate space in symbol index translation table
 
    // Loop through external symbol names
@@ -327,12 +327,12 @@ void COMF2ASM::MakeExternalSymbolsTable() {
 
 void COMF2ASM::MakePublicSymbolsTable() {
    // Make symbol table entries for public symbols
-   uint32 i;                                     // Record index
+   uint32_t i;                                     // Record index
    char * string;                                // Symbol name
-   uint32 Segment;                               // Segment
-   uint32 Offset;                                // Offset
-   uint32 isymo;                                 // Symbol number in disasm
-   uint32 CommunalSection = FirstComDatSection;  // Index to communal section
+   uint32_t Segment;                               // Segment
+   uint32_t Offset;                                // Offset
+   uint32_t isymo;                                 // Symbol number in disasm
+   uint32_t CommunalSection = FirstComDatSection;  // Index to communal section
 
    PubdefTranslation.Push(0);                    // Make index 0 = 0
 
@@ -366,9 +366,9 @@ void COMF2ASM::MakePublicSymbolsTable() {
    for (i = 0; i < NumRecords; i++) {
       if (Records[i].Type2 == OMF_COMDEF) {
          // COMDEF record, Borland communal name
-         uint32 DType;
-         //uint32 DSize;
-         //uint32 DNum;
+         uint32_t DType;
+         //uint32_t DSize;
+         //uint32_t DNum;
          Records[i].Index = 3;
 
          // Loop through possibly multiple entries in record
@@ -411,21 +411,21 @@ void COMF2ASM::MakeCommunalSymbolsTable() {
    char * string;                                // Symbol name
 
    // Search for communal records
-   for (uint32 i = 0; i < NumRecords; i++) {
+   for (uint32_t i = 0; i < NumRecords; i++) {
       // Count communal records
       if (Records[i].Type2 == OMF_CEXTDEF) {
          Records[i].Index = 3;
          // Loop through strings in record
-         while (Records[i].Index < Records[i].End) {
-            uint32 LIndex = Records[i].GetIndex();
+         while (Records[i].Index < Records[i].End) {			
+            uint32_t LIndex = Records[i].GetIndex();
             Records[i].GetIndex(); // Group. Ignore
             string = GetLocalName(LIndex);
 
             // find section with same name
-            int32 section = 0;
-            for (uint32 j = 0; j < Segments.GetNumEntries(); j++) {
+            int32_t section = 0;
+            for (uint32_t j = 0; j < Segments.GetNumEntries(); j++) {
                if (Segments[j].NameIndex == LIndex) {
-                  section = (int32)j; break;
+                  section = (int32_t)j; break;
                }
             }
 
@@ -439,7 +439,7 @@ void COMF2ASM::MakeCommunalSymbolsTable() {
 
 void COMF2ASM::MakeGroupDefinitions() {
    // Make segment group definitions
-   uint32 i;                                     // Record index
+   uint32_t i;                                     // Record index
 
    // Search for group records
    for (i = 0; i < NumRecords; i++) {
@@ -447,7 +447,7 @@ void COMF2ASM::MakeGroupDefinitions() {
          // GRPDEF record
          Records[i].Index = 3;
          // Get group name
-         uint32 ClassIndex = Records[i].GetIndex();
+         uint32_t ClassIndex = Records[i].GetIndex();
          char * GroupName = GetLocalName(ClassIndex);
 
          // Define group
@@ -456,9 +456,9 @@ void COMF2ASM::MakeGroupDefinitions() {
          // Loop through remaining entries in record
          while (Records[i].Index < Records[i].End) {
             // Entry type should be 0xFF
-            uint8 Type = Records[i].GetByte();
+            uint8_t Type = Records[i].GetByte();
             // Get member name
-            int32 NameIndex = Records[i].GetIndex();
+            int32_t NameIndex = Records[i].GetIndex();
             // Check if type valid
             if (Type == 0xFF && NameIndex > 0) {
                // A group member is found. Add member to group
@@ -474,23 +474,23 @@ void COMF2ASM::MakeGroupDefinitions() {
 // MakeSegmentList
 void COMF2ASM::MakeSegmentList() {
    // Make Sections list in Disasm
-   int32  SegNum;                                // Segment number
-   int32  Segment = 0;                           // Segment number in OMF record
-   uint32 RecNum;                                // OMF record number
-   uint32 LastDataRecord;                        // OMF record number of last LEDATA record
-   uint32 RecOffset;                             // Segment offset of LEDATA, LIDATA record
-   uint32 RecSize;                               // Data size of LEDATA, LIDATA record
-   uint32 LastDataRecordSize;                    // Last RecSize
-   uint32 LastOffset;                            // Last RecOffset
-   int8 * LastDataRecordPointer;                 // Point to last raw data
-   uint32 BufOffset;                             // Offset of segment into SegmentData buffer
+   int32_t  SegNum;                                // Segment number
+   int32_t  Segment = 0;                           // Segment number in OMF record
+   uint32_t RecNum;                                // OMF record number
+   uint32_t LastDataRecord;                        // OMF record number of last LEDATA record
+   uint32_t RecOffset;                             // Segment offset of LEDATA, LIDATA record
+   uint32_t RecSize;                               // Data size of LEDATA, LIDATA record
+   uint32_t LastDataRecordSize;                    // Last RecSize
+   uint32_t LastOffset;                            // Last RecOffset
+   int8_t * LastDataRecordPointer;                 // Point to last raw data
+   uint32_t BufOffset;                             // Offset of segment into SegmentData buffer
    CMemoryBuffer TempBuf;                        // Temporary buffer for building raw data
 
    // Loop through segments
    for (SegNum = 1; SegNum <= NumSegments; SegNum++) {
 
       // Get size
-      uint32 SegmentSize = Segments[SegNum].Size;
+      uint32_t SegmentSize = Segments[SegNum].Size;
       if (SegmentSize == 0) continue;            // Empty segment
 
       // Allocate temporary data buffer and reset it
@@ -587,7 +587,7 @@ void COMF2ASM::MakeSegmentList() {
             // COMDAT record.
 
             Records[RecNum].Index = 3;           // Initialize record reading
-            uint16 flags = Records[RecNum].GetByte();
+            uint16_t flags = Records[RecNum].GetByte();
             if ((flags&1)==0) { // not a continuation
                ++comdatsSoFar;
                LastDataRecord = RecNum;             // Save for later FIXUPP that refers to this record
@@ -595,13 +595,13 @@ void COMF2ASM::MakeSegmentList() {
             Segment = FirstComDatSection + comdatsSoFar-1;
             if (SegNum != Segment) continue;
 
-            uint16 attribs = Records[RecNum].GetByte();
+            uint16_t attribs = Records[RecNum].GetByte();
             Records[RecNum].GetByte(); // align (ignore)
             RecOffset = Records[RecNum].GetNumeric();
             Records[RecNum].GetIndex(); // type (ignore)
             if ((attribs&0xF)==0) {
                Records[RecNum].GetIndex(); // public base
-               uint16 publicSegment = Records[RecNum].GetIndex();
+               uint16_t publicSegment = Records[RecNum].GetIndex();
                if (publicSegment==0) Records[RecNum].GetIndex(); // public frame (ignore)
             }
             Records[RecNum].GetIndex(); // public name (ignore)
@@ -623,14 +623,14 @@ void COMF2ASM::MakeSegmentList() {
             if (Records[LastDataRecord].Type2 == OMF_LEDATA) {
                // FIXUPP for last LEDATA record
                // Make relocation records
-               MakeRelocations(Segment, RecNum, LastOffset, LastDataRecordSize, (uint8*)TempBuf.Buf());
+               MakeRelocations(Segment, RecNum, LastOffset, LastDataRecordSize, (uint8_t*)TempBuf.Buf());
             }
             else if (Records[RecNum].Index < Records[RecNum].End) {
                // Non-empty FIXUPP record does not refer to LEDATA record
                if (Records[LastDataRecord].Type2 == OMF_COMDAT) {
                   // FIXUPP for last COMDAT record
                   // Make relocation records
-                  MakeRelocations(Segment, RecNum, LastOffset, LastDataRecordSize, (uint8*)TempBuf.Buf());
+                  MakeRelocations(Segment, RecNum, LastOffset, LastDataRecordSize, (uint8_t*)TempBuf.Buf());
                }
                else if (Records[LastDataRecord].Type2 == OMF_LIDATA) {
                   err.submit(2311);              // Error: Relocation of iterated data not supported
@@ -660,13 +660,13 @@ void COMF2ASM::MakeSegmentList() {
    for (SegNum = 1; SegNum <= NumSegments; SegNum++) {
 
       // Pointer to merged raw data
-      uint8 * RawDatap = (uint8*)SegmentData.Buf() + Segments[SegNum].BufOffset;
+      uint8_t * RawDatap = (uint8_t*)SegmentData.Buf() + Segments[SegNum].BufOffset;
 
       // Size of raw data
-      uint32 InitSize = (Segments[SegNum].Type == 3) ? 0 : Segments[SegNum].Size;
+      uint32_t InitSize = (Segments[SegNum].Type == 3) ? 0 : Segments[SegNum].Size;
 
       // Define segment
-      const char * SegmentName = NameBuffer.Buf() + Segments[SegNum].NameO;
+      const char * SegmentName = (char*)NameBuffer.Buf() + Segments[SegNum].NameO;
       Disasm.AddSection(RawDatap, InitSize, Segments[SegNum].Size, Segments[SegNum].Offset,
          Segments[SegNum].Type, Segments[SegNum].Align, Segments[SegNum].WordSize, SegmentName);
       if (Segments[SegNum].Type == 1 || Segments[SegNum].Type == 0x1001) {
@@ -677,7 +677,7 @@ void COMF2ASM::MakeSegmentList() {
 
 
 // MakeRelocations
-void COMF2ASM::MakeRelocations(int32 Segment, uint32 RecNum, uint32 SOffset, uint32 RSize, uint8 * SData) {
+void COMF2ASM::MakeRelocations(int32_t Segment, uint32_t RecNum, uint32_t SOffset, uint32_t RSize, uint8_t * SData) {
    // Make relocations for object and executable files
    // Parameters:
    // Segment = segment index of last LEDATA record
@@ -686,17 +686,17 @@ void COMF2ASM::MakeRelocations(int32 Segment, uint32 RecNum, uint32 SOffset, uin
    // RSize = Size of last LEDATA record
    // SData = pointer to raw segment data
 
-   uint32 Frame, Target, TargetDisplacement; // Contents of FIXUPP record
-   uint8  byte1, byte2;                // First two bytes of subrecord
-   int32  Inline;                      // Inline address or addend in relocation source
-   //int16  InlineSeg;                   // Segment address stored in relocation source
-   int32  Addend;                      // Correction to add to target address
-   int32  SourceSize;                  // Size of relocation source
-   uint32 RelType;                     // Relocation type, as defined in disasm.h
-   int32  TargetSegment;               // Target segment or group
-   uint32 TargetOffset;                // Target offset
-   uint32 TargetSymbol;                // Symbol index of target
-   uint32 ReferenceIndex;              // Segment/group index of reference frame
+   uint32_t Frame, Target, TargetDisplacement; // Contents of FIXUPP record
+   uint8_t  byte1, byte2;                // First two bytes of subrecord
+   int32_t  Inline;                      // Inline address or addend in relocation source
+   //int16_t  InlineSeg;                   // Segment address stored in relocation source
+   int32_t  Addend;                      // Correction to add to target address
+   int32_t  SourceSize;                  // Size of relocation source
+   uint32_t RelType;                     // Relocation type, as defined in disasm.h
+   int32_t  TargetSegment;               // Target segment or group
+   uint32_t TargetOffset;                // Target offset
+   uint32_t TargetSymbol;                // Symbol index of target
+   uint32_t ReferenceIndex;              // Segment/group index of reference frame
 
    // Bitfields in subrecords
    OMF_SLocat Locat;         // Structure of first two bytes of FIXUP subrecord swapped = Locat field
@@ -771,7 +771,7 @@ void COMF2ASM::MakeRelocations(int32 Segment, uint32 RecNum, uint32 SOffset, uin
                // Refers to Borland communal section
                Target = (Target & ~0x4000) + FirstComDatSection - 1;
             }
-            //uint32 TargetMethod = FixData.s.Target + FixData.s.P * 4;
+            //uint32_t TargetMethod = FixData.s.Target + FixData.s.P * 4;
          }
          else {
             // Target specified in previous thread
@@ -792,7 +792,7 @@ void COMF2ASM::MakeRelocations(int32 Segment, uint32 RecNum, uint32 SOffset, uin
          // Get inline addend and check relocation method
 
          // Pointer to relocation source inline in raw data:
-         uint8 * inlinep = SData + SOffset + Locat.s.Offset;
+         uint8_t * inlinep = SData + SOffset + Locat.s.Offset;
          Inline = 0;  SourceSize = 0;
          //InlineSeg = 0;
          TargetSegment = 0;  TargetOffset = 0;  TargetSymbol = 0;
@@ -810,30 +810,30 @@ void COMF2ASM::MakeRelocations(int32 Segment, uint32 RecNum, uint32 SOffset, uin
          switch (Locat.s.Location) {// Relocation method
          case OMF_Fixup_8bit:       // 8 bit
             SourceSize = 1;
-            Inline = *(int8*)inlinep;
+            Inline = *(int8_t*)inlinep;
             break;
 
          case OMF_Fixup_16bit:      // 16 bit
             SourceSize = 2;
-            Inline = *(int16*)inlinep;
+            Inline = *(int16_t*)inlinep;
             break;
 
          case OMF_Fixup_32bit:      // 32 bit
             SourceSize = 4;
-            Inline = *(int32*)inlinep;
+            Inline = *(int32_t*)inlinep;
             break;
 
          case OMF_Fixup_Far:        // far 16+16 bit
             RelType = 0x400;
             SourceSize = 4;
-            Inline = *(int16*)inlinep;
+            Inline = *(int16_t*)inlinep;
             break;
 
          case OMF_Fixup_Farword:    // far 32+16 bit
          case OMF_Fixup_Pharlab48:
             RelType = 0x400;
             SourceSize = 6;
-            Inline = *(int32*)inlinep;
+            Inline = *(int32_t*)inlinep;
             break;
 
          case OMF_Fixup_Segment:    // segment selector
@@ -847,19 +847,19 @@ void COMF2ASM::MakeRelocations(int32 Segment, uint32 RecNum, uint32 SOffset, uin
                RelType = 0x100;
             };
             SourceSize = 2;
-            Inline = *(int16*)inlinep;
+            Inline = *(int16_t*)inlinep;
             break;
 
          case OMF_Fixup_16bitLoader: // 16-bit loader resolved
             RelType = 0x21;
             SourceSize = 2;
-            Inline = *(int16*)inlinep;
+            Inline = *(int16_t*)inlinep;
             break;
 
          case OMF_Fixup_32bitLoader: // 32-bit loader resolved
             RelType = 0x21;
             SourceSize = 4;
-            Inline = *(int32*)inlinep;
+            Inline = *(int32_t*)inlinep;
             break;
 
          default:                   // unknown or not supported
@@ -870,7 +870,7 @@ void COMF2ASM::MakeRelocations(int32 Segment, uint32 RecNum, uint32 SOffset, uin
 
 
          // Offset of relocation source
-         uint32 SourceOffset = SOffset + Locat.s.Offset;
+         uint32_t SourceOffset = SOffset + Locat.s.Offset;
 
          // Relocation type: direct or (E)IP-relative
          if (RelType == 2) {

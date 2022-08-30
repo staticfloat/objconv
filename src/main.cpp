@@ -36,25 +36,25 @@ SIntTxt SectionDotOptionNames[] = {
 // with wrong size.
 static void CheckIntegerTypes() {
    if (
-      sizeof(uint8) != 1 ||
-      sizeof(int16) != 2 ||
-      sizeof(int32) != 4 ||
-      sizeof(int64) != 8) {
+      sizeof(uint8_t) != 1 ||
+      sizeof(int16_t) != 2 ||
+      sizeof(int32_t) != 4 ||
+      sizeof(int64_t) != 8) {
       err.submit(9001);                // Make error message if type definitions are wrong
    }
 }
 
 // Check that we are running on a machine with little-endian memory organization
 static void CheckEndianness() {
-   static uint8 bytes[4] = {1, 2, 3, 4};
-   if (*(uint32*)bytes != 0x04030201) {
+   static uint8_t bytes[4] = {1, 2, 3, 4};
+   if (*(uint32_t*)bytes != 0x04030201) {
       // Big endian
       err.submit(9002);
    }
 }
 
 // Function to convert powers of 2 to index
-int FloorLog2(uint32 x) {
+int FloorLog2(uint32_t x) {
    int i = -1;
    do {
       x >>= 1;
@@ -63,12 +63,12 @@ int FloorLog2(uint32 x) {
    return i;
 }
 
-const char * timestring(uint32 t) {
+const char * timestring(uint32_t t) {
    // Convert 32 bit time stamp to string
    // Fix the problem that time_t may be 32 bit or 64 bit
    union {
       time_t t;
-      uint32 t32;
+      uint32_t t32;
    } utime;
    utime.t = 0;
    utime.t32 = t;
@@ -83,10 +83,10 @@ int main(int argc, char * argv[]) {
    CheckEndianness();                  // Check that machine is little-endian
 
 #ifdef  _DEBUG
-   // For debugging only. Remove this
+   // For debugging only. You may remove this
    if (argc == 1) {
-      char * dummyarg[] = {"", "@resp.txt"}; // Read command line from file resp.txt
-      argc = 2; argv = dummyarg;}
+      const char * dummyarg[] = {"", "@resp.txt"}; // Read command line from file resp.txt
+      argc = 2; argv = (char**)dummyarg;}
 #endif
 
    cmd.ReadCommandLine(argc, argv);    // Read command line parameters
@@ -495,7 +495,7 @@ void CConverter::Go() {
       }
       if (err.Number()) return;        // Return if error
 
-      if (cmd.Verbose > (uint32)(cmd.LibraryOptions != 0)) {
+      if (cmd.Verbose > (uint32_t)(cmd.LibraryOptions != 0)) {
          // Tell what we are doing:
          printf("\nInput file: %s, output file: %s", FileName, OutputFileName);
          if (FileType != cmd.OutputType) {
@@ -543,7 +543,7 @@ void CConverter::Go() {
                }
             }
          }
-         if (cmd.Verbose > (uint32)(cmd.LibraryOptions != 0)) { // Tell which option is chosen
+         if (cmd.Verbose > (uint32_t)(cmd.LibraryOptions != 0)) { // Tell which option is chosen
             printf("\n%s", Lookup(UnderscoreOptionNames, cmd.Underscore));
          }
       }
@@ -563,7 +563,7 @@ void CConverter::Go() {
                cmd.SegmentDot = CMDL_SECTIONDOT_NOCHANGE;
             }
          }
-         if (cmd.Verbose > (uint32)(cmd.LibraryOptions != 0)) { // Tell which option is chosen
+         if (cmd.Verbose > (uint32_t)(cmd.LibraryOptions != 0)) { // Tell which option is chosen
             printf("\n%s", Lookup(SectionDotOptionNames, cmd.SegmentDot));
          }
       }

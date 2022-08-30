@@ -37,11 +37,11 @@ void CELF2ELF<ELFSTRUCTURES>::Convert() {
 // MakeSymbolTable()
 template <class TELF_Header, class TELF_SectionHeader, class TELF_Symbol, class TELF_Relocation>
 void CELF2ELF<ELFSTRUCTURES>::MakeSymbolTable() {
-   uint32 SectionNumber;      // Section number
+   uint32_t SectionNumber;      // Section number
    char * SectionName;        // Section name
-   uint32 SecNamei;           // Section name index
-   uint32 OldSymi;            // Old symbol index
-   uint32 NewSymi;            // New symbol index
+   uint32_t SecNamei;           // Section name index
+   uint32_t OldSymi;            // Old symbol index
+   uint32_t NewSymi;            // New symbol index
    int isymt;                 // 0 = symtab, 1 = dynsym
    const char * name1;        // Old name of symbol
    const char * name2;        // Changed name of symbol
@@ -50,7 +50,7 @@ void CELF2ELF<ELFSTRUCTURES>::MakeSymbolTable() {
    int binding;               // Symbol binding
    TELF_Symbol sym;               // Symbol table entry
    TELF_Symbol AliasEntry;        // Symbol table alias entry
-   uint32 symnamei;           // New symbol name index
+   uint32_t symnamei;           // New symbol name index
    CMemoryBuffer TempGlobalSymbolTable; // Temporary storage of public and external symbols
 
    // Find symbol table and string tables
@@ -94,21 +94,21 @@ void CELF2ELF<ELFSTRUCTURES>::MakeSymbolTable() {
       &&  istrtab[isymt] && istrtab[isymt] < this->NSections) {
 
          // Symbol table header
-         uint32 SymTabHeaderOffset = uint32(this->FileHeader.e_shoff + isymtab[isymt] * this->SectionHeaderSize);
+         uint32_t SymTabHeaderOffset = uint32_t(this->FileHeader.e_shoff + isymtab[isymt] * this->SectionHeaderSize);
          //TELF_SectionHeader SymTabHeader = this->Get<TELF_SectionHeader>(SymTabHeaderOffset);
          // Some compilers fail with the double template here. Avoid the template:
          TELF_SectionHeader SymTabHeader = *(TELF_SectionHeader*)(this->Buf() + SymTabHeaderOffset);
 
          // Find symbol table
-         uint32 symtabsize = (uint32)(SymTabHeader.sh_size);
-         int8 * symtab = this->Buf() + SymTabHeader.sh_offset;
-         int8 * symtabend = symtab + symtabsize;
+         uint32_t symtabsize = (uint32_t)(SymTabHeader.sh_size);
+         int8_t * symtab = this->Buf() + SymTabHeader.sh_offset;
+         int8_t * symtabend = symtab + symtabsize;
          int entrysize = (int)(SymTabHeader.sh_entsize);
          if (entrysize <= 0) entrysize = sizeof(TELF_Symbol);
 
          // Find string table
-         char * StringTable = this->Buf() + this->SectionHeaders[istrtab[isymt]].sh_offset;
-         uint32 StringTableLen = uint32(this->SectionHeaders[istrtab[isymt]].sh_size);
+         char * StringTable = (char*)this->Buf() + this->SectionHeaders[istrtab[isymt]].sh_offset;
+         uint32_t StringTableLen = uint32_t(this->SectionHeaders[istrtab[isymt]].sh_size);
 
          NewStringTable[isymt].Push(0, 1); // Initialize new string table, first entry 0
 
@@ -140,7 +140,7 @@ void CELF2ELF<ELFSTRUCTURES>::MakeSymbolTable() {
                SymbolType = SYMT_LOCAL;    // Symbol is local
             }
             else if (type == STT_OBJECT || type == STT_FUNC || type == STT_NOTYPE) {
-               if (int16(sym.st_shndx) > 0) { // Check section number
+               if (int16_t(sym.st_shndx) > 0) { // Check section number
                   SymbolType = SYMT_PUBLIC;  // Symbol is public
                }
                else {
@@ -260,21 +260,21 @@ void CELF2ELF<ELFSTRUCTURES>::MakeSymbolTable() {
 template <class TELF_Header, class TELF_SectionHeader, class TELF_Symbol, class TELF_Relocation>
 void CELF2ELF<ELFSTRUCTURES>::ChangeSections() {
    // Convert subfunction: Change section names if needed and adjust all relocation tables
-   uint32 SectionNumber;        // Section number
+   uint32_t SectionNumber;        // Section number
    const char * name1;          // Section name
    const char * name2;          // Changed section name
    int action;                  // Name change action
    TELF_SectionHeader * sheaderp;   // Pointer to section header
-   uint32 SectionHeaderOffset;  // File offset to section header
-   uint32 namei;                // Section name index into string table
+   uint32_t SectionHeaderOffset;  // File offset to section header
+   uint32_t namei;                // Section name index into string table
    TELF_Relocation * relocp;        // Pointer to relocation entry
-   uint32 oldsymi, newsymi;     // Relocation symbol index
+   uint32_t oldsymi, newsymi;     // Relocation symbol index
 
    // Initialize section header string table .shstrtab. First entry = 0
    NewStringTable[2].Push(0, 1);
 
    // Loop through sections
-   SectionHeaderOffset = uint32(this->FileHeader.e_shoff);
+   SectionHeaderOffset = uint32_t(this->FileHeader.e_shoff);
    for (SectionNumber = 0; SectionNumber < this->NSections; SectionNumber++, SectionHeaderOffset += this->FileHeader.e_shentsize) {
 
       // Get section header
@@ -302,8 +302,8 @@ void CELF2ELF<ELFSTRUCTURES>::ChangeSections() {
       if (sheaderp->sh_type == SHT_REL || sheaderp->sh_type == SHT_RELA) {
          // This is a relocation section. Update all symbol indices
 
-         int8 * reltab = this->Buf() + sheaderp->sh_offset;
-         int8 * reltabend = reltab + sheaderp->sh_size;
+         int8_t * reltab = this->Buf() + sheaderp->sh_offset;
+         int8_t * reltabend = reltab + sheaderp->sh_size;
          int entrysize = (int)(sheaderp->sh_entsize);
          if (entrysize <= 0) entrysize = sizeof(TELF_Relocation);
 
@@ -331,7 +331,7 @@ void CELF2ELF<ELFSTRUCTURES>::ChangeSections() {
 template <class TELF_Header, class TELF_SectionHeader, class TELF_Symbol, class TELF_Relocation>
 void CELF2ELF<ELFSTRUCTURES>::MakeBinaryFile() {
 
-   uint32 SectionNumber;               // Section number
+   uint32_t SectionNumber;               // Section number
    CMemoryBuffer NewSectionHeaders;    // Temporary storage of section headers
 
    // Copy file header
@@ -344,7 +344,7 @@ void CELF2ELF<ELFSTRUCTURES>::MakeBinaryFile() {
    }
 
    // Copy section data
-   uint32 SectionHeaderOffset = uint32(this->FileHeader.e_shoff);
+   uint32_t SectionHeaderOffset = uint32_t(this->FileHeader.e_shoff);
    TELF_SectionHeader sheader;                     // Section header
 
    // Loop through sections
@@ -397,7 +397,7 @@ void CELF2ELF<ELFSTRUCTURES>::MakeBinaryFile() {
       }
       else {
          // Any other section (including istrtab[3] = .stabstr)
-         sheader.sh_offset = ToFile.Push(this->Buf() + (uint32)sheader.sh_offset, (uint32)sheader.sh_size);
+         sheader.sh_offset = ToFile.Push(this->Buf() + (uint32_t)sheader.sh_offset, (uint32_t)sheader.sh_size);
       }
 
       // Store section header
@@ -409,7 +409,7 @@ void CELF2ELF<ELFSTRUCTURES>::MakeBinaryFile() {
    ToFile.Align(16);
 
    // Store section headers
-   uint32 SectionHeadersOffset = ToFile.Push(NewSectionHeaders.Buf(), NewSectionHeaders.GetDataSize());
+   uint32_t SectionHeadersOffset = ToFile.Push(NewSectionHeaders.Buf(), NewSectionHeaders.GetDataSize());
 
    // Update file header
    ((TELF_Header*)ToFile.Buf())->e_shoff = SectionHeadersOffset;

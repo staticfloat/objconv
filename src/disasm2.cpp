@@ -1,7 +1,7 @@
 /****************************  disasm2.cpp   ********************************
 * Author:        Agner Fog
 * Date created:  2007-02-25
-* Last modified: 2016-11-27
+* Last modified: 2022-04-25
 * Project:       objconv
 * Module:        disasm2.cpp
 * Description:
@@ -9,7 +9,7 @@
 *
 * Changes that relate to assembly language syntax should be done in this file only.
 *
-* Copyright 2007-2016 GNU General Public License http://www.gnu.org/licenses
+* Copyright 2007-2022 GNU General Public License http://www.gnu.org/licenses
 *****************************************************************************/
 #include "stdafx.h"
 
@@ -141,8 +141,8 @@ const char * InstructionSetNames[] = {
     "Supplementary SSE3", "SSE4.1", "SSE4.2", "AES", // 14 - 17
     "CLMUL", "AVX", "FMA3", "?",                     // 18 - 1B
     "AVX2", "BMI etc.", "?", "?",                    // 1C - 1F
-    "AVX-512", "AVX512PF/ER/CD", "MPX,SHA,TBD", "AVX512IFMA/VBMI", // 20 - 23
-    "AVX512_4FMAPS", "?", "?", "?",                                // 24 - 27
+    "AVX-512", "AVX512PF/ER/CD", "MPX,SHA,TBD", "AVX512IFMA/VBMI/VBMI2", // 20 - 23
+    "Misc.extensions", "AVX512-FP16", "?", "?",      // 24 - 27
     "?", "?", "?", "?",                              // 28 - 2B
     "?", "?", "?", "?",                              // 2C - 2F
     "?", "?", "?", "?",                              // 30 - 33
@@ -178,24 +178,24 @@ Most member functions of CDisassembler are defined in disasm1.cpp
 Only the functions that produce output are defined here:
 ******************************************************************************/
 
-void CDisassembler::WriteShortRegOperand(uint32 Type) {
+void CDisassembler::WriteShortRegOperand(uint32_t Type) {
     // Write register operand from lower 3 bits of opcode byte to OutFile
-    uint32 rnum = Get<uint8>(s.OpcodeStart2) & 7;
+    uint32_t rnum = Get<uint8_t>(s.OpcodeStart2) & 7;
     // Check REX.B prefix
     if (s.Prefixes[7] & 1) rnum |= 8;             // Add 8 if REX.B prefix
     // Write register name
     WriteRegisterName(rnum, Type);
 }
 
-void CDisassembler::WriteRegOperand(uint32 Type) {
+void CDisassembler::WriteRegOperand(uint32_t Type) {
     // Write register operand from reg bits
-    uint32 Num = s.Reg;                           // Register number
+    uint32_t Num = s.Reg;                           // Register number
 
     // Write register name
     WriteRegisterName(Num, Type);
 }
 
-void CDisassembler::WriteRMOperand(uint32 Type) {
+void CDisassembler::WriteRMOperand(uint32_t Type) {
     // Write memory or register operand from mod/rm bits of mod/reg/rm byte
     // and possibly SIB byte or direct memory operand to OutFile.
     // Also used for writing direct memory operand
@@ -205,8 +205,8 @@ void CDisassembler::WriteRMOperand(uint32 Type) {
         return;
     }
 
-    uint32 Components = 0;                        // Count number of addends inside []
-    int64  Addend = 0;                            // Inline displacement or addend
+    uint32_t Components = 0;                        // Count number of addends inside []
+    int64_t  Addend = 0;                            // Inline displacement or addend
     int AddressingMode = 0;                       // 0: 16- or 32 bit addressing mode
     // 1: 64-bit pointer
     // 2: 32-bit absolute in 64-bit mode
@@ -222,20 +222,20 @@ void CDisassembler::WriteRMOperand(uint32 Type) {
     // Find addend, if any
     switch (s.AddressFieldSize) {
     case 1:  // 1 byte displacement
-        Addend = Get<int8>(s.AddressField);
+        Addend = Get<int8_t>(s.AddressField);
         break;
     case 2:  // 2 bytes displacement
-        Addend = Get<int16>(s.AddressField);
+        Addend = Get<int16_t>(s.AddressField);
         break;
     case 4:  // 4 bytes displacement
-        Addend = Get<int32>(s.AddressField);
+        Addend = Get<int32_t>(s.AddressField);
         if ((s.MFlags & 0x100) && !s.AddressRelocation) {
             // rip-relative
-            Addend += ImageBase + uint64(SectionAddress + IEnd);
+            Addend += ImageBase + uint64_t(SectionAddress + IEnd);
         }
         break;
     case 8:  // 8 bytes address
-        Addend = Get<int64>(s.AddressField);
+        Addend = Get<int64_t>(s.AddressField);
         break;
     }
     // Get AddressingMode
@@ -276,7 +276,7 @@ void CDisassembler::WriteRMOperand(uint32 Type) {
         OutFile.Put(RegisterNamesSeg[GetSegmentRegisterFromPrefix()]);
         OutFile.Put(":");
     }
-    else if (!s.BaseReg && !s.IndexReg && (!s.AddressRelocation || (s.Warnings1 & 0x10000)) && Syntax != SUBTYPE_YASM) {
+    else if (!s.BaseReg && !s.IndexReg && (!s.AddressRelocation || (s.Warnings1 & 0x10000)) && Syntax != SUBTYPE_NASM) {
         // No pointer register and no memory reference or wrong type of memory reference.
         // Write segment register to indicate that we have a memory operand
         OutFile.Put("DS:");
@@ -287,7 +287,7 @@ void CDisassembler::WriteRMOperand(uint32 Type) {
         OutFile.Put("[");
     }
 
-    if (Syntax == SUBTYPE_YASM && (AddressingMode & 0x0E)) {
+    if (Syntax == SUBTYPE_NASM && (AddressingMode & 0x0E)) {
         // Specify absolute or relative addressing mode
         switch (AddressingMode) {
         case 2: OutFile.Put("abs ");  break;
@@ -308,7 +308,7 @@ void CDisassembler::WriteRMOperand(uint32 Type) {
 
     // Check address size for pointer registers
     //const char * * PointerRegisterNames;
-    uint32 RegisterType = 0;
+    uint32_t RegisterType = 0;
     switch (s.AddressSize) {
     case 16:
         RegisterType = 2;  break;
@@ -358,12 +358,12 @@ void CDisassembler::WriteRMOperand(uint32 Type) {
 
     if (Addend || Components == 0) {
         // Find minimum number of digits needed
-        uint32 AddendSize = s.AddressFieldSize;
-        if ((uint64)Addend < 0x100 && AddendSize > 1) AddendSize = 1;
-        else if ((uint64)Addend < 0x10000 && AddendSize > 2) AddendSize = 2;
+        uint32_t AddendSize = s.AddressFieldSize;
+        if ((uint64_t)Addend < 0x100 && AddendSize > 1) AddendSize = 1;
+        else if ((uint64_t)Addend < 0x10000 && AddendSize > 2) AddendSize = 2;
 
         // Write address or addend as hexadecimal
-        OutFile.PutHex((uint64)Addend, 2);
+        OutFile.PutHex((uint64_t)Addend, 2);
 
         // Check if offset multiplier needed
         if (s.OffsetMultiplier && s.AddressFieldSize == 1 && Addend) {
@@ -382,18 +382,18 @@ void CDisassembler::WriteRMOperand(uint32 Type) {
 }
 
 
-void CDisassembler::WriteOperandType(uint32 type) {
+void CDisassembler::WriteOperandType(uint32_t type) {
     switch (Syntax) {
     case SUBTYPE_MASM:
         WriteOperandTypeMASM(type);  break;
-    case SUBTYPE_YASM:
+    case SUBTYPE_NASM:
         WriteOperandTypeYASM(type);  break;
     case SUBTYPE_GASM:
         WriteOperandTypeGASM(type);  break;
     }
 }
 
-void CDisassembler::WriteOperandTypeMASM(uint32 type) {
+void CDisassembler::WriteOperandTypeMASM(uint32_t type) {
     // Write type override before operand, e.g. "dword ", MASM syntax
     if (type & 0xF00) {
         type &= 0xF00;                             // Ignore element type for vectors
@@ -455,10 +455,10 @@ void CDisassembler::WriteOperandTypeMASM(uint32 type) {
     case 0x700:  // future 1024 bit
         OutFile.Put("?mmword ");  break;
     }
-    OutFile.Put("ptr ");
+    if (type) OutFile.Put("ptr ");
 }
 
-void CDisassembler::WriteOperandTypeYASM(uint32 type) {
+void CDisassembler::WriteOperandTypeYASM(uint32_t type) {
     // Write type override before operand, e.g. "dword", NASM/YASM syntax
     if (type & 0xF00) {
         type &= 0xF00;                             // Ignore element type for vectors
@@ -466,7 +466,7 @@ void CDisassembler::WriteOperandTypeYASM(uint32 type) {
     else {
         type &= 0xFF;                              // Use operand type only
     }
-    uint32 Dest = s.OpcodeDef->Destination & 0xFF;// Destination operand
+    uint32_t Dest = s.OpcodeDef->Destination & 0xFF;// Destination operand
     if (Dest >= 0xB && Dest < 0x10) {
         // This is a pointer
         if (Dest < 0x0D) {
@@ -535,7 +535,7 @@ void CDisassembler::WriteOperandTypeYASM(uint32 type) {
     }
 }
 
-void CDisassembler::WriteOperandTypeGASM(uint32 type) {
+void CDisassembler::WriteOperandTypeGASM(uint32_t type) {
     // Write type override before operand, e.g. "dword ", GAS syntax
     if (type & 0xF00) {
         type &= 0xF00;                             // Ignore element type for vectors
@@ -600,23 +600,23 @@ void CDisassembler::WriteOperandTypeGASM(uint32 type) {
 }
 
 
-void CDisassembler::WriteDREXOperand(uint32 Type) {
+void CDisassembler::WriteDREXOperand(uint32_t Type) {
     // Write register operand from dest bits of DREX byte (AMD only)
-    uint32 Num = s.Vreg >> 4;                    // Register number
+    uint32_t Num = s.Vreg >> 4;                    // Register number
     // Write register name
     WriteRegisterName(Num, Type);
 }
 
-void CDisassembler::WriteVEXOperand(uint32 Type, int i) {
+void CDisassembler::WriteVEXOperand(uint32_t Type, int i) {
     // Write register operand from VEX.vvvv bits or immediate bits
-    uint32 Num;                                   // Register number
+    uint32_t Num;                                   // Register number
     switch (i) {
     case 0:  // Use VEX.vvvv bits
         Num = s.Vreg & 0x1F;  break;
     case 1:  // Use immediate bits 4-7
-        Num = Get<uint8>(s.ImmediateField) >> 4;  break;
+        Num = Get<uint8_t>(s.ImmediateField) >> 4;  break;
     case 2:  // Use immediate bits 0-3 (Unused. For possible future use)
-        Num = Get<uint8>(s.ImmediateField) & 0x0F;  break;
+        Num = Get<uint8_t>(s.ImmediateField) & 0x0F;  break;
     default:
         Num = 0;
     }
@@ -630,7 +630,7 @@ void CDisassembler::WriteOperandAttributeEVEX(int i, int isMem) {
     // i = operand number (0 = destination, 1 = first source, 2 = second source,
     // 98 = after last SIMD operand, 99 = after last operand)
     // isMem: true if memory operand, false if register operand
-    uint32 swiz = s.OpcodeDef->EVEX;   // indicates meaning of EVEX attribute bits
+    uint32_t swiz = s.OpcodeDef->EVEX;   // indicates meaning of EVEX attribute bits
 
     if ((swiz & 0x30) && (i == 0 || (s.OpcodeDef->Destination == 0 && i == 1))) {  // first operand
         // write mask
@@ -651,11 +651,11 @@ void CDisassembler::WriteOperandAttributeEVEX(int i, int isMem) {
             if ((swiz & 0x01) && (s.Esss & 1)) {
                 // write memory broadcast
                 // calculate broadcast factor
-                uint32 op = s.Operands[i];  // operand
-                uint32 elementsize = GetDataElementSize(op); // element size
-                uint32 opv = s.Operands[0];  // any vector operand
+                uint32_t op = s.Operands[i];  // operand
+                uint32_t elementsize = GetDataElementSize(op); // element size
+                uint32_t opv = s.Operands[0];  // any vector operand
                 if (!(opv & 0xF00)) opv = s.Operands[1]; // first operand is not a vector, use next
-                uint32 vectorsize  = GetDataItemSize(opv); // vector size
+                uint32_t vectorsize  = GetDataItemSize(opv); // vector size
                 if (vectorsize > elementsize) { // avoid broadcasting to scalar
                     if (elementsize) { // avoid division by zero
                         OutFile.Put(" {1to");
@@ -675,7 +675,7 @@ void CDisassembler::WriteOperandAttributeEVEX(int i, int isMem) {
             // Perhaps the comma should be removed for other assemblers?
             if ((swiz & 0x4) && (s.Esss & 1)) {
                 // write rounding mode
-                uint32 rounding = (s.Esss >> 1) & 3;
+                uint32_t rounding = (s.Esss >> 1) & 3;
                 OutFile.Put(", {");
                 OutFile.Put(EVEXRoundingNames[rounding]);
                 OutFile.Put("}");
@@ -695,7 +695,7 @@ void CDisassembler::WriteOperandAttributeMVEX(int i, int isMem) {
     // Write operand attributes and instruction attributes from MVEX sss, e and kkk bits.
     // i = operand number (0 = destination, 1 = first source, 2 = second source, 99 = after last operand)
     // isMem: true if memory operand, false if register operand
-    uint32 swiz = s.OpcodeDef->MVEX;   // indicates meaning of MVEX attribute bits
+    uint32_t swiz = s.OpcodeDef->MVEX;   // indicates meaning of MVEX attribute bits
     const int R_sae_syntax = 0;   // syntax alternatives for rounding mode + sae
                                   // 0: {rn-sae}, 1: {rn}{sae}
     const char * text = 0;        // temporary text pointer
@@ -754,7 +754,7 @@ void CDisassembler::WriteOperandAttributeMVEX(int i, int isMem) {
     }
 }
 
-void CDisassembler::WriteRegisterName(uint32 Value, uint32 Type) {
+void CDisassembler::WriteRegisterName(uint32_t Value, uint32_t Type) {
     // Write name of register to OutFile
     if (Type & 0xF00) {
         // vector register
@@ -801,7 +801,7 @@ void CDisassembler::WriteRegisterName(uint32 Value, uint32 Type) {
     }
 
     // Get register number limit
-    uint32 RegNumLimit = 7;    // largest register number
+    uint32_t RegNumLimit = 7;    // largest register number
     if (WordSize >= 64) {
         RegNumLimit = 15;
         if ((s.Prefixes[6] & 0x40) && (Type & 0xF40)) {
@@ -902,7 +902,7 @@ void CDisassembler::WriteRegisterName(uint32 Value, uint32 Type) {
             break;
 
         case 0x40:  // st register
-            if (Syntax == SUBTYPE_YASM) {
+            if (Syntax == SUBTYPE_NASM) {
                 // NASM, YASM and GAS-AT&T use st0
                 OutFile.Put("st");
                 OutFile.PutDecimal(Value);
@@ -956,14 +956,14 @@ void CDisassembler::WriteRegisterName(uint32 Value, uint32 Type) {
 }
 
 
-void CDisassembler::WriteImmediateOperand(uint32 Type) {
+void CDisassembler::WriteImmediateOperand(uint32_t Type) {
     // Write immediate operand or direct jump/call address
     int    WriteFormat;                 // 0: unsigned, 1: signed, 2: hexadecimal
     int    Components = 0;              // Number of components in immediate operand
-    uint32 OSize;                       // Operand size
-    uint32 FieldPointer;                // Pointer to field containing value
-    uint32 FieldSize;                   // Size of field containing value
-    int64  Value = 0;                   // Value of immediate operand
+    uint32_t OSize;                       // Operand size
+    uint32_t FieldPointer;                // Pointer to field containing value
+    uint32_t FieldSize;                   // Size of field containing value
+    int64_t  Value = 0;                   // Value of immediate operand
 
     // Check if far
     if ((Type & 0xFE) == 0x84) {
@@ -981,7 +981,7 @@ void CDisassembler::WriteImmediateOperand(uint32 Type) {
     FieldPointer = s.ImmediateField;
     FieldSize    = s.ImmediateFieldSize;
 
-    if (Syntax == SUBTYPE_YASM && (Type & 0x0F) == 4 && FieldSize == 8) {
+    if (Syntax == SUBTYPE_NASM && (Type & 0x0F) == 4 && FieldSize == 8) {
         // Write type override to make sure we get 8 bytes address in case there is a relocation here
         WriteOperandType(4);
     }
@@ -1001,31 +1001,31 @@ void CDisassembler::WriteImmediateOperand(uint32 Type) {
     // Get inline value
     switch (FieldSize) {
     case 0:  // 4 bits
-        Value = Get<uint8>(FieldPointer) & 0x0F;
+        Value = Get<uint8_t>(FieldPointer) & 0x0F;
         break;
 
     case 1:  // 8 bits
-        Value = Get<int8>(FieldPointer);
+        Value = Get<int8_t>(FieldPointer);
         break;
 
     case 2:  // 16 bits
-        Value = Get<int16>(FieldPointer);  break;
+        Value = Get<int16_t>(FieldPointer);  break;
 
     case 6:  // 48 bits
-        Value  = Get<int32>(FieldPointer);
-        Value += (uint64)Get<uint16>(FieldPointer + 4) << 32;
+        Value  = Get<int32_t>(FieldPointer);
+        Value += (uint64_t)Get<uint16_t>(FieldPointer + 4) << 32;
         break;
 
     case 4:  // 32 bits
-        Value = Get<int32>(FieldPointer);  break;
+        Value = Get<int32_t>(FieldPointer);  break;
 
     case 8:  // 64 bits
-        Value = Get<int64>(FieldPointer);  break;
+        Value = Get<int64_t>(FieldPointer);  break;
 
     case 3:  // 16+8 bits ("Enter" instruction)
         if ((Type & 0xFF) == 0x12) {
             // First 16 bits
-            FieldSize = 2; Value = Get<int16>(FieldPointer);  break;
+            FieldSize = 2; Value = Get<int16_t>(FieldPointer);  break;
         }
         // else continue in default case to get error message
 
@@ -1036,7 +1036,7 @@ void CDisassembler::WriteImmediateOperand(uint32 Type) {
     // Check if relocation
     if (s.ImmediateRelocation) {
         // Write relocation target name
-        uint32 Context = 2;
+        uint32_t Context = 2;
         if ((Type & 0xFC) == 0x80) Context = 8;     // Near jump/call destination
         if ((Type & 0xFC) == 0x84) Context = 0x10;  // Far jump/call destination
 
@@ -1060,7 +1060,7 @@ void CDisassembler::WriteImmediateOperand(uint32 Type) {
     }
     else if (s.ImmediateFieldSize == 8) {
         // 64 bit constant
-        if (Value == (int32)Value) {
+        if (Value == (int32_t)Value) {
             // Signed
             WriteFormat = 1;
         }
@@ -1083,7 +1083,7 @@ void CDisassembler::WriteImmediateOperand(uint32 Type) {
         Value += IEnd;                             // Get absolute address of target
 
         // Look for symbol at target address
-        uint32 ISymbol = Symbols.FindByAddress(Section, (uint32)Value);
+        uint32_t ISymbol = Symbols.FindByAddress(Section, (uint32_t)Value);
         if (ISymbol && (Symbols[ISymbol].Name || CodeMode == 1)) {
             // Symbol found. Write its name
             OutFile.Put(Symbols.GetName(ISymbol));
@@ -1095,7 +1095,7 @@ void CDisassembler::WriteImmediateOperand(uint32 Type) {
     }
 
     // Operand size
-    if ((s.Operands[0] & 0xFFF) <= 0xA || (s.Operands[0] & 0xF0) == 0xA0) {
+    if ((s.Operands[0] & 0xFFF) <= 0xA && s.Operands[0] != 0 || (s.Operands[0] & 0xF0) == 0xA0) {
         // Destination is general purpose register
         OSize = s.OperandSize;
     }
@@ -1141,24 +1141,24 @@ void CDisassembler::WriteImmediateOperand(uint32 Type) {
         // Write with hexadecimal number appropriate size
         switch (OSize) {
         case 8:  // 8 bits
-            OutFile.PutHex((uint8)Value, 1);  break;
+            OutFile.PutHex((uint8_t)Value, 1);  break;
         case 16:  // 16 bits
             if ((Type & 0xFC) == 0x84) {
                 // Segment of far call
-                OutFile.PutHex((uint16)(Value >> 16), 1);
+                OutFile.PutHex((uint16_t)(Value >> 16), 1);
                 OutFile.Put(':');
             }
-            OutFile.PutHex((uint16)Value, 2);  break;
+            OutFile.PutHex((uint16_t)Value, 2);  break;
         case 32:  // 32 bits
         default:  // Should not occur
             if ((Type & 0xFC) == 0x84) {
                 // Segment of far call
-                OutFile.PutHex((uint16)(Value >> 32), 1);
+                OutFile.PutHex((uint16_t)(Value >> 32), 1);
                 OutFile.Put(':');
             }
-            OutFile.PutHex((uint32)Value, 2);  break;
+            OutFile.PutHex((uint32_t)Value, 2);  break;
         case 64:  // 64 bits
-            OutFile.PutHex((uint64)Value, 2);  break;
+            OutFile.PutHex((uint64_t)Value, 2);  break;
         }
     }
     else {
@@ -1171,15 +1171,15 @@ void CDisassembler::WriteImmediateOperand(uint32 Type) {
                 Value &= 0xFFFF;  break;
             }
         }
-        OutFile.PutDecimal((int32)Value, WriteFormat);  // Write value. Signed or usigned decimal
+        OutFile.PutDecimal((int32_t)Value, WriteFormat);  // Write value. Signed or usigned decimal
     }
 }
 
 
-void CDisassembler::WriteOtherOperand(uint32 Type) {
+void CDisassembler::WriteOtherOperand(uint32_t Type) {
     // Write other type of operand
     const char * * OpRegisterNames;               // Pointer to list of register names
-    uint32 RegI = 0;                              // Index into list of register names
+    uint32_t RegI = 0;                              // Index into list of register names
 
     switch (Type & 0x8FF) {
     case 0xA1:  // AL
@@ -1223,7 +1223,7 @@ void CDisassembler::WriteOtherOperand(uint32 Type) {
 
 void CDisassembler::WriteErrorsAndWarnings() {
     // Write errors, warnings and comments, if any
-    uint32 n;                                     // Error bit
+    uint32_t n;                                     // Error bit
     if (s.Errors) {
         // There are errors
         // Loop through all bits in s.Errors
@@ -1265,7 +1265,7 @@ void CDisassembler::WriteErrorsAndWarnings() {
         }
         if (s.Warnings2 & 1) {
             // Write spurious label
-            uint32 sym1 = Symbols.FindByAddress(Section, LabelEnd);
+            uint32_t sym1 = Symbols.FindByAddress(Section, LabelEnd);
             if (sym1) {
                 const char * name = Symbols.GetName(sym1);
                 OutFile.Put(CommentSeparator);
@@ -1299,12 +1299,12 @@ void CDisassembler::WriteErrorsAndWarnings() {
     }
 }
 
-void CDisassembler::WriteSymbolName(uint32 symi) {
+void CDisassembler::WriteSymbolName(uint32_t symi) {
     // Write symbol name. symi = new symbol index
     OutFile.Put(Symbols.GetName(symi));
 }
 
-void CDisassembler::WriteSectionName(int32 SegIndex) {
+void CDisassembler::WriteSectionName(int32_t SegIndex) {
     // Write name of section, segment or group from section index
     const char * Name = 0;
     // Check for special index values
@@ -1322,25 +1322,25 @@ void CDisassembler::WriteSectionName(int32 SegIndex) {
     case ASM_SEGMENT_IMGREL:    // Segment unknown. Offset relative to image base or file base
         Name = "ImageBased";  break;
     default:                    // > 0 means normal segment index
-        if ((uint32)SegIndex >= Sections.GetNumEntries()) {
+        if ((uint32_t)SegIndex >= Sections.GetNumEntries()) {
             // Out of range
             Name = "IndexOutOfRange";
        }
        else {
            // Get index into NameBuffer
-           uint32 NameIndex = Sections[SegIndex].Name;
+           uint32_t NameIndex = Sections[SegIndex].Name;
            // Check if valid
            if (NameIndex == 0 || NameIndex >= NameBuffer.GetDataSize()) {
                Name = "ErrorNameMissing";
            }
            else {
                // Normal valid name of segment, section or group
-               Name = NameBuffer.Buf() + NameIndex;
+               Name = (char*)NameBuffer.Buf() + NameIndex;
            }
        }
        break;
     }
-    if (Syntax == SUBTYPE_YASM && Name[0] == '_') {
+    if (Syntax == SUBTYPE_NASM && Name[0] == '_') {
         // Change leading underscore to dot
         OutFile.Put('.');
         OutFile.Put(Name+1); // Write rest of name
@@ -1360,15 +1360,15 @@ void CDisassembler::WriteDataItems() {
     // 3: First data item written, write comma and more data
     // 4: Last data item written, write comment
     // 5: Comment written if any, start new line
-    uint32 Pos = IBegin;                          // Current position
-    uint32 LinePos = IBegin;                      // Position for beginning of output line
-    uint32 BytesPerLine;                          // Number of bytes to write per line
-    uint32 LineEnd;                               // Data position for end of line
-    uint32 DataEnd;                               // End of data
-    uint32 ElementSize, OldElementSize;           // Size of each data element
-    uint32 RelOffset;                             // Offset of relocation
-    uint32 irel, Oldirel;                         // Relocation index
-    int64  Value;                                 // Inline value or addend
+    uint32_t Pos = IBegin;                          // Current position
+    uint32_t LinePos = IBegin;                      // Position for beginning of output line
+    uint32_t BytesPerLine;                          // Number of bytes to write per line
+    uint32_t LineEnd;                               // Data position for end of line
+    uint32_t DataEnd;                               // End of data
+    uint32_t ElementSize, OldElementSize;           // Size of each data element
+    uint32_t RelOffset;                             // Offset of relocation
+    uint32_t irel, Oldirel;                         // Relocation index
+    int64_t  Value;                                 // Inline value or addend
     const char * Symname;                         // Symbol name
     int    SeparateLine;                          // Label is on separate line
 
@@ -1436,8 +1436,8 @@ void CDisassembler::WriteDataItems() {
     }
 
     // Get symbol name for label
-    uint32 sym;                                   // Current symbol index
-    uint32 sym1, sym2 = 0;                        // First and last symbol at current address
+    uint32_t sym;                                   // Current symbol index
+    uint32_t sym1, sym2 = 0;                        // First and last symbol at current address
 
     sym1 = Symbols.FindByAddress(Section, Pos, &sym2);
 
@@ -1460,7 +1460,7 @@ void CDisassembler::WriteDataItems() {
             switch (Syntax) {
             case SUBTYPE_MASM:
                 WriteDataLabelMASM(Symname, sym, SeparateLine);  break;
-            case SUBTYPE_YASM:
+            case SUBTYPE_NASM:
                 WriteDataLabelYASM(Symname, sym, SeparateLine);  break;
             case SUBTYPE_GASM:
                 WriteDataLabelGASM(Symname, sym, SeparateLine);  break;
@@ -1475,14 +1475,14 @@ void CDisassembler::WriteDataItems() {
     if ((Sections[Section].Type & 0xFF) == 3 || Pos >= Sections[Section].InitSize) {
         // This is an unitialized data (BSS) section
         // Data repeat count
-        uint32 DataCount = (DataEnd - Pos) / ElementSize;
+        uint32_t DataCount = (DataEnd - Pos) / ElementSize;
         if (DataCount) {
             OutFile.Tabulate(AsmTab1);
             // Write data directives
             switch (Syntax) {
             case SUBTYPE_MASM:
                 WriteUninitDataItemsMASM(ElementSize, DataCount);  break;
-            case SUBTYPE_YASM:
+            case SUBTYPE_NASM:
                 WriteUninitDataItemsYASM(ElementSize, DataCount);  break;
             case SUBTYPE_GASM:
                 WriteUninitDataItemsGASM(ElementSize, DataCount);  break;
@@ -1503,7 +1503,7 @@ void CDisassembler::WriteDataItems() {
             switch (Syntax) {
             case SUBTYPE_MASM:
                 WriteUninitDataItemsMASM(ElementSize, DataCount);  break;
-            case SUBTYPE_YASM:
+            case SUBTYPE_NASM:
                 WriteUninitDataItemsYASM(ElementSize, DataCount);  break;
             case SUBTYPE_GASM:
                 WriteUninitDataItemsGASM(ElementSize, DataCount);  break;
@@ -1533,8 +1533,8 @@ void CDisassembler::WriteDataItems() {
             // Check if relocation
             Rel.Section = Section;
             Rel.Offset  = Pos;
-            uint32 irel = Relocations.FindFirst(Rel);
-            if (irel >= Relocations.GetNumEntries() || Relocations[irel].Section != (int32)Section) {
+            uint32_t irel = Relocations.FindFirst(Rel);
+            if (irel >= Relocations.GetNumEntries() || Relocations[irel].Section != (int32_t)Section) {
                 // No relevant relocation
                 irel = 0;
             }
@@ -1565,7 +1565,7 @@ void CDisassembler::WriteDataItems() {
                 }
                 // Check for overlapping relocations
                 if (irel && irel+1 < Relocations.GetNumEntries()
-                    && Relocations[irel+1].Section == (int32)Section
+                    && Relocations[irel+1].Section == (int32_t)Section
                     && Relocations[irel+1].Offset < RelOffset + ElementSize) {
                         // Overlapping relocations
                         s.Errors |= 0x2000;
@@ -1608,7 +1608,7 @@ void CDisassembler::WriteDataItems() {
                 switch (Syntax) {
                 case SUBTYPE_MASM:
                     WriteDataDirectiveMASM(ElementSize);  break;
-                case SUBTYPE_YASM:
+                case SUBTYPE_NASM:
                     WriteDataDirectiveYASM(ElementSize);  break;
                 case SUBTYPE_GASM:
                     WriteDataDirectiveGASM(ElementSize);  break;
@@ -1621,12 +1621,12 @@ void CDisassembler::WriteDataItems() {
             }
             // Get inline value
             switch (ElementSize) {
-            case 1:  Value = Get<int8>(Pos);  break;
-            case 2:  Value = Get<int16>(Pos);  break;
-            case 4:  Value = Get<int32>(Pos);  break;
-            case 6:  Value = Get<uint32>(Pos) + ((uint64)Get<uint16>(Pos+4) << 32); break;
-            case 8:  Value = Get<int64>(Pos);  break;
-            case 10: Value = Get<int64>(Pos); break;
+            case 1:  Value = Get<int8_t>(Pos);  break;
+            case 2:  Value = Get<int16_t>(Pos);  break;
+            case 4:  Value = Get<int32_t>(Pos);  break;
+            case 6:  Value = Get<uint32_t>(Pos) + ((uint64_t)Get<uint16_t>(Pos+4) << 32); break;
+            case 8:  Value = Get<int64_t>(Pos);  break;
+            case 10: Value = Get<int64_t>(Pos); break;
             default: Value = 0; // should not occur
             }
             if (irel) {
@@ -1637,21 +1637,21 @@ void CDisassembler::WriteDataItems() {
                 // Write value
                 switch (ElementSize) {
                 case 1:
-                    OutFile.PutHex((uint8)Value, 1);
+                    OutFile.PutHex((uint8_t)Value, 1);
                     break;
                 case 2:
-                    OutFile.PutHex((uint16)Value, 1);
+                    OutFile.PutHex((uint16_t)Value, 1);
                     break;
                 case 4:
-                    OutFile.PutHex((uint32)Value, 1);
+                    OutFile.PutHex((uint32_t)Value, 1);
                     break;
                 case 6:
-                    OutFile.PutHex((uint16)(Value >> 32), 1);
+                    OutFile.PutHex((uint16_t)(Value >> 32), 1);
                     OutFile.Put(":");
-                    OutFile.PutHex((uint32)Value, 1);
+                    OutFile.PutHex((uint32_t)Value, 1);
                     break;
                 case 8:
-                    OutFile.PutHex((uint64)Value, 1);
+                    OutFile.PutHex((uint64_t)Value, 1);
                     break;
                 case 10:
                     OutFile.Put("??");
@@ -1688,7 +1688,7 @@ void CDisassembler::WriteDataItems() {
 }
 
 
-void CDisassembler::WriteDataLabelMASM(const char * name, uint32 sym, int line) {
+void CDisassembler::WriteDataLabelMASM(const char * name, uint32_t sym, int line) {
     // Write label before data item, MASM syntax
     // name = name of data item(s)
     // sym  = symbol index
@@ -1703,7 +1703,7 @@ void CDisassembler::WriteDataLabelMASM(const char * name, uint32 sym, int line) 
     if (line) {
         // Write label and type on seperate line
         // Get size
-        uint32 Symsize = Symbols[sym].Size;
+        uint32_t Symsize = Symbols[sym].Size;
         if (Symsize == 0) Symsize = DataSize;
         OutFile.Put("label ");
         // Write type
@@ -1746,7 +1746,7 @@ void CDisassembler::WriteDataLabelMASM(const char * name, uint32 sym, int line) 
     }
 }
 
-void CDisassembler::WriteDataLabelYASM(const char * name, uint32 sym, int line) {
+void CDisassembler::WriteDataLabelYASM(const char * name, uint32_t sym, int line) {
     // Write label before data item, YASM syntax
     // name = name of data item(s)
     // sym  = symbol index
@@ -1778,7 +1778,7 @@ void CDisassembler::WriteDataLabelYASM(const char * name, uint32 sym, int line) 
         }
         else {
             // Write size
-            uint32 Symsize = Symbols[sym].Size;
+            uint32_t Symsize = Symbols[sym].Size;
             if (Symsize == 0) Symsize = DataSize;
             switch(Symsize) {
             case 1: default:
@@ -1806,7 +1806,7 @@ void CDisassembler::WriteDataLabelYASM(const char * name, uint32 sym, int line) 
     }
 }
 
-void CDisassembler::WriteDataLabelGASM(const char * name, uint32 sym, int line) {
+void CDisassembler::WriteDataLabelGASM(const char * name, uint32_t sym, int line) {
     // Write label before data item, GAS syntax
     // name = name of data item(s)
     // sym  = symbol index
@@ -1838,7 +1838,7 @@ void CDisassembler::WriteDataLabelGASM(const char * name, uint32 sym, int line) 
         }
         else {
             // Write size
-            uint32 Symsize = Symbols[sym].Size;
+            uint32_t Symsize = Symbols[sym].Size;
             if (Symsize == 0) Symsize = DataSize;
             switch(Symsize) {
             case 1: default:
@@ -1864,7 +1864,7 @@ void CDisassembler::WriteDataLabelGASM(const char * name, uint32 sym, int line) 
     }
 }
 
-void CDisassembler::WriteUninitDataItemsMASM(uint32 size, uint32 count) {
+void CDisassembler::WriteUninitDataItemsMASM(uint32_t size, uint32_t count) {
     // Write uninitialized (BSS) data, MASM syntax
     // size = size of each data element
     // count = number of data elements on each line
@@ -1896,7 +1896,7 @@ void CDisassembler::WriteUninitDataItemsMASM(uint32 size, uint32 count) {
     }
 }
 
-void CDisassembler::WriteUninitDataItemsYASM(uint32 size, uint32 count) {
+void CDisassembler::WriteUninitDataItemsYASM(uint32_t size, uint32_t count) {
     // Write uninitialized (BSS) data, YASM syntax
     // Write data definition directive for appropriate size
     switch (size) {
@@ -1917,7 +1917,7 @@ void CDisassembler::WriteUninitDataItemsYASM(uint32 size, uint32 count) {
     OutFile.PutDecimal(count);
 }
 
-void CDisassembler::WriteUninitDataItemsGASM(uint32 size, uint32 count) {
+void CDisassembler::WriteUninitDataItemsGASM(uint32_t size, uint32_t count) {
     // Write uninitialized (BSS) data, GAS  syntax
     OutFile.Put(".zero");
     OutFile.Tabulate(AsmTab2);
@@ -1927,7 +1927,7 @@ void CDisassembler::WriteUninitDataItemsGASM(uint32 size, uint32 count) {
     OutFile.PutDecimal(size);
 }
 
-void CDisassembler::WriteDataDirectiveMASM(uint32 size) {
+void CDisassembler::WriteDataDirectiveMASM(uint32_t size) {
     // Write DB, etc., MASM syntax
     // Write data definition directive for appropriate size
     switch (size) {
@@ -1943,7 +1943,7 @@ void CDisassembler::WriteDataDirectiveMASM(uint32 size) {
     }
 }
 
-void CDisassembler::WriteDataDirectiveYASM(uint32 size) {
+void CDisassembler::WriteDataDirectiveYASM(uint32_t size) {
     // Write DB, etc., YASM syntax
     // Write data definition directive for appropriate size
     switch (size) {
@@ -1958,7 +1958,7 @@ void CDisassembler::WriteDataDirectiveYASM(uint32 size) {
     }
 }
 
-void CDisassembler::WriteDataDirectiveGASM(uint32 size) {
+void CDisassembler::WriteDataDirectiveGASM(uint32_t size) {
     // Write DB, etc., GAS syntax
     // Write data definition directive for appropriate size
     switch (size) {
@@ -1972,23 +1972,23 @@ void CDisassembler::WriteDataDirectiveGASM(uint32 size) {
 }
 
 
-void CDisassembler::WriteDataComment(uint32 ElementSize, uint32 LinePos, uint32 Pos, uint32 irel) {
+void CDisassembler::WriteDataComment(uint32_t ElementSize, uint32_t LinePos, uint32_t Pos, uint32_t irel) {
     // Write comment after data item
-    uint32 pos1;                            // Position of data for comment
-    uint32 RelType = 0;                     // Relocation type
+    uint32_t pos1;                            // Position of data for comment
+    uint32_t RelType = 0;                     // Relocation type
     char TextBuffer[64];                    // Buffer for writing floating point number
 
     OutFile.Tabulate(AsmTab3);              // Tabulate to comment field
     OutFile.Put(CommentSeparator);          // Start comment
 
     // Write address
-    if (SectionEnd + SectionAddress + (uint32)ImageBase > 0xFFFF) {
+    if (SectionEnd + SectionAddress + (uint32_t)ImageBase > 0xFFFF) {
         // Write 32 bit address
-        OutFile.PutHex(LinePos + SectionAddress + (uint32)ImageBase);
+        OutFile.PutHex(LinePos + SectionAddress + (uint32_t)ImageBase);
     }
     else {
         // Write 16 bit address
-        OutFile.PutHex((uint16)(LinePos + SectionAddress));
+        OutFile.PutHex((uint16_t)(LinePos + SectionAddress));
     }
 
     if ((Sections[Section].Type & 0xFF) == 3 || Pos > Sections[Section].InitSize) {
@@ -2010,7 +2010,7 @@ void CDisassembler::WriteDataComment(uint32 ElementSize, uint32 LinePos, uint32 
         // Bytes. Write ASCII characters
         for (pos1 = LinePos; pos1 < Pos; pos1++) {
             // Get character
-            int8 c = Get<int8>(pos1);
+            int8_t c = Get<int8_t>(pos1);
             // Avoid non-printable characters
             if (c < ' ' || c == 0x7F) c = '.';
             // Print ASCII character
@@ -2021,10 +2021,10 @@ void CDisassembler::WriteDataComment(uint32 ElementSize, uint32 LinePos, uint32 
         // Words. Write as decimal
         for (pos1 = LinePos; pos1 < Pos; pos1 += 2) {
             if (RelType) {
-                OutFile.PutHex(Get<uint16>(pos1), 1); // Write as hexadecimal
+                OutFile.PutHex(Get<uint16_t>(pos1), 1); // Write as hexadecimal
             }
             else {
-                OutFile.PutDecimal(Get<int16>(pos1), 1);// Write as signed decimal
+                OutFile.PutDecimal(Get<int16_t>(pos1), 1);// Write as signed decimal
             }
             OutFile.Put(' ');
         }
@@ -2041,11 +2041,11 @@ void CDisassembler::WriteDataComment(uint32 ElementSize, uint32 LinePos, uint32 
             }
             else if (((DataType + 1) & 0xFF) == 0x0C || RelType) {
                 // jump/call address or offset. Write as hexadecimal
-                OutFile.PutHex(Get<uint32>(pos1));
+                OutFile.PutHex(Get<uint32_t>(pos1));
             }
             else {
                 // Other. Write as decimal
-                OutFile.PutDecimal(Get<int32>(pos1), 1);
+                OutFile.PutDecimal(Get<int32_t>(pos1), 1);
             }
             OutFile.Put(' ');
         }
@@ -2062,7 +2062,7 @@ void CDisassembler::WriteDataComment(uint32 ElementSize, uint32 LinePos, uint32 
             }
             else {
                 // Write as hexadecimal
-                OutFile.PutHex(Get<uint64>(pos1));
+                OutFile.PutHex(Get<uint64_t>(pos1));
             }
             OutFile.Put(' ');
         }
@@ -2070,7 +2070,7 @@ void CDisassembler::WriteDataComment(uint32 ElementSize, uint32 LinePos, uint32 
     case 10:
         // tbyte. Many compilers do not support long doubles in sprintf. Write as bytes
         for (pos1 = LinePos; pos1 < Pos; pos1++) {
-            OutFile.PutHex(Get<uint8>(pos1), 1);
+            OutFile.PutHex(Get<uint8_t>(pos1), 1);
         }
         break;
     }
@@ -2081,7 +2081,7 @@ void CDisassembler::WriteDataComment(uint32 ElementSize, uint32 LinePos, uint32 
 }
 
 
-void CDisassembler::WriteRelocationTarget(uint32 irel, uint32 Context, int64 Addend) {
+void CDisassembler::WriteRelocationTarget(uint32_t irel, uint32_t Context, int64_t Addend) {
     // Write cross reference, including addend, but not including segment override and []
     // irel = index into Relocations
     // Context:
@@ -2097,11 +2097,11 @@ void CDisassembler::WriteRelocationTarget(uint32 irel, uint32 Context, int64 Add
     // IEnd:    reference point for self-relative addressing
     // BaseReg, IndexReg
 
-    uint32 RefFrame;                    // Target segment
-    int32  Addend2 = 0;                 // Difference between '$' and reference point
+    uint32_t RefFrame;                    // Target segment
+    int32_t  Addend2 = 0;                 // Difference between '$' and reference point
 
     // Get relocation type
-    uint32 RelType = Relocations[irel].Type;
+    uint32_t RelType = Relocations[irel].Type;
 
     if (RelType & 0x60) {
         // Inline addend is already relocated.
@@ -2111,16 +2111,16 @@ void CDisassembler::WriteRelocationTarget(uint32 irel, uint32 Context, int64 Add
     }
 
     // Get relocation size
-    uint32 RelSize = Relocations[irel].Size;
+    uint32_t RelSize = Relocations[irel].Size;
 
     // Get relocation addend
     Addend += Relocations[irel].Addend;
 
     // Get relocation target
-    uint32 Target = Relocations[irel].TargetOldIndex;
+    uint32_t Target = Relocations[irel].TargetOldIndex;
 
     // Is offset operand needed?
-    if (Syntax != SUBTYPE_YASM && (
+    if (Syntax != SUBTYPE_NASM && (
         ((RelType & 0xB) && (Context & 2))
         || ((RelType & 8) && (Context & 0x108)))) {
             // offset operator needed to convert memory operand to immediate address
@@ -2143,7 +2143,7 @@ void CDisassembler::WriteRelocationTarget(uint32 irel, uint32 Context, int64 Add
         }
         if (RefFrame && RefFrame < Sections.GetNumEntries()) {
             // Write segment or group name
-            const char * SecName = NameBuffer.Buf()+Sections[RefFrame].Name;
+            const char * SecName = (char*)NameBuffer.Buf()+Sections[RefFrame].Name;
             OutFile.Put(SecName);
             OutFile.Put(":");
         }
@@ -2180,7 +2180,7 @@ void CDisassembler::WriteRelocationTarget(uint32 irel, uint32 Context, int64 Add
         // Target is a segment
         RefFrame = Symbols[Symbols.Old2NewIndex(Target)].Section;
         if (RefFrame && RefFrame < Sections.GetNumEntries()) {
-            const char * SecName = NameBuffer.Buf()+Sections[RefFrame].Name;
+            const char * SecName = (char*)NameBuffer.Buf()+Sections[RefFrame].Name;
             OutFile.Put(SecName);
         }
         else {
@@ -2191,15 +2191,15 @@ void CDisassembler::WriteRelocationTarget(uint32 irel, uint32 Context, int64 Add
         // Target is a symbol
 
         // Find target symbol
-        uint32 TargetSym = Symbols.Old2NewIndex(Target);
+        uint32_t TargetSym = Symbols.Old2NewIndex(Target);
 
         // Check if Target is appropriate
-        if (((Symbols[TargetSym].Type & 0x80000000) || (int32)Addend)
+        if (((Symbols[TargetSym].Type & 0x80000000) || (int32_t)Addend)
             && !(CodeMode == 1 && s.BaseReg)) {
                 // Symbol is a start-of-section entry in symbol table, or has an addend
                 // Look for a more appropriate symbol, except if code with base register
-                uint32 sym, sym1, sym2 = 0;
-                sym1 = Symbols.FindByAddress(Symbols[TargetSym].Section, Symbols[TargetSym].Offset + (int32)Addend, &sym2);
+                uint32_t sym, sym1, sym2 = 0;
+                sym1 = Symbols.FindByAddress(Symbols[TargetSym].Section, Symbols[TargetSym].Offset + (int32_t)Addend, &sym2);
                 for (sym = sym1; sym && sym <= sym2; sym++) {
                     if (Symbols[sym].Scope && !(Symbols[sym].Type & 0x80000000)) {
                         // Found a better symbol name for target address
@@ -2227,7 +2227,7 @@ void CDisassembler::WriteRelocationTarget(uint32 irel, uint32 Context, int64 Add
     if (RelType & 0x10) {
         OutFile.Put("-");
         // Write name of segment/group frame
-        uint32 RefPoint = Relocations[irel].RefOldIndex;
+        uint32_t RefPoint = Relocations[irel].RefOldIndex;
         if (RefPoint) {
             // Reference point name valid
             OutFile.Put(Symbols.GetNameO(RefPoint));
@@ -2264,21 +2264,21 @@ void CDisassembler::WriteRelocationTarget(uint32 irel, uint32 Context, int64 Add
         // Write value as hexadecimal
         switch (RelSize) {
         case 1:
-            OutFile.PutHex((uint8)Addend, 1);
+            OutFile.PutHex((uint8_t)Addend, 1);
             break;
         case 2:
-            OutFile.PutHex((uint16)Addend, 2);
+            OutFile.PutHex((uint16_t)Addend, 2);
             break;
         case 4:
-            OutFile.PutHex((uint32)Addend, 2);
+            OutFile.PutHex((uint32_t)Addend, 2);
             break;
         case 6:
-            OutFile.PutHex((uint16)(Addend >> 32), 1);
+            OutFile.PutHex((uint16_t)(Addend >> 32), 1);
             OutFile.Put(":");
-            OutFile.PutHex((uint32)Addend, 1);
+            OutFile.PutHex((uint32_t)Addend, 1);
             break;
         case 8:
-            OutFile.PutHex((uint64)Addend, 2);
+            OutFile.PutHex((uint64_t)Addend, 2);
             break;
         default:
             OutFile.Put("??"); // Should not occur
@@ -2298,10 +2298,10 @@ int CDisassembler::WriteFillers() {
         // This instruction can not be used as filler
         return 0;
     }
-    uint32 FillerType;                            // Type of filler
+    uint32_t FillerType;                            // Type of filler
     const char * FillerName = s.OpcodeDef->Name;  // Name of filler
-    uint32 IFillerBegin = IBegin;                 // Start of filling space
-    uint32 IFillerEnd;                            // End of filling space
+    uint32_t IFillerBegin = IBegin;                 // Start of filling space
+    uint32_t IFillerEnd;                            // End of filling space
 
     // check for CC = int 3 breakpoint, 3C00 = 90 NOP, 11F = multibyte NOP
     if (Opcodei == 0xCC || (Opcodei & 0xFFFE) == 0x3C00 || Opcodei == 0x11F) {
@@ -2347,7 +2347,7 @@ int CDisassembler::WriteFillers() {
     if (IFillerEnd <= IFillerBegin) return 0;
 
     // Size of fillers
-    uint32 FillerSize = IFillerEnd - IFillerBegin;
+    uint32_t FillerSize = IFillerEnd - IFillerBegin;
 
     // Write size of filling space
     OutFile.Put(CommentSeparator);
@@ -2373,7 +2373,7 @@ int CDisassembler::WriteFillers() {
     }
 
     // Write as bytes
-    uint32 Pos;
+    uint32_t Pos;
     for (Pos = IFillerBegin; Pos < IFillerEnd; Pos++) {
         if (((Pos - IFillerBegin) & 7) == 0) {
             // Start new line
@@ -2387,13 +2387,13 @@ int CDisassembler::WriteFillers() {
             OutFile.Put(", ");
         }
         // Write byte value
-        OutFile.PutHex(Get<uint8>(Pos), 1);
+        OutFile.PutHex(Get<uint8_t>(Pos), 1);
     }
     // Blank line
     OutFile.NewLine(); OutFile.NewLine();
 
     // Find alignment
-    uint32 Alignment = 4;                         // Limit to 2^4 = 16
+    uint32_t Alignment = 4;                         // Limit to 2^4 = 16
 
     // Check if first non-filler is aligned by this value
     while (Alignment && (IFillerEnd & ((1 << Alignment) - 1))) {
@@ -2426,7 +2426,7 @@ int CDisassembler::WriteFillers() {
     return 1;
 }
 
-void CDisassembler::WriteAlign(uint32 a) {
+void CDisassembler::WriteAlign(uint32_t a) {
     // Write alignment directive
     OutFile.Put(Syntax == SUBTYPE_GASM ? ".ALIGN" : "ALIGN");
     OutFile.Tabulate(AsmTab1);
@@ -2459,11 +2459,11 @@ void CDisassembler::WriteFileBegin() {
         OutFile.NewLine();
     }
 
-    // Write mode
+    // Write type and mode
     OutFile.Put(CommentSeparator);
-    OutFile.Put("Mode: ");
+    OutFile.Put("Type: ");
+    OutFile.Put(CFileBuffer::GetFileFormatName(cmd.InputType));
     OutFile.PutDecimal(WordSize);
-    OutFile.Put(" bits");
     OutFile.NewLine();
 
     // Write syntax dialect
@@ -2472,8 +2472,8 @@ void CDisassembler::WriteFileBegin() {
     switch (Syntax) {
     case SUBTYPE_MASM:
         OutFile.Put(WordSize < 64 ? "MASM/ML" : "MASM/ML64");  break;
-    case SUBTYPE_YASM:
-        OutFile.Put("YASM/NASM");  break;
+    case SUBTYPE_NASM:
+        OutFile.Put("NASM");  break;
     case SUBTYPE_GASM:
         OutFile.Put("GAS(Intel)");  break;
     }
@@ -2540,7 +2540,7 @@ void CDisassembler::WriteFileBegin() {
         WriteFileBeginMASM();
         WritePublicsAndExternalsMASM();
         break;
-    case SUBTYPE_YASM:
+    case SUBTYPE_NASM:
         WriteFileBeginYASM();
         WritePublicsAndExternalsYASMGASM();
         break;
@@ -2651,8 +2651,8 @@ void CDisassembler::WriteFileBeginGASM() {
 
 void CDisassembler::WritePublicsAndExternalsMASM() {
     // Write public and external symbol definitions
-    uint32 i;                                     // Loop counter
-    uint32 LinesWritten = 0;                      // Count lines written
+    uint32_t i;                                     // Loop counter
+    uint32_t LinesWritten = 0;                      // Count lines written
     const char * XName;                           // Name of external symbols
 
     // Loop through public symbols
@@ -2687,9 +2687,9 @@ void CDisassembler::WritePublicsAndExternalsMASM() {
             // Get name
             XName = Symbols.GetName(i);
             // Check for dynamic import
-            if (Symbols[i].DLLName && strncmp(XName, Symbols.ImportTablePrefix, (uint32)strlen(Symbols.ImportTablePrefix)) == 0) {
+            if (Symbols[i].DLLName && strncmp(XName, Symbols.ImportTablePrefix, (uint32_t)strlen(Symbols.ImportTablePrefix)) == 0) {
                 // Remove "_imp" prefix from name
-                XName += (uint32)strlen(Symbols.ImportTablePrefix);
+                XName += (uint32_t)strlen(Symbols.ImportTablePrefix);
             }
 
             // Write name
@@ -2757,22 +2757,22 @@ void CDisassembler::WritePublicsAndExternalsMASM() {
         LinesWritten = 0;
     }
     // Write any group definitions
-    int32 GroupId, SegmentId;
+    int32_t GroupId, SegmentId;
     // Loop through sections to search for group definitions
-    for (GroupId = 1; GroupId < (int32)Sections.GetNumEntries(); GroupId++) {
+    for (GroupId = 1; GroupId < (int32_t)Sections.GetNumEntries(); GroupId++) {
 
         // Get section type
-        uint32 SectionType = Sections[GroupId].Type;
+        uint32_t SectionType = Sections[GroupId].Type;
         if (SectionType & 0x800) {
             // This is a segment group definition
             // Count number of members
-            uint32 NumMembers = 0;
+            uint32_t NumMembers = 0;
             // Write group name
             WriteSectionName(GroupId);
             // Write "group"
             OutFile.Put(" ");  OutFile.Tabulate(AsmTab1);  OutFile.Put("GROUP ");
             // Search for group members
-            for (SegmentId = 1; SegmentId < (int32)Sections.GetNumEntries(); SegmentId++) {
+            for (SegmentId = 1; SegmentId < (int32_t)Sections.GetNumEntries(); SegmentId++) {
                 if (Sections[SegmentId].Group == GroupId && !(Sections[SegmentId].Type & 0x800)) {
                     // is this first member?
                     if (NumMembers++) {
@@ -2797,8 +2797,8 @@ void CDisassembler::WritePublicsAndExternalsMASM() {
 
 void CDisassembler::WritePublicsAndExternalsYASMGASM() {
     // Write public and external symbol definitions, YASM and GAS syntax
-    uint32 i;                                     // Loop counter
-    uint32 LinesWritten = 0;                      // Count lines written
+    uint32_t i;                                     // Loop counter
+    uint32_t LinesWritten = 0;                      // Count lines written
     const char * XName;                           // Name of external symbols
 
     // Loop through public symbols
@@ -2813,7 +2813,7 @@ void CDisassembler::WritePublicsAndExternalsYASMGASM() {
             // Write type
             if ((Symbols[i].Type & 0xF0) == 0x80) {
                 // Symbol is a function
-                if (Syntax == SUBTYPE_YASM) {
+                if (Syntax == SUBTYPE_NASM) {
                     OutFile.Put(": function");
                 }
                 else if (Syntax == SUBTYPE_GASM) {
@@ -2850,9 +2850,9 @@ void CDisassembler::WritePublicsAndExternalsYASMGASM() {
             // Get name
             XName = Symbols.GetName(i);
             // Check for dynamic import
-            if (Symbols[i].DLLName && strncmp(XName, Symbols.ImportTablePrefix, (uint32)strlen(Symbols.ImportTablePrefix)) == 0) {
+            if (Symbols[i].DLLName && strncmp(XName, Symbols.ImportTablePrefix, (uint32_t)strlen(Symbols.ImportTablePrefix)) == 0) {
                 // Remove "_imp" prefix from name
-                XName += (uint32)strlen(Symbols.ImportTablePrefix);
+                XName += (uint32_t)strlen(Symbols.ImportTablePrefix);
             }
             // Write name
             OutFile.Put(XName);
@@ -2901,7 +2901,7 @@ void CDisassembler::WritePublicsAndExternalsYASMGASM() {
     for (i = 0; i < Symbols.GetNumEntries(); i++) {
         if (Symbols[i].Section == ASM_SEGMENT_ABSOLUTE /*&& (Symbols[i].Scope & 0x1C)*/) {
             // Symbol is constant
-            if (Syntax == SUBTYPE_YASM) {
+            if (Syntax == SUBTYPE_NASM) {
                 // Write name equ value
                 OutFile.Put(Symbols.GetName(i));
                 OutFile.Put(" equ ");
@@ -2928,21 +2928,21 @@ void CDisassembler::WritePublicsAndExternalsYASMGASM() {
         LinesWritten = 0;
     }
     // Write any group definitions
-    int32 GroupId, SegmentId;
+    int32_t GroupId, SegmentId;
     // Loop through sections to search for group definitions
-    for (GroupId = 1; GroupId < (int32)Sections.GetNumEntries(); GroupId++) {
+    for (GroupId = 1; GroupId < (int32_t)Sections.GetNumEntries(); GroupId++) {
         // Get section type
-        uint32 SectionType = Sections[GroupId].Type;
+        uint32_t SectionType = Sections[GroupId].Type;
         if (SectionType & 0x800) {
             // This is a segment group definition
             // Count number of members
-            uint32 NumMembers = 0;
+            uint32_t NumMembers = 0;
             // Write group name
             WriteSectionName(GroupId);
             // Write "group"
             OutFile.Put(" ");  OutFile.Tabulate(AsmTab1);  OutFile.Put("GROUP ");
             // Search for group members
-            for (SegmentId = 1; SegmentId < (int32)Sections.GetNumEntries(); SegmentId++) {
+            for (SegmentId = 1; SegmentId < (int32_t)Sections.GetNumEntries(); SegmentId++) {
                 if (Sections[SegmentId].Group == GroupId && !(Sections[SegmentId].Type & 0x800)) {
                     // is this first member?
                     if (NumMembers++) {
@@ -2978,7 +2978,7 @@ void CDisassembler::WriteFileEnd() {
         OutFile.Put(".att_syntax prefix ");
         OutFile.NewLine();
         break;
-    case SUBTYPE_YASM:
+    case SUBTYPE_NASM:
         break;
     }
 }
@@ -2990,7 +2990,7 @@ void CDisassembler::WriteSegmentBegin() {
     switch (Syntax) {
     case SUBTYPE_MASM:
         WriteSegmentBeginMASM();  break;
-    case SUBTYPE_YASM:
+    case SUBTYPE_NASM:
         WriteSegmentBeginYASM();  break;
     case SUBTYPE_GASM:
         WriteSegmentBeginGASM();  break;
@@ -3155,7 +3155,7 @@ void CDisassembler::WriteSegmentBeginYASM() {
 
 void CDisassembler::WriteSegmentBeginGASM() {
     // Write begin of segment
-    uint32 Type;                                  // Section type
+    uint32_t Type;                                  // Section type
 
     OutFile.NewLine();                            // Blank line
 
@@ -3235,7 +3235,7 @@ void CDisassembler::WriteSegmentEnd() {
     }
 
     // Write segment name
-    const char * segname = NameBuffer.Buf() + Sections[Section].Name;
+    const char * segname = (char*)NameBuffer.Buf() + Sections[Section].Name;
     OutFile.Put(segname);
 
     // Tabulate
@@ -3260,10 +3260,10 @@ void CDisassembler::WriteFunctionBegin() {
     }
 
     // Get symbol old index
-    uint32 symi = FunctionList[IFunction].OldSymbolIndex;
+    uint32_t symi = FunctionList[IFunction].OldSymbolIndex;
 
     // Get symbol record
-    uint32 SymI = Symbols.Old2NewIndex(symi);
+    uint32_t SymI = Symbols.Old2NewIndex(symi);
 
     OutFile.NewLine();                        // Blank line
 
@@ -3284,14 +3284,14 @@ void CDisassembler::WriteFunctionBegin() {
     switch (Syntax) {
     case SUBTYPE_MASM:
         WriteFunctionBeginMASM(SymI, Symbols[SymI].Scope);  break;
-    case SUBTYPE_YASM:
+    case SUBTYPE_NASM:
         WriteFunctionBeginYASM(SymI, Symbols[SymI].Scope);  break;
     case SUBTYPE_GASM:
         WriteFunctionBeginGASM(SymI, Symbols[SymI].Scope);  break;
     }
 }
 
-void CDisassembler::WriteFunctionBeginMASM(uint32 symi, uint32 scope) {
+void CDisassembler::WriteFunctionBeginMASM(uint32_t symi, uint32_t scope) {
     // Write begin of function, MASM syntax
     // Write name
     WriteSymbolName(symi);
@@ -3332,7 +3332,7 @@ void CDisassembler::WriteFunctionBeginMASM(uint32 symi, uint32 scope) {
     OutFile.NewLine();
 }
 
-void CDisassembler::WriteFunctionBeginYASM(uint32 symi, uint32 scope) {
+void CDisassembler::WriteFunctionBeginYASM(uint32_t symi, uint32_t scope) {
     // Write begin of function, YASM syntax
     // Write name
     WriteSymbolName(symi);
@@ -3367,7 +3367,7 @@ void CDisassembler::WriteFunctionBeginYASM(uint32 symi, uint32 scope) {
     OutFile.NewLine();
 }
 
-void CDisassembler::WriteFunctionBeginGASM(uint32 symi, uint32 scope) {
+void CDisassembler::WriteFunctionBeginGASM(uint32_t symi, uint32_t scope) {
     // Write begin of function, GAS syntax
     WriteSymbolName(symi);                        // Write name
     OutFile.Put(":");
@@ -3403,8 +3403,8 @@ void CDisassembler::WriteFunctionEnd() {
     }
 
     // Get symbol index
-    uint32 SymOldI = FunctionList[IFunction].OldSymbolIndex;
-    uint32 SymNewI = Symbols.Old2NewIndex(SymOldI);
+    uint32_t SymOldI = FunctionList[IFunction].OldSymbolIndex;
+    uint32_t SymNewI = Symbols.Old2NewIndex(SymOldI);
 
     // check scope
     if (Symbols[SymNewI].Scope & 0x1C) {
@@ -3412,7 +3412,7 @@ void CDisassembler::WriteFunctionEnd() {
         switch (Syntax) {
         case SUBTYPE_MASM:
             WriteFunctionEndMASM(SymNewI);  break;
-        case SUBTYPE_YASM:
+        case SUBTYPE_NASM:
             WriteFunctionEndYASM(SymNewI);  break;
         case SUBTYPE_GASM:
             WriteFunctionEndGASM(SymNewI);  break;
@@ -3420,7 +3420,7 @@ void CDisassembler::WriteFunctionEnd() {
     }
 }
 
-void CDisassembler::WriteFunctionEndMASM(uint32 symi) {
+void CDisassembler::WriteFunctionEndMASM(uint32_t symi) {
     // Write end of function, MASM syntax
     // Write name
     WriteSymbolName(symi);
@@ -3432,7 +3432,7 @@ void CDisassembler::WriteFunctionEndMASM(uint32 symi) {
     OutFile.NewLine();
 }
 
-void CDisassembler::WriteFunctionEndYASM(uint32 symi) {
+void CDisassembler::WriteFunctionEndYASM(uint32_t symi) {
     // Write end of function, YASM syntax
     // Write comment
     OutFile.Put(CommentSeparator);
@@ -3442,7 +3442,7 @@ void CDisassembler::WriteFunctionEndYASM(uint32 symi) {
     OutFile.NewLine();
 }
 
-void CDisassembler::WriteFunctionEndGASM(uint32 symi){
+void CDisassembler::WriteFunctionEndGASM(uint32_t symi){
     // Write end of function, GAS syntax
     // Write .size directive
     OutFile.Tabulate(AsmTab1);
@@ -3458,11 +3458,11 @@ void CDisassembler::WriteFunctionEndGASM(uint32 symi){
 }
 
 
-void CDisassembler::WriteCodeLabel(uint32 symi) {
+void CDisassembler::WriteCodeLabel(uint32_t symi) {
     // Write private or public code label. symi is new symbol index
 
     // Get scope
-    uint32 Scope = Symbols[symi].Scope;
+    uint32_t Scope = Symbols[symi].Scope;
 
     // Check scope
     if (Scope & 0x100) return;                    // Has been written as function begin
@@ -3486,7 +3486,7 @@ void CDisassembler::WriteCodeLabel(uint32 symi) {
     switch (Syntax) {
     case SUBTYPE_MASM:
         WriteCodeLabelMASM(symi, Symbols[symi].Scope);  break;
-    case SUBTYPE_YASM:
+    case SUBTYPE_NASM:
         WriteCodeLabelYASM(symi, Symbols[symi].Scope);  break;
     case SUBTYPE_GASM:
         WriteCodeLabelGASM(symi, Symbols[symi].Scope);  break;
@@ -3497,7 +3497,7 @@ void CDisassembler::WriteCodeLabel(uint32 symi) {
 }
 
 
-void CDisassembler::WriteCodeLabelMASM(uint32 symi, uint32 scope) {
+void CDisassembler::WriteCodeLabelMASM(uint32_t symi, uint32_t scope) {
     // Write private or public code label, MASM syntax
     if ((scope & 0xFF) > 1) {
         // Scope > function local. Write as label near
@@ -3549,7 +3549,7 @@ void CDisassembler::WriteCodeLabelMASM(uint32 symi, uint32 scope) {
     }
 }
 
-void CDisassembler::WriteCodeLabelYASM(uint32 symi, uint32 scope) {
+void CDisassembler::WriteCodeLabelYASM(uint32_t symi, uint32_t scope) {
     // Write private or public code label, YASM syntax
     if ((scope & 0xFF) > 2) {
         // Scope is public
@@ -3589,7 +3589,7 @@ void CDisassembler::WriteCodeLabelYASM(uint32 symi, uint32 scope) {
     }
 }
 
-void CDisassembler::WriteCodeLabelGASM(uint32 symi, uint32 scope) {
+void CDisassembler::WriteCodeLabelGASM(uint32_t symi, uint32_t scope) {
     // Write private or public code label, GAS syntax same as YASM syntax
     WriteCodeLabelYASM(symi, scope);
 }
@@ -3599,11 +3599,11 @@ void CDisassembler::WriteAssume() {
     if (Syntax != SUBTYPE_MASM) return;
     if (!s.AddressField) return;
 
-    int32 SegReg, PrefixSeg;                      // Segment register used
-    uint32 symo;                                  // Target symbol old index
-    uint32 symi;                                  // Target symbol new index
-    int32 TargetSegment;                          // Target segment/section
-    int32 TargetGroup;                            // Group containing target segment
+    int32_t SegReg, PrefixSeg;                      // Segment register used
+    uint32_t symo;                                  // Target symbol old index
+    uint32_t symi;                                  // Target symbol new index
+    int32_t TargetSegment;                          // Target segment/section
+    int32_t TargetGroup;                            // Group containing target segment
 
     // Find which segment register is used for addressing memory operand
     SegReg = 3;  // DS is default
@@ -3629,12 +3629,12 @@ void CDisassembler::WriteAssume() {
             symi = Symbols.Old2NewIndex(symo);                   // Target symbol new index
             if (symi) {
                 TargetSegment = Symbols[symi].Section;            // Target segment
-                if (TargetSegment < 0 || TargetSegment >= (int32)Sections.GetNumEntries()) {
+                if (TargetSegment < 0 || TargetSegment >= (int32_t)Sections.GetNumEntries()) {
                     TargetSegment = 0;
                 }
                 else {
                     TargetGroup = Sections[TargetSegment].Group;   // Group containing target segment
-                    if (TargetGroup <= ASM_SEGMENT_ERROR || TargetGroup >= (int32)Sections.GetNumEntries()) {
+                    if (TargetGroup <= ASM_SEGMENT_ERROR || TargetGroup >= (int32_t)Sections.GetNumEntries()) {
                         TargetGroup = 0;
                     }
                 }
@@ -3674,8 +3674,8 @@ void CDisassembler::WriteAssume() {
 
 void CDisassembler::WriteInstruction() {
     // Write instruction and operands
-    uint32 NumOperands = 0;                       // Number of operands written
-    uint32 i;                                     // Loop index
+    uint32_t NumOperands = 0;                       // Number of operands written
+    uint32_t i;                                     // Loop index
     const char * OpName;                          // Opcode name
 
     if (s.AddressFieldSize && Syntax == SUBTYPE_MASM) {
@@ -3695,11 +3695,11 @@ void CDisassembler::WriteInstruction() {
         OutFile.Tabulate(AsmTab2);                 // Tabulate
         for (i = IBegin; i < s.OpcodeStart1; i++) {
             if (i > IBegin) OutFile.Put(", ");
-            OutFile.PutHex(Get<uint8>(i), 1);
+            OutFile.PutHex(Get<uint8_t>(i), 1);
         }
         OutFile.Tabulate(AsmTab3);                 // Tabulate
         OutFile.Put(CommentSeparator);
-        if ((s.OpcodeDef->AllowedPrefixes & 8) && Get<uint8>(IBegin) == 0xF2) {
+        if ((s.OpcodeDef->AllowedPrefixes & 8) && Get<uint8_t>(IBegin) == 0xF2) {
             OutFile.Put("BND prefix coded explicitly");    // Comment
         }
         else {
@@ -3859,7 +3859,7 @@ void CDisassembler::WriteInstruction() {
             }
 
             // Write register and memory operands
-            uint32 optype = (s.Operands[i] >> 16) & 0x0F;
+            uint32_t optype = (s.Operands[i] >> 16) & 0x0F;
             switch (optype) {
             case 0:        // Other type of operand
                 WriteOtherOperand(s.Operands[i]);  break;
@@ -3930,9 +3930,9 @@ void CDisassembler::WriteInstruction() {
 
 void CDisassembler::WriteStringInstruction() {
     // Write string instruction or xlat instruction
-    uint32 NumOperands = 0;                       // Number of operands written
-    uint32 i;                                     // Loop index
-    uint32 Segment;                               // Possible segment prefix
+    uint32_t NumOperands = 0;                       // Number of operands written
+    uint32_t i;                                     // Loop index
+    uint32_t Segment;                               // Possible segment prefix
 
     if (!(s.OpcodeDef->AllowedPrefixes & 0x1100)) {
         // Operand size is 8 if operand size prefixes not allowed
@@ -4047,7 +4047,7 @@ void CDisassembler::WriteStringInstruction() {
         if ((s.Operands[1] & 0xCF) != 0xC0) {
 
             // Suffix for operand size
-            uint32 i = s.OperandSize / 8;
+            uint32_t i = s.OperandSize / 8;
             if (i <= 8) {
                 static const char SizeSuffixes[] = " bw d   q"; // Table of suffixes
                 OutFile.Put(SizeSuffixes[i]);
@@ -4059,21 +4059,21 @@ void CDisassembler::WriteStringInstruction() {
 
 void CDisassembler::WriteCodeComment() {
     // Write hex listing of instruction as comment after instruction
-    uint32 i;                                     // Index to current byte
-    uint32 FieldSize;                             // Number of bytes in field
+    uint32_t i;                                     // Index to current byte
+    uint32_t FieldSize;                             // Number of bytes in field
     const char * Spacer;                          // Space between fields
 
     OutFile.Tabulate(AsmTab3);                    // Tabulate to comment field
     OutFile.Put(CommentSeparator);                // Start comment
 
     // Write address
-    if (SectionEnd + SectionAddress + (uint32)ImageBase > 0xFFFF) {
+    if (SectionEnd + SectionAddress + (uint32_t)ImageBase > 0xFFFF) {
         // Write 32 bit address
-        OutFile.PutHex(IBegin + SectionAddress + (uint32)ImageBase);
+        OutFile.PutHex(IBegin + SectionAddress + (uint32_t)ImageBase);
     }
     else {
         // Write 16 bit address
-        OutFile.PutHex((uint16)(IBegin + SectionAddress));
+        OutFile.PutHex((uint16_t)(IBegin + SectionAddress));
     }
 
     // Space after address
@@ -4108,35 +4108,35 @@ void CDisassembler::WriteCodeComment() {
         // Write byte or bytes
         switch (FieldSize) {
         case 1:  // Write single byte
-            OutFile.PutHex(Get<uint8>(i));
+            OutFile.PutHex(Get<uint8_t>(i));
             break;
         case 2:  // Write two bytes
-            OutFile.PutHex(Get<uint16>(i));
+            OutFile.PutHex(Get<uint16_t>(i));
             break;
         case 3:  // Write three bytes (operands for "enter" instruction)
-            OutFile.PutHex(Get<uint16>(i));
+            OutFile.PutHex(Get<uint16_t>(i));
             OutFile.Put(", ");
-            OutFile.PutHex(Get<uint8>(i+2));
+            OutFile.PutHex(Get<uint8_t>(i+2));
             break;
         case 4:  // Write four bytes
             if ((s.Operands[0] & 0xFE) == 0x84) {
                 // Far jump/call address
-                OutFile.PutHex(Get<uint16>(i));
+                OutFile.PutHex(Get<uint16_t>(i));
                 OutFile.Put(" ");
-                OutFile.PutHex(Get<uint16>(i+2));
+                OutFile.PutHex(Get<uint16_t>(i+2));
             }
             else {
                 // Any other 32 bit operand
-                OutFile.PutHex(Get<uint32>(i));
+                OutFile.PutHex(Get<uint32_t>(i));
             }
             break;
         case 6:  // Write six bytes (far jump address)
-            OutFile.PutHex(Get<uint32>(i));
+            OutFile.PutHex(Get<uint32_t>(i));
             OutFile.Put(" ");
-            OutFile.PutHex(Get<uint16>(i+4));
+            OutFile.PutHex(Get<uint16_t>(i+4));
             break;
         case 8:  // Write eight bytes
-            OutFile.PutHex(Get<uint64>(i));
+            OutFile.PutHex(Get<uint64_t>(i));
             break;
         }
         // Search for relocation
@@ -4145,13 +4145,13 @@ void CDisassembler::WriteCodeComment() {
         rel1.Offset  = i;                             // rel1 marks current field in instruction
 
         // Is there a relocation source exactly here?
-        int32 irel = Relocations.Exists(rel1);        // Finds relocation with source = i
+        int32_t irel = Relocations.Exists(rel1);        // Finds relocation with source = i
 
         if (irel > 0) {
             // This field has a relocation. Indicate relocation type
             // 0 = unknown, 1 = direct, 2 = self-relative, 3 = image-relative,
             // 4 = segment relative, 5 = relative to arbitrary ref. point, 8 = segment address/descriptor
-            uint32 RelType = Relocations[irel].Type;
+            uint32_t RelType = Relocations[irel].Type;
             if (RelType) {
                 OutFile.Put(Lookup(RelocationTypeNames, RelType));
             }
@@ -4175,30 +4175,31 @@ void CDisassembler::CountInstructions() {
     // have the same name and differ only in the bits that define register
     // name, operand size, etc.
 
-    uint32 map;                                   // Map number
-    uint32 index;                                 // Index into map
-    uint32 n;                                     // Number of instructions with same code
-    uint32 iset;                                  // Instruction set
-    uint32 instructions = 0;                      // Total number of instructions
-    uint32 mmxinstr = 0;                          // Number of MMX instructions
-    uint32 sseinstr = 0;                          // Number of SSE instructions
-    uint32 sse2instr = 0;                         // Number of SSE2 instructions
-    uint32 sse3instr = 0;                         // Number of SSE3 instructions
-    uint32 ssse3instr = 0;                        // Number of SSSE3 instructions
-    uint32 sse41instr = 0;                        // Number of SSE4.1 instructions
-    uint32 sse42instr = 0;                        // Number of SSE4.2 instructions
-    uint32 AVXinstr  = 0;                         // Number of AVX instructions
-    uint32 FMAinstr  = 0;                         // Number of FMA3 and later instructions
-    uint32 AVX2instr  = 0;                        // Number of AVX2 instructions
-    uint32 BMIinstr  = 0;                         // Number of BMI instructions and other small instruction sets
-    uint32 AVX512instr = 0;                       // Number of AVX-512 instructions
-    uint32 MICinstr = 0;                          // Number of MIC instructions
-    uint32 AMDinstr = 0;                          // Number of AMD instructions
-    uint32 VIAinstr = 0;                          // Number of AMD instructions
-    uint32 privilinstr = 0;                       // Number of privileged instructions
-    uint32 undocinstr = 0;                        // Number of undocumented instructions
-    uint32 droppedinstr = 0;                      // Number of opcodes planned but never implemented
-    uint32 VEXdouble = 0;                         // Number of instructions that have both VEX and non-VEX version
+    uint32_t map;                                   // Map number
+    uint32_t index;                                 // Index into map
+    uint32_t n;                                     // Number of instructions with same code
+    uint32_t iset;                                  // Instruction set
+    uint32_t instructions = 0;                      // Total number of instructions
+    uint32_t mmxinstr = 0;                          // Number of MMX instructions
+    uint32_t sseinstr = 0;                          // Number of SSE instructions
+    uint32_t sse2instr = 0;                         // Number of SSE2 instructions
+    uint32_t sse3instr = 0;                         // Number of SSE3 instructions
+    uint32_t ssse3instr = 0;                        // Number of SSSE3 instructions
+    uint32_t sse41instr = 0;                        // Number of SSE4.1 instructions
+    uint32_t sse42instr = 0;                        // Number of SSE4.2 instructions
+    uint32_t AVXinstr  = 0;                         // Number of AVX instructions
+    uint32_t FMAinstr  = 0;                         // Number of FMA3 and later instructions
+    uint32_t AVX2instr  = 0;                        // Number of AVX2 instructions
+    uint32_t BMIinstr  = 0;                         // Number of BMI instructions and other small instruction sets
+    uint32_t AVX512instr = 0;                       // Number of AVX-512 instructions
+    uint32_t AVX512FP16instr = 0;                   // Number of AVX512-FP16 instructions
+    uint32_t MICinstr = 0;                          // Number of MIC instructions
+    uint32_t AMDinstr = 0;                          // Number of AMD instructions
+    uint32_t VIAinstr = 0;                          // Number of AMD instructions
+    uint32_t privilinstr = 0;                       // Number of privileged instructions
+    uint32_t undocinstr = 0;                        // Number of undocumented instructions
+    uint32_t droppedinstr = 0;                      // Number of opcodes planned but never implemented
+    uint32_t VEXdouble = 0;                         // Number of instructions that have both VEX and non-VEX version
     SOpcodeDef const * opcode;                    // Pointer to map entry
 
     // Loop through all maps
@@ -4266,6 +4267,8 @@ void CDisassembler::CountInstructions() {
                     BMIinstr += n; break;
                 case 0x20:                       // AVX-512 instructions
                     AVX512instr += n; break;
+                case 0x25:                       // AVX512-FP16 instructions
+                    AVX512FP16instr += n; break;
                 case 0x80:                       // MIC instructions
                     MICinstr += n; break;
                 case 0x1001: case 0x1002: case 0x1004: case 0x1005: case 0x1006:  // AMD
@@ -4292,7 +4295,8 @@ void CDisassembler::CountInstructions() {
     printf("\n%5i AVX2   instructions", AVX2instr);
     printf("\n%5i FMA3   instructions", FMAinstr);
     printf("\n%5i BMI/micsellaneous instr.", BMIinstr);
-    printf("\n%5i AVX-512 instructions", AVX512instr);
+    printf("\n%5i AVX512 instructions", AVX512instr);
+    printf("\n%5i AVX512-FP16 instructions", AVX512FP16instr);
     printf("\n%5i MIC/Xeon Phi instructions", MICinstr);
     printf("\n%5i AMD    instructions", AMDinstr);
     printf("\n%5i VIA    instructions", VIAinstr);

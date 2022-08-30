@@ -26,7 +26,7 @@
 
 // Constants for subtypes
 #define SUBTYPE_MASM                 0       // Disassembly MASM/TASM
-#define SUBTYPE_YASM                 1       // Disassembly NASM/YASM
+#define SUBTYPE_NASM                 1       // Disassembly NASM/YASM
 #define SUBTYPE_GASM                 2       // Disassembly GAS(Intel)
 
 // Constants for verbose or silent console output
@@ -136,16 +136,16 @@ public:
    int    SubType;                           // Subtype of output type. Assembly language dialect or library type
    int    MemberType;                        // File type of library members
    int    DesiredWordSize;                   // Desired word size for output file
-   uint32 Verbose;                           // How much diagnostics to print on screen
-   uint32 DumpOptions;                       // Options for dumping file
-   uint32 DebugInfo;                         // Strip or convert debug info
-   uint32 ExeptionInfo;                      // Strip or preserve exception handler info and other incompatible info
-   uint32 Underscore;                        // Add/remove underscores in symbol names
-   uint32 SegmentDot;                        // Change underscore/dot in beginning of segment names
-   uint32 LibraryOptions;                    // Options for manipulating library
-   uint32 LibrarySubtype;                    // Options for manipulating library
-   uint32 FileOptions;                       // Options for input and output files
-   uint32 ImageBase;                         // Specified image base
+   uint32_t Verbose;                           // How much diagnostics to print on screen
+   uint32_t DumpOptions;                       // Options for dumping file
+   uint32_t DebugInfo;                         // Strip or convert debug info
+   uint32_t ExeptionInfo;                      // Strip or preserve exception handler info and other incompatible info
+   uint32_t Underscore;                        // Add/remove underscores in symbol names
+   uint32_t SegmentDot;                        // Change underscore/dot in beginning of segment names
+   uint32_t LibraryOptions;                    // Options for manipulating library
+   uint32_t LibrarySubtype;                    // Options for manipulating library
+   uint32_t FileOptions;                       // Options for input and output files
+   uint32_t ImageBase;                         // Specified image base
    int    ShowHelp;                          // Help screen printed
 protected:
    int  libmode;                             // -lib option has been encountered
@@ -169,8 +169,8 @@ protected:
    int SymbolChangeEntries;                  // Number of entries in SymbolList, except library entries
    CMemoryBuffer SymbolList;                 // List of symbol names to change. Contains entries of type SSymbolChange
    CMemoryBuffer MemberNames;                // Buffer containing truncated member names
-   uint32 MemberNamesAllocated;              // Size of buffer in MemberNames
-   uint32 CurrentSymbol;                     // Pointer into SymbolList
+   uint32_t MemberNamesAllocated;              // Size of buffer in MemberNames
+   uint32_t CurrentSymbol;                     // Pointer into SymbolList
    // Statistics counters
    int CountUnderscoreConversions;           // Count number of times symbol leading underscores are changed
    int CountSectionDotConversions;           // Count number of times leading character is changed on section names

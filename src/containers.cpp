@@ -49,7 +49,7 @@ CMemoryBuffer::~CMemoryBuffer() {
     SetSize(0);                         // De-allocate buffer
 }
 
-void CMemoryBuffer::SetSize(uint32 size) {
+void CMemoryBuffer::SetSize(uint32_t size) {
     // Allocate, reallocate or deallocate buffer of specified size.
     // DataSize is initially zero. It is increased by Push or PushString.
     // Setting size > DataSize will allocate more buffer and fill it with zeroes but not increase DataSize.
@@ -71,10 +71,10 @@ void CMemoryBuffer::SetSize(uint32 size) {
         // Request to reduce size but not delete it
         return;                          // Ignore
     }
-//  size = (size + 15) & uint32(-16);   // Round up size to value divisible by 16
-    size = (size + BufferSize + 15) & uint32(-16);   // Double size and round up to value divisible by 16
-    int8 * buffer2 = 0;                 // New buffer
-    buffer2 = new int8[size];           // Allocate new buffer
+//  size = (size + 15) & uint32_t(-16);   // Round up size to value divisible by 16
+    size = (size + BufferSize + 15) & uint32_t(-16);   // Double size and round up to value divisible by 16
+    int8_t * buffer2 = 0;                 // New buffer
+    buffer2 = new int8_t[size];           // Allocate new buffer
     if (buffer2 == 0) {err.submit(9006); return;} // Error can't allocate
     memset (buffer2, 0, size);          // Initialize to all zeroes
     if (buffer) {
@@ -86,17 +86,17 @@ void CMemoryBuffer::SetSize(uint32 size) {
     BufferSize = size;                  // Save size
 }
 
-uint32 CMemoryBuffer::Push(void const * obj, uint32 size) {
+uint32_t CMemoryBuffer::Push(void const * obj, uint32_t size) {
     // Add object to buffer, return offset
     // Parameters:
     // obj = pointer to object, 0 if fill with zeroes
     // size = size of object to push
 
     // Old offset will be offset to new object
-    uint32 OldOffset = DataSize;
+    uint32_t OldOffset = DataSize;
 
     // New data size will be old data size plus size of new object
-    uint32 NewOffset = DataSize + size;
+    uint32_t NewOffset = DataSize + size;
 
     if (NewOffset > BufferSize) {
         // Buffer too small, allocate more space.
@@ -107,10 +107,10 @@ uint32 CMemoryBuffer::Push(void const * obj, uint32 size) {
 
         // Allocate more space without using SetSize:
         // Double the size + 1 kB, and round up size to value divisible by 16
-        uint32 NewSize = (NewOffset * 2 + 1024 + 15) & uint32(-16);
-        int8 * buffer2 = 0;                        // New buffer
+        uint32_t NewSize = (NewOffset * 2 + 1024 + 15) & uint32_t(-16);
+        int8_t * buffer2 = 0;                        // New buffer
         // Allocate new buffer
-        buffer2 = new int8[NewSize];
+        buffer2 = new int8_t[NewSize];
         if (buffer2 == 0) {
             // Error can't allocate
             err.submit(9006);  return 0;
@@ -147,19 +147,19 @@ uint32 CMemoryBuffer::Push(void const * obj, uint32 size) {
     return OldOffset;
 }
 
-uint32 CMemoryBuffer::PushString(char const * s) {
+uint32_t CMemoryBuffer::PushString(char const * s) {
     // Add ASCIIZ string to buffer, return offset
-    return Push (s, uint32(strlen(s))+1);
+    return Push (s, uint32_t(strlen(s))+1);
 }
 
-uint32 CMemoryBuffer::GetLastIndex() {
+uint32_t CMemoryBuffer::GetLastIndex() {
     // Index of last object pushed (zero-based)
     return NumEntries - 1;
 }
 
-void CMemoryBuffer::Align(uint32 a) {
+void CMemoryBuffer::Align(uint32_t a) {
     // Align next entry to address divisible by a
-    uint32 NewOffset = (DataSize + a - 1) / a * a;
+    uint32_t NewOffset = (DataSize + a - 1) / a * a;
     if (NewOffset > BufferSize) {
         // Allocate more space
         SetSize (NewOffset + 2048);
@@ -184,7 +184,7 @@ CFileBuffer::CFileBuffer(char const * filename) : CMemoryBuffer() {
 
 void CFileBuffer::Read(int IgnoreError) {
     // Read file into buffer
-    uint32 status;                             // Error status
+    uint32_t status;                             // Error status
 
 #ifdef _MSC_VER  // Microsoft compiler prefers this:
 
@@ -220,12 +220,12 @@ void CFileBuffer::Read(int IgnoreError) {
         // File too big or zero size
         err.submit(2105, FileName); fclose(fh); return;
     }
-    DataSize = (uint32)fsize;
+    DataSize = (uint32_t)fsize;
     rewind(fh);
     // Allocate buffer
     SetSize(DataSize + 2048);                 // Allocate buffer, 2k extra
     // Read entire file
-    status = (uint32)fread(Buf(), 1, DataSize, fh);
+    status = (uint32_t)fread(Buf(), 1, DataSize, fh);
     if (status != DataSize) err.submit(2103, FileName);
     status = fclose(fh);
     if (status != 0) err.submit(2103, FileName);
@@ -241,7 +241,7 @@ void CFileBuffer::Write() {
 #ifdef _MSC_VER       // Microsoft compiler prefers this:
 
     int fh;                                       // File handle
-    uint32 status;                                // Error status
+    uint32_t status;                                // Error status
     // Open file in binary mode
     fh = _open(FileName, O_RDWR | O_BINARY | O_CREAT | O_TRUNC, _S_IREAD | _S_IWRITE);
     // Check if error
@@ -262,7 +262,7 @@ void CFileBuffer::Write() {
     // Check if error
     if (!ff) {err.submit(2104, FileName);  return;}
     // Write file
-    uint32 n = (uint32)fwrite(Buf(), 1, DataSize, ff);
+    uint32_t n = (uint32_t)fwrite(Buf(), 1, DataSize, ff);
     // Check if error
     if (n != DataSize) err.submit(2104, FileName);
     // Close file
@@ -279,13 +279,13 @@ int CFileBuffer::GetFileType() {
     if (!DataSize) return 0;                  // No file
     if (!Buf()) return 0;                     // No contents
 
-    uint32 namelen = FileName ? (uint32)strlen(FileName) : 0;
+    uint32_t namelen = FileName ? (uint32_t)strlen(FileName) : 0;
 
-    if (strncmp(Buf(),"!<arch>",7) == 0) {
+    if (strncmp((char*)Buf(),"!<arch>",7) == 0) {
         // UNIX style library. Contains members of file type COFF, ELF or MACHO
         FileType = FILETYPE_LIBRARY;
     }
-    else if (strncmp(Buf(),ELFMAG,4) == 0) {
+    else if (strncmp((char*)Buf(),ELFMAG,4) == 0) {
         // ELF file
         FileType = FILETYPE_ELF;
         Executable = Get<Elf32_Ehdr>(0).e_type != ET_REL;
@@ -296,40 +296,40 @@ int CFileBuffer::GetFileType() {
             WordSize = 64; break;
         }
     }
-    else if (Get<uint32>(0) == MAC_MAGIC_32) {
+    else if (Get<uint32_t>(0) == MAC_MAGIC_32) {
         // Mach-O 32 little endian
         FileType = FILETYPE_MACHO_LE;
         WordSize = 32;
         Executable = Get<MAC_header_32>(0).filetype != MAC_OBJECT;
     }
-    else if (Get<uint32>(0) == MAC_MAGIC_64) {
+    else if (Get<uint32_t>(0) == MAC_MAGIC_64) {
         // Mach-O 64 little endian
         FileType = FILETYPE_MACHO_LE;
         WordSize = 64;
         Executable = Get<MAC_header_64>(0).filetype != MAC_OBJECT;
     }
-    else if (Get<uint32>(0) == MAC_CIGAM_32) {
+    else if (Get<uint32_t>(0) == MAC_CIGAM_32) {
         // Mach-O 32 big endian
         FileType = FILETYPE_MACHO_BE;
         WordSize = 32;
     }
-    else if (Get<uint32>(0) == MAC_CIGAM_64) {
+    else if (Get<uint32_t>(0) == MAC_CIGAM_64) {
         // Mach-O 64 big endian
         FileType = FILETYPE_MACHO_BE;
         WordSize = 64;
     }
-    else if (Get<uint32>(0) == MAC_CIGAM_UNIV) {
+    else if (Get<uint32_t>(0) == MAC_CIGAM_UNIV) {
         // MacIntosh universal binary
         FileType = FILETYPE_MAC_UNIVBIN;
         WordSize = 0;
     }
-    else if (Get<uint32>(0) == 0xFFFF0000 || Get<uint32>(0) == 0x10000) {
+    else if (Get<uint32_t>(0) == 0xFFFF0000 || Get<uint32_t>(0) == 0x10000) {
         // Windows subtypes:
-        if (Get<uint16>(4) == 0) {
+        if (Get<uint16_t>(4) == 0) {
             // This type only occurs when attempting to extract a member from an import library
             FileType = IMPORT_LIBRARY_MEMBER;
         }
-        else if (Get<uint16>(4) == 1) {
+        else if (Get<uint16_t>(4) == 1) {
             // Whole program optimization intermediate file for MS compiler. Undocumented
             FileType = FILETYPE_MS_WPO;
         }
@@ -338,52 +338,52 @@ int CFileBuffer::GetFileType() {
             FileType = FILETYPE_WIN_UNKNOWN;
         }
         // Get word size
-        if (Get<uint16>(6) == PE_MACHINE_I386) {
+        if (Get<uint16_t>(6) == PE_MACHINE_I386) {
             WordSize = 32;
         }
-        else if (Get<uint16>(6) == PE_MACHINE_X8664) {
+        else if (Get<uint16_t>(6) == PE_MACHINE_X8664) {
             WordSize = 64;
         }
         else {
             WordSize = 0;
         }
     }
-    else if (Get<uint16>(0) == PE_MACHINE_I386) {
+    else if (Get<uint16_t>(0) == PE_MACHINE_I386) {
         // COFF/PE 32
         FileType = FILETYPE_COFF;
         WordSize = 32;
         Executable = (Get<SCOFF_FileHeader>(0).Flags & PE_F_EXEC) != 0;
     }
-    else if (Get<uint16>(0) == PE_MACHINE_X8664) {
+    else if (Get<uint16_t>(0) == PE_MACHINE_X8664) {
         // COFF64/PE32+
         FileType = FILETYPE_COFF;
         WordSize = 64;
         Executable = (Get<SCOFF_FileHeader>(0).Flags & PE_F_EXEC) != 0;
     }
-    else if (Get<uint8>(0) == OMF_THEADR) {
+    else if (Get<uint8_t>(0) == OMF_THEADR) {
         // OMF 16 or 32
         FileType = FILETYPE_OMF;
         // Word size can only be determined by searching through records in file:
         GetOMFWordSize(); // Determine word size
     }
-    else if (Get<uint8>(0) == OMF_LIBHEAD) {
+    else if (Get<uint8_t>(0) == OMF_LIBHEAD) {
         // OMF Library 16 or 32
         FileType = FILETYPE_OMFLIBRARY;
     }
-    else if ((Get<uint16>(0) & 0xFFF9) == 0x5A49) {
+    else if ((Get<uint16_t>(0) & 0xFFF9) == 0x5A49) {
         // DOS file or file with DOS stub
         FileType = FILETYPE_DOS;
         WordSize = 16;
         Executable = 1;
-        uint32 Signature = Get<uint32>(0x3C);
+        uint32_t Signature = Get<uint32_t>(0x3C);
         if (Signature + 8 < DataSize) {
-            if (Get<uint16>(Signature) == 0x454E) {
+            if (Get<uint16_t>(Signature) == 0x454E) {
                 // Windows 3.x file
                 FileType = FILETYPE_WIN3X;
             }
-            else if (Get<uint16>(Signature) == 0x4550) {
+            else if (Get<uint16_t>(Signature) == 0x4550) {
                 // COFF file
-                uint16 MachineType = Get<uint16>(Signature + 4);
+                uint16_t MachineType = Get<uint16_t>(Signature + 4);
                 if (MachineType == PE_MACHINE_I386) {
                     FileType = FILETYPE_COFF;
                     WordSize = 32;
@@ -400,7 +400,7 @@ int CFileBuffer::GetFileType() {
         FileType = FILETYPE_DOS;
         WordSize = 16;  Executable = 1;
     }
-    else if (Get<uint16>(0) == 0 && namelen > 4 && stricmp(FileName + namelen - 4, ".obj") == 0) {
+    else if (Get<uint16_t>(0) == 0 && namelen > 4 && stricmp(FileName + namelen - 4, ".obj") == 0) {
         // Possibly alias record in COFF library
         FileType = FILETYPE_COFF;
         WordSize = 0;
@@ -408,7 +408,7 @@ int CFileBuffer::GetFileType() {
     }
     else {
         // Unknown file type
-        int utype = Get<uint32>(0);
+        int utype = Get<uint32_t>(0);
         err.submit(2018, utype, FileName);
         FileType = 0;
     }
@@ -514,20 +514,20 @@ void CFileBuffer::GetOMFWordSize() {
     // method is absolutely safe.
 
     // We have to parse through all records in file buffer
-    uint8  RecordType;                            // Type of current record
-    uint32 RecordStart;                           // Index to start of current record
-    uint32 RecordEnd;                             // Index to end of current record
-    uint32 RecordLength;                          // Length of current record
-    uint32 Index = 0;                             // Current offset from buffer while reading
+    uint8_t  RecordType;                            // Type of current record
+    uint32_t RecordStart;                           // Index to start of current record
+    uint32_t RecordEnd;                             // Index to end of current record
+    uint32_t RecordLength;                          // Length of current record
+    uint32_t Index = 0;                             // Current offset from buffer while reading
     OMF_SAttrib SegAttr;                          // Segment attributed
-    uint32 SegLength;                             // Segment length
+    uint32_t SegLength;                             // Segment length
 
     WordSize = 16;                                // WordSize = 16 if no 32 bit records found
 
     while (Index < GetDataSize()) {
         RecordStart = Index;                       // Record starts here
-        RecordType = Get<uint8>(Index++);          // Get first byte of record = type
-        RecordLength = Get<uint16>(Index);         // Next two bytes = length
+        RecordType = Get<uint8_t>(Index++);          // Get first byte of record = type
+        RecordLength = Get<uint16_t>(Index);         // Next two bytes = length
         Index += 2;
         RecordEnd = RecordStart + RecordLength + 3;// End of record
         if (RecordEnd > GetDataSize()) {
@@ -538,12 +538,12 @@ void CFileBuffer::GetOMFWordSize() {
             WordSize = 32;                                   // ..but this method is not safe
         }
         if ((RecordType & 0xFE) == OMF_SEGDEF) {   // Segment definition record
-            SegAttr.b = Get<uint8>(Index++);        // Get segment attributes
+            SegAttr.b = Get<uint8_t>(Index++);        // Get segment attributes
             if (SegAttr.u.A == 0) {
                 // Frame and Offset only included if A = 0
                 Index += 2+1;
             }
-            SegLength = (RecordType & 1) ? Get<uint32>(Index) : Get<uint16>(Index); // Segment length
+            SegLength = (RecordType & 1) ? Get<uint32_t>(Index) : Get<uint16_t>(Index); // Segment length
 
             if (SegAttr.u.P && SegLength) {         // if segment has P attribute and nonzero length
                 WordSize = 32;                       // .. then it is a 32-bit segment
@@ -564,7 +564,7 @@ CTextFileBuffer::CTextFileBuffer() {
 
 void CTextFileBuffer::Put(const char * text) {
     // Write text string to buffer
-    uint32 len = (uint32)strlen(text);            // Length of text
+    uint32_t len = (uint32_t)strlen(text);            // Length of text
     Push(text, len);                              // Add to buffer without terminating zero
     column += len;                                // Update column
 }
@@ -586,23 +586,23 @@ void CTextFileBuffer::NewLine() {
     column = 0;                                   // Reset column
 }
 
-void CTextFileBuffer::Tabulate(uint32 i) {
+void CTextFileBuffer::Tabulate(uint32_t i) {
     // Insert spaces until column i
-    uint32 j;
+    uint32_t j;
     if (i > column) {                             // Only insert spaces if we are not already past i
         for (j = column; j < i; j++) Push(" ", 1); // Insert i - column spaces
         column = i;                                // Update column
     }
 }
 
-void CTextFileBuffer::PutDecimal(int32 x, int IsSigned) {
+void CTextFileBuffer::PutDecimal(int32_t x, int IsSigned) {
     // Write decimal number to buffer, unsigned or signed
     char text[16];
     sprintf(text, IsSigned ? "%i" : "%u", x);
     Put(text);
 }
 
-void CTextFileBuffer::PutHex(uint8 x, int MasmForm) {
+void CTextFileBuffer::PutHex(uint8_t x, int MasmForm) {
     // Write hexadecimal 8 bit number to buffer
     // If MasmForm >= 1 then the function will write the number in a
     // way that can be read by the assembler, e.g. 0FFH or 0xFF
@@ -621,7 +621,7 @@ void CTextFileBuffer::PutHex(uint8 x, int MasmForm) {
     if (MasmForm) Put("H");
 }
 
-void CTextFileBuffer::PutHex(uint16 x, int MasmForm) {
+void CTextFileBuffer::PutHex(uint16_t x, int MasmForm) {
     // Write hexadecimal 16 bit number to buffer
     // If MasmForm >= 1 then the function will write the number in a
     // way that can be read by the assembler, e.g. 0FFH or 0xFF
@@ -642,7 +642,7 @@ void CTextFileBuffer::PutHex(uint16 x, int MasmForm) {
     if (MasmForm) Put("H");
 }
 
-void CTextFileBuffer::PutHex(uint32 x, int MasmForm) {
+void CTextFileBuffer::PutHex(uint32_t x, int MasmForm) {
     // Write hexadecimal 32 bit number to buffer
     // If MasmForm >= 1 then the function will write the number in a
     // way that can be read by the assembler, e.g. 0FFH or 0xFF
@@ -664,21 +664,21 @@ void CTextFileBuffer::PutHex(uint32 x, int MasmForm) {
     if (MasmForm) Put("H");
 }
 
-void CTextFileBuffer::PutHex(uint64 x, int MasmForm) {
+void CTextFileBuffer::PutHex(uint64_t x, int MasmForm) {
     // Write unsigned hexadecimal 64 bit number to buffer
     // If MasmForm >= 1 then the function will write the number in a
     // way that can be read by the assembler, e.g. 0FFH or 0xFF
     // If MasmForm == 2 then leading zeroes are stripped
     char text[32];
     if (MasmForm < 2) {  // Print all digits
-        sprintf(text, "%08X%08X", HighDWord(x), uint32(x));
+        sprintf(text, "%08X%08X", HighDWord(x), uint32_t(x));
     }
     else { // Skip leading zeroes
         if (HighDWord(x)) {
-            sprintf(text, "%X%08X", HighDWord(x), uint32(x));
+            sprintf(text, "%X%08X", HighDWord(x), uint32_t(x));
         }
         else {
-            sprintf(text, "%X", uint32(x));
+            sprintf(text, "%X", uint32_t(x));
         }
     }
     if (MasmForm) {

@@ -40,7 +40,7 @@ void CELF2ASM<ELFSTRUCTURES>::FindImageBase() {
    }
 
    // Loop through sections to find the first allocated section
-   for (uint32 sc = 0; sc < this->NSections; sc++) {
+   for (uint32_t sc = 0; sc < this->NSections; sc++) {
       if (this->SectionHeaders[sc].sh_type == SHT_PROGBITS    // Must be code or data section
       && (this->SectionHeaders[sc].sh_flags & SHF_ALLOC)      // Must be allocated
       && this->SectionHeaders[sc].sh_offset <= this->SectionHeaders[sc].sh_addr) { // Avoid negative
@@ -95,13 +95,13 @@ void CELF2ASM<ELFSTRUCTURES>::MakeSectionList() {
 
    // Allocate array for translating oroginal section numbers to new index
    SectionNumberTranslate.SetNum(this->NSections + 1);
-   uint32 NewSectionIndex = 0;
+   uint32_t NewSectionIndex = 0;
 
-   for (uint32 sc = 0; sc < this->NSections; sc++) {
+   for (uint32_t sc = 0; sc < this->NSections; sc++) {
       // Get copy of 32-bit header or converted 64-bit header
       TELF_SectionHeader sheader = this->SectionHeaders[sc];
-      //int entrysize = (uint32)(sheader.sh_entsize);
-      uint32 namei = sheader.sh_name;
+      //int entrysize = (uint32_t)(sheader.sh_entsize);
+      uint32_t namei = sheader.sh_name;
       if (namei >= this->SecStringTableLen) {err.submit(2112); break;}
 
 //      if (sheader.sh_type == SHT_PROGBITS || sheader.sh_type == SHT_NOBITS) {
@@ -114,15 +114,15 @@ void CELF2ASM<ELFSTRUCTURES>::MakeSectionList() {
          SectionNumberTranslate[sc] = ++NewSectionIndex;
 
          // Get section parameters
-         uint8 * Buffer = (uint8*)(this->Buf()) + (uint32)sheader.sh_offset;
-         uint32  InitSize = (sheader.sh_type == SHT_NOBITS) ? 0 : (uint32)sheader.sh_size;
-         uint32  TotalSize = (uint32)sheader.sh_size;
-         uint32  SectionAddress = (uint32)sheader.sh_addr - (uint32)ImageBase;
-         uint32  Align = FloorLog2((uint32)sheader.sh_addralign);
+         uint8_t * Buffer = (uint8_t*)(this->Buf()) + (uint32_t)sheader.sh_offset;
+         uint32_t  InitSize = (sheader.sh_type == SHT_NOBITS) ? 0 : (uint32_t)sheader.sh_size;
+         uint32_t  TotalSize = (uint32_t)sheader.sh_size;
+         uint32_t  SectionAddress = (uint32_t)sheader.sh_addr - (uint32_t)ImageBase;
+         uint32_t  Align = FloorLog2((uint32_t)sheader.sh_addralign);
          const char * Name = this->SecStringTableLen ? this->SecStringTable + namei : "???";
 
          // Detect segment type
-         uint32  Type = 0;
+         uint32_t  Type = 0;
          if (sheader.sh_flags & SHF_ALLOC) {
             // Allocate
             if (sheader.sh_type == SHT_NOBITS) {
@@ -159,10 +159,10 @@ void CELF2ASM<ELFSTRUCTURES>::MakeSymbolList() {
    SymbolTableOffset.SetNum(this->NSections + 1);
    NumSymbols = 0;
 
-   for (uint32 sc = 0; sc < this->NSections; sc++) {
+   for (uint32_t sc = 0; sc < this->NSections; sc++) {
       // Get copy of 32-bit header or converted 64-bit header
       TELF_SectionHeader sheader = this->SectionHeaders[sc];
-      int entrysize = (uint32)(sheader.sh_entsize);
+      int entrysize = (uint32_t)(sheader.sh_entsize);
 
       if (sheader.sh_type==SHT_SYMTAB || sheader.sh_type==SHT_DYNSYM) {
          // This is a symbol table
@@ -172,17 +172,17 @@ void CELF2ASM<ELFSTRUCTURES>::MakeSymbolList() {
 
          // Find associated string table
          if (sheader.sh_link >= this->NSections) {err.submit(2035); sheader.sh_link = 0;}
-         int8 * strtab = this->Buf() + uint32(this->SectionHeaders[sheader.sh_link].sh_offset);
+         char * strtab = (char*)(this->Buf()) + uint32_t(this->SectionHeaders[sheader.sh_link].sh_offset);
 
          // Find symbol table
-         uint32 symtabsize = (uint32)(sheader.sh_size);
-         int8 * symtab = this->Buf() + uint32(sheader.sh_offset);
-         int8 * symtabend = symtab + symtabsize;
+         uint32_t symtabsize = (uint32_t)(sheader.sh_size);
+         int8_t * symtab = this->Buf() + uint32_t(sheader.sh_offset);
+         int8_t * symtabend = symtab + symtabsize;
          if (entrysize < (int)sizeof(TELF_Symbol)) {err.submit(2033); entrysize = (int)sizeof(TELF_Symbol);}
 
          // Loop through symbol table
-         uint32 symi1;                           // Symbol number in this table
-         uint32 symi2;                           // Symbol number in joined table
+         uint32_t symi1;                           // Symbol number in this table
+         uint32_t symi2;                           // Symbol number in joined table
          symtab += entrysize;                    // Skip symbol number 0
          for (symi1 = 1; symtab < symtabend; symtab += entrysize, symi1++) {
 
@@ -193,12 +193,12 @@ void CELF2ASM<ELFSTRUCTURES>::MakeSymbolList() {
             TELF_Symbol sym = *(TELF_Symbol*)symtab;
 
             // Parameters
-            uint32 Offset = uint32(sym.st_value);
-            uint32 Size = (uint32)sym.st_size;
+            uint32_t Offset = uint32_t(sym.st_value);
+            uint32_t Size = (uint32_t)sym.st_size;
 
             // Get section
-            int32 Section = int16(sym.st_shndx);
-            if (Section >= (int32)(this->NSections)) {
+            int32_t Section = int16_t(sym.st_shndx);
+            if (Section >= (int32_t)(this->NSections)) {
                // Error. wrong section
                Section = 0;
             }
@@ -206,9 +206,9 @@ void CELF2ASM<ELFSTRUCTURES>::MakeSymbolList() {
                // Translate to new section index
                Section = SectionNumberTranslate[Section];
             }
-            else if ((int16)Section < 0) {
+            else if ((int16_t)Section < 0) {
                // Special section values
-               if ((int16)Section == SHN_ABS) {
+               if ((int16_t)Section == SHN_ABS) {
                   // Absolute symbol
                   Section = ASM_SEGMENT_ABSOLUTE;
                }
@@ -234,7 +234,7 @@ void CELF2ASM<ELFSTRUCTURES>::MakeSymbolList() {
             }
 
             // Get scope
-            uint32 Scope = 0;
+            uint32_t Scope = 0;
             switch (sym.st_bind) {
             case STB_LOCAL:
                Scope = 2;
@@ -249,7 +249,7 @@ void CELF2ASM<ELFSTRUCTURES>::MakeSymbolList() {
                break;
             }
             // Get type
-            uint32 Type = 0;
+            uint32_t Type = 0;
 
             if (sym.st_type == STT_FUNC) {
                // Function
@@ -306,20 +306,20 @@ void CELF2ASM<ELFSTRUCTURES>::MakeSymbolList() {
             if (Scope != 0x20) {
                // Not external
                // Check if offset is absolute or section relative
-               if (ExeType && Offset >= (uint32)ImageBase) {
+               if (ExeType && Offset >= (uint32_t)ImageBase) {
                   // Offset is absolute address
                   if (Section >= 0
-                     && (uint32)Section < this->NSections
-                     && Offset >= (uint32)this->SectionHeaders[Section].sh_addr
-                     && Offset - (uint32)this->SectionHeaders[Section].sh_addr < (uint32)(this->SectionHeaders[Section].sh_size)) {
+                     && (uint32_t)Section < this->NSections
+                     && Offset >= (uint32_t)this->SectionHeaders[Section].sh_addr
+                     && Offset - (uint32_t)this->SectionHeaders[Section].sh_addr < (uint32_t)(this->SectionHeaders[Section].sh_size)) {
                         // Change to section relative offset
-                        Offset -= (uint32)(this->SectionHeaders[Section].sh_addr);
+                        Offset -= (uint32_t)(this->SectionHeaders[Section].sh_addr);
                      }
                   else {
                      // Address is outside specified section or otherwise inconsistent.
                      // Let Disasm try to find the address
                      Section = ASM_SEGMENT_IMGREL;
-                     Offset -= (uint32)ImageBase;
+                     Offset -= (uint32_t)ImageBase;
                   }
                }
             }
@@ -339,18 +339,18 @@ template <class TELF_Header, class TELF_SectionHeader, class TELF_Symbol, class 
 void CELF2ASM<ELFSTRUCTURES>::MakeRelocations() {
    // Make relocations for object and executable files
 
-   int32 Section;                                // Source section new index
+   int32_t Section;                                // Source section new index
 
    // Loop through sections
-   for (uint32 sc = 0; sc < this->NSections; sc++) {
+   for (uint32_t sc = 0; sc < this->NSections; sc++) {
       // Get copy of 32-bit header or converted 64-bit header
       TELF_SectionHeader sheader = this->SectionHeaders[sc];
-      int entrysize = (uint32)(sheader.sh_entsize);
+      int entrysize = (uint32_t)(sheader.sh_entsize);
 
       if (sheader.sh_type == SHT_REL || sheader.sh_type == SHT_RELA) {
          // Relocations section
-         int8 * reltab = this->Buf() + uint32(sheader.sh_offset);
-         int8 * reltabend = reltab + uint32(sheader.sh_size);
+         int8_t * reltab = this->Buf() + uint32_t(sheader.sh_offset);
+         int8_t * reltabend = reltab + uint32_t(sheader.sh_size);
          int expectedentrysize = sheader.sh_type == SHT_RELA ?
             sizeof(TELF_Relocation) :              // Elf32_Rela, Elf64_Rela
             sizeof(TELF_Relocation) - this->WordSize/8;  // Elf32_Rel,  Elf64_Rel
@@ -363,13 +363,13 @@ void CELF2ASM<ELFSTRUCTURES>::MakeRelocations() {
             memcpy(&rel, reltab, entrysize);
 
             // Get section-relative or absolute address
-            uint32  Offset = (uint32)rel.r_offset;
+            uint32_t  Offset = (uint32_t)rel.r_offset;
 
             // Get addend, if any
-            int32   Addend = (uint32)rel.r_addend;
+            int32_t   Addend = (uint32_t)rel.r_addend;
 
             // Find target symbol
-            uint32  TargetIndex = rel.r_sym;
+            uint32_t  TargetIndex = rel.r_sym;
             if (sheader.sh_link < this->NSections) {
                // sh_link indicates which symbol table r_sym refers to
                TargetIndex += SymbolTableOffset[sheader.sh_link];
@@ -382,12 +382,12 @@ void CELF2ASM<ELFSTRUCTURES>::MakeRelocations() {
             else {
                // Not found. Try to let disasm find by absolute address
                Section = ASM_SEGMENT_IMGREL;
-               if (Offset < (uint32)ImageBase) Offset += (uint32)ImageBase;
+               if (Offset < (uint32_t)ImageBase) Offset += (uint32_t)ImageBase;
             }
 
             // Get relocation type and size
-            uint32  Type = 0;
-            uint32  Size = 0;
+            uint32_t  Type = 0;
+            uint32_t  Size = 0;
             if (this->WordSize == 32) {
                switch (rel.r_type) {
                case R_386_RELATIVE: // Adjust by program base
@@ -479,18 +479,18 @@ void CELF2ASM<ELFSTRUCTURES>::MakeRelocations() {
             }
 
             // Check if offset is absolute or section relative
-            if (ImageBase && Offset > (uint32)ImageBase) {
+            if (ImageBase && Offset > (uint32_t)ImageBase) {
                // Offset is absolute address
-               if (Section > 0 && (uint32)Section < this->NSections
-               && Offset >= (uint32)(this->SectionHeaders[Section].sh_addr)
-               && Offset - (uint32)(this->SectionHeaders[Section].sh_addr) < (uint32)(this->SectionHeaders[Section].sh_size)) {
+               if (Section > 0 && (uint32_t)Section < this->NSections
+               && Offset >= (uint32_t)(this->SectionHeaders[Section].sh_addr)
+               && Offset - (uint32_t)(this->SectionHeaders[Section].sh_addr) < (uint32_t)(this->SectionHeaders[Section].sh_size)) {
                   // Change to section relative offset
-                  Offset -= (uint32)(this->SectionHeaders[Section].sh_addr);
+                  Offset -= (uint32_t)(this->SectionHeaders[Section].sh_addr);
                }
                else {
                   // Inconsistent. Let Disasm try to find the address
                   Section = ASM_SEGMENT_IMGREL;
-                  Offset -= (uint32)ImageBase;
+                  Offset -= (uint32_t)ImageBase;
                }
             }
 

@@ -41,7 +41,7 @@ void CCOF2COF::MakeSymbolTable() {
    // Pointer to old symbol table
    union {
       SCOFF_SymTableEntry * p; // Symtab entry pointer
-      int8 * b;                // Used for increment
+      int8_t * b;                // Used for increment
    } OldSymtab;
 
    // Initialize new string table. Make space for size
@@ -123,7 +123,7 @@ void CCOF2COF::MakeSymbolTable() {
          // Change name of symbol
          if (OldSymtab.p->s.StorageClass == COFF_CLASS_FILE) {
             // File name is stored in aux records, not in symbol table
-            if ((uint32)strlen(name2) > (uint32)numaux * SIZE_SCOFF_SymTableEntry) {
+            if ((uint32_t)strlen(name2) > (uint32_t)numaux * SIZE_SCOFF_SymTableEntry) {
                // Name too long. I don't want to add more aux records
                err.submit(2201, name2);
             }
@@ -149,7 +149,7 @@ void CCOF2COF::MakeSymbolTable() {
          if (strlen(name2) > 8) {
             // Long name. use string table
             // Store string table offset
-            ((uint32 *)(AliasEntry.s.Name))[1] = NewStringTable.GetDataSize();
+            ((uint32_t *)(AliasEntry.s.Name))[1] = NewStringTable.GetDataSize();
             // Put name into new string table
             NewStringTable.PushString(name2);
          }
@@ -170,7 +170,7 @@ void CCOF2COF::MakeSymbolTable() {
          if (strlen(name3) > 8) {
             // Name is long. use string table
             // Type-case Name field to string table entry
-            uint32 * LongNameStorage = (uint32 *)(OldSymtab.p->s.Name);
+            uint32_t * LongNameStorage = (uint32_t *)(OldSymtab.p->s.Name);
             // Start with 0 to indicate long name
             LongNameStorage[0] = 0;
             // Index into new string table
@@ -189,7 +189,7 @@ void CCOF2COF::MakeSymbolTable() {
    }  // End symbol table loop
 
    // Loop through section headers to search for section names
-   uint32 SectionOffset = sizeof(SCOFF_FileHeader) + FileHeader->SizeOfOptionalHeader;
+   uint32_t SectionOffset = sizeof(SCOFF_FileHeader) + FileHeader->SizeOfOptionalHeader;
    for (isec = 0; isec < NSections; isec++) {
       SCOFF_SectionHeader * pSectHeader;
       pSectHeader = &Get<SCOFF_SectionHeader>(SectionOffset);
@@ -246,18 +246,18 @@ void CCOF2COF::MakeBinaryFile() {
    }
 
    // Insert new string table
-   uint32 NewStringTableSize = NewStringTable.GetDataSize();
+   uint32_t NewStringTableSize = NewStringTable.GetDataSize();
    // First 4 bytes = size
-   ToFile.Push(&NewStringTableSize, sizeof(uint32));
+   ToFile.Push(&NewStringTableSize, sizeof(uint32_t));
    // Then the string table itself, except the first 4 bytes
    if (NewStringTableSize > 4)
       ToFile.Push(NewStringTable.Buf() + 4, NewStringTableSize - 4);
 
    // Find end of old and new string tables
-   uint32 EndOfOldStringTable = FileHeader->PSymbolTable
+   uint32_t EndOfOldStringTable = FileHeader->PSymbolTable
       + NumberOfSymbols * SIZE_SCOFF_SymTableEntry + StringTableSize;
 
-   uint32 EndOfNewStringTable = FileHeader->PSymbolTable
+   uint32_t EndOfNewStringTable = FileHeader->PSymbolTable
       + (NumberOfSymbols + NumAddedSymbols) * SIZE_SCOFF_SymTableEntry + NewStringTableSize;
 
    // Check if there is anything after the string table
@@ -279,7 +279,7 @@ void CCOF2COF::MakeBinaryFile() {
          // New symboltable + string table bigger than old
          // Find all references to the data that come after the string table and fix them
          // Search all section headers
-         uint32 SectionOffset = sizeof(SCOFF_FileHeader) + NewFileHeader.SizeOfOptionalHeader;
+         uint32_t SectionOffset = sizeof(SCOFF_FileHeader) + NewFileHeader.SizeOfOptionalHeader;
          for (i = 0; i < NSections; i++) {
             SCOFF_SectionHeader * pSectHeader;
             pSectHeader = &Get<SCOFF_SectionHeader>(SectionOffset);

@@ -138,13 +138,13 @@ void CMACHO<MACSTRUCTURES>::ParseFile(){
    FileHeader = *(TMAC_header*)Buf();   // Copy file header
 
    // Loop through file commands
-   uint32 cmd, cmdsize;
-   uint32 currentoffset = sizeof(TMAC_header);
-   for (uint32 i = 1; i <= FileHeader.ncmds; i++) {
+   uint32_t cmd, cmdsize;
+   uint32_t currentoffset = sizeof(TMAC_header);
+   for (uint32_t i = 1; i <= FileHeader.ncmds; i++) {
       if (currentoffset >= this->GetDataSize()) {
          err.submit(2016); return;
       }
-      uint8 * currentp = (uint8*)(Buf() + currentoffset);
+      uint8_t * currentp = (uint8_t*)(Buf() + currentoffset);
       cmd     = ((MAC_load_command*)currentp) -> cmd;
       cmdsize = ((MAC_load_command*)currentp) -> cmdsize;
       // Interpret specific command type
@@ -162,8 +162,8 @@ void CMACHO<MACSTRUCTURES>::ParseFile(){
          case MAC_LC_SEGMENT_64: {
             if (WordSize != 64) err.submit(2320); // mixed segment size
             MAC_segment_command_64 * sh = (MAC_segment_command_64*)currentp;
-            SegmentOffset = (uint32)sh->fileoff;      // File offset of segment
-            SegmentSize = (uint32)sh->filesize;       // Size of segment
+            SegmentOffset = (uint32_t)sh->fileoff;      // File offset of segment
+            SegmentSize = (uint32_t)sh->filesize;       // Size of segment
             NumSections = sh->nsects;                 // Number of sections
             SectionHeaderOffset = currentoffset + sizeof(TMAC_segment_command); // File offset of section headers
             if (!ImageBase && strcmp(sh->segname, "__TEXT")==0) ImageBase = sh->vmaddr; // Find image base
@@ -196,10 +196,10 @@ void CMACHO<MACSTRUCTURES>::ParseFile(){
 // Debug dump
 template <class TMAC_header, class TMAC_segment_command, class TMAC_section, class TMAC_nlist, class MInt>
 void CMACHO<MACSTRUCTURES>::Dump(int options) {
-   uint32 icmd;                        // Command index
-   int32  isec1;                       // Section index within segment
-   int32  isec2;                       // Section index global
-   int32  nsect;                        // Number of sections in segment
+   uint32_t icmd;                        // Command index
+   int32_t  isec1;                       // Section index within segment
+   int32_t  isec2;                       // Section index global
+   int32_t  nsect;                        // Number of sections in segment
 
    if (options & DUMP_FILEHDR) {
       // File header
@@ -218,10 +218,10 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
          FileHeader.ncmds, FileHeader.sizeofcmds, FileHeader.flags);
    }
 
-   uint32 cmd;                         // Load command
-   uint32 cmdsize;                     // Command size
+   uint32_t cmd;                         // Load command
+   uint32_t cmdsize;                     // Command size
    // Pointer to current position
-   uint8 * currentp = (uint8*)(Buf() + sizeof(TMAC_header));
+   uint8_t * currentp = (uint8_t*)(Buf() + sizeof(TMAC_header));
 
    // Loop through file commands
    for (icmd = 1; icmd <= FileHeader.ncmds; icmd++) {
@@ -250,10 +250,10 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
                printf("\n  Name: %s, \n  Memory address 0x%08X%08X, Memory size 0x%08X%08X"
                   "\n  File offset 0x%08X%08X, File size 0x%08X%08X\n  Maxprot 0x%X, Initprot 0x%X"
                   "\n  Number of sections %i, Flags 0x%X",
-                  sh->segname, (uint32)(sh->vmaddr>>32), (uint32)sh->vmaddr,
-                  (uint32)(sh->vmsize>>32), (uint32)sh->vmsize,
-                  (uint32)(sh->fileoff>>32), (uint32)sh->fileoff,
-                  (uint32)(sh->filesize>>32), (uint32)sh->filesize,
+                  sh->segname, (uint32_t)(sh->vmaddr>>32), (uint32_t)sh->vmaddr,
+                  (uint32_t)(sh->vmsize>>32), (uint32_t)sh->vmsize,
+                  (uint32_t)(sh->fileoff>>32), (uint32_t)sh->fileoff,
+                  (uint32_t)(sh->filesize>>32), (uint32_t)sh->filesize,
                   sh->maxprot, sh->initprot,
                   sh->nsects, sh->flags);
                break;}
@@ -280,7 +280,7 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
                   "\n  Offset to local relocation entries 0x%X, Number of local reloc. entries %i",
                   sh->modtaboff, sh->nmodtab, sh->extrefsymoff, sh->nextrefsyms,
                   sh->indirectsymoff, sh->nindirectsyms, sh->extreloff, sh->nextrel,
-                  sh->locreloff, sh->nlocrel);
+                  sh->locreloff, sh->nlocrel);	
                break;}
          }
 
@@ -293,7 +293,7 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
       printf("\n\nSections:");
 
       // Reset current pointer
-      currentp = (uint8*)(Buf() + sizeof(TMAC_header));
+      currentp = (uint8_t*)(Buf() + sizeof(TMAC_header));
       isec2 = 0;
 
       // Loop through load commands
@@ -325,7 +325,7 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
                   printf("\n  Relocations:");
                   if (sectp->reloff >= this->GetDataSize()) {err.submit(2035); break;}
                   MAC_relocation_info * relp = (MAC_relocation_info*)(Buf() + sectp->reloff);
-                  for (uint32 r = 1; r <= sectp->nreloc; r++, relp++) {
+                  for (uint32_t r = 1; r <= sectp->nreloc; r++, relp++) {
                      if (relp->r_address & R_SCATTERED) {
                         // scattered relocation into
                         MAC_scattered_relocation_info * scatp = (MAC_scattered_relocation_info*)relp;
@@ -335,7 +335,7 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
                               scatp->r_address, scatp->r_value, 1 << scatp->r_length,
                               Lookup(Mac32RelocationTypeNames, scatp->r_type));
                            if (scatp->r_address < sectp->size) {
-                              printf(", Inline: 0x%X", *(int32*)(Buf()+sectp->offset+scatp->r_address));
+                              printf(", Inline: 0x%X", *(int32_t*)(Buf()+sectp->offset+scatp->r_address));
                            }
                         }
                         else {
@@ -355,7 +355,7 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
                            1 << relp->r_length, relp->r_extern,
                            Lookup(Mac32RelocationTypeNames, relp->r_type));
                         if (relp->r_address < sectp->size) {
-                           printf(", Inline: 0x%X", *(int32*)(Buf()+sectp->offset+relp->r_address));
+                           printf(", Inline: 0x%X", *(int32_t*)(Buf()+sectp->offset+relp->r_address));
                         }
                      }
                   }
@@ -377,7 +377,7 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
                printf("\n  Memory address 0x%X, Size 0x%X, File offset 0x%X"
                   "\n  Alignment %i, Reloc. ent. offset 0x%X, Num reloc. %i"
                   "\n  Flags 0x%X, reserved1 0x%X, reserved2 0x%X",
-                  (uint32)sectp->addr, (uint32)sectp->size, sectp->offset, 1 << sectp->align,
+                  (uint32_t)sectp->addr, (uint32_t)sectp->size, sectp->offset, 1 << sectp->align,
                   sectp->reloff, sectp->nreloc, sectp->flags,
                   sectp->reserved1, sectp->reserved2);
 
@@ -385,7 +385,7 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
                   // Dump relocations
                   printf("\n  Relocations:");
                   MAC_relocation_info * relp = (MAC_relocation_info*)(Buf() + sectp->reloff);
-                  for (uint32 r = 1; r <= sectp->nreloc; r++, relp++) {
+                  for (uint32_t r = 1; r <= sectp->nreloc; r++, relp++) {
                      if (relp->r_address & R_SCATTERED) {
                         // scattered relocation into (not used in 64-bit Mach-O)
                         MAC_scattered_relocation_info * scatp = (MAC_scattered_relocation_info*)relp;
@@ -394,7 +394,7 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
                               scatp->r_address, scatp->r_value, 1 << scatp->r_length,
                               Lookup(Mac64RelocationTypeNames, scatp->r_type));
                            if (scatp->r_address < sectp->size) {
-                              printf(", Inline: 0x%X", *(int32*)(Buf()+sectp->offset+scatp->r_address));
+                              printf(", Inline: 0x%X", *(int32_t*)(Buf()+sectp->offset+scatp->r_address));
                            }
                         }
                         else {
@@ -417,11 +417,11 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
                            // Print inline addend
                            if (relp->r_length == 3) {
                               // 8 bytes inline addend
-                              printf(", Inline: 0x%08X%08X", *(int32*)(Buf()+sectp->offset+relp->r_address+4), *(int32*)(Buf()+sectp->offset+relp->r_address));
+                              printf(", Inline: 0x%08X%08X", *(int32_t*)(Buf()+sectp->offset+relp->r_address+4), *(int32_t*)(Buf()+sectp->offset+relp->r_address));
                            }
                            else {
                               // 4 bytes inline addend
-                              printf(", Inline: 0x%08X", *(int32*)(Buf()+sectp->offset+relp->r_address));
+                              printf(", Inline: 0x%08X", *(int32_t*)(Buf()+sectp->offset+relp->r_address));
                            }
                         }
                      }
@@ -441,7 +441,7 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
    // Dump symbol table
    if (options & DUMP_SYMTAB) {
       printf("\n\nSymbol table:");
-      uint32 i;
+      uint32_t i;
       TMAC_nlist * symp;
 
       // loop through symbol table
@@ -454,11 +454,11 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
 
          if (symp->n_strx < StringTabSize && !(symp->n_type & MAC_N_STAB)) {
             printf("\n  %2i %s, Section %i, Value 0x%X\n    ",
-               i, strtab + symp->n_strx, symp->n_sect, uint32(symp->n_value));
+               i, strtab + symp->n_strx, symp->n_sect, uint32_t(symp->n_value));
          }
          else {
             printf("\n  String table offset: 0x%X, Section %i, Value 0x%X\n    ",
-               symp->n_strx, symp->n_sect, uint32(symp->n_value));
+               symp->n_strx, symp->n_sect, uint32_t(symp->n_value));
          }
 
          if (symp->n_type & MAC_N_STAB) {
@@ -471,7 +471,7 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
          }
          printf("\n    Reference type: %s,  Flags: ",
             Lookup(MacSymbolReferenceTypeNames, symp->n_desc & MAC_REF_TYPE));
-         for (uint32 f = MAC_REFERENCED_DYNAMICALLY; f <= MAC_N_WEAK_DEF; f <<= 1) {
+         for (uint32_t f = MAC_REFERENCED_DYNAMICALLY; f <= MAC_N_WEAK_DEF; f <<= 1) {
             if (symp->n_desc & f) {
                printf("%s, ", Lookup(MacSymbolDescriptorFlagNames, f));
             }
@@ -484,7 +484,7 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
          printf("\n\n  Indirect symbols:");
 
          // loop through indirect symbol table
-         uint32 * IndSymip = (uint32*)(Buf() + IndirectSymTabOffset);
+         uint32_t * IndSymip = (uint32_t*)(Buf() + IndirectSymTabOffset);
 
          for (i = 0; i < IndirectSymTabNumber; i++, IndSymip++) {
 
@@ -497,7 +497,7 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
             // Find record
             TMAC_nlist * pIndSym = symp0 + *IndSymip;
             // Find name
-            uint32 StringIndex = pIndSym->n_strx;
+            uint32_t StringIndex = pIndSym->n_strx;
             if (StringIndex >= StringTabSize) {
                err.submit(2035); continue;
             }
@@ -505,7 +505,7 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
             printf("\n   %s", strtab + StringIndex);
             // print type, etc.
             printf(", type 0x%X, sect %i, desc 0x%X, val 0x%X",
-               pIndSym->n_type, pIndSym->n_sect, pIndSym->n_desc, uint32(pIndSym->n_value));
+               pIndSym->n_type, pIndSym->n_sect, pIndSym->n_desc, uint32_t(pIndSym->n_value));
          }
       }
    }
@@ -513,11 +513,11 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
    // Dump string table
    if (options & DUMP_STRINGTB) {
       printf("\n\nString table:");
-      uint32 str = 0, istr = 0;
+      uint32_t str = 0, istr = 0;
       while (str < StringTabSize) {
          char * p = (char*)(Buf() + StringTabOffset + str);
          printf("\n  %3i: %s", str, p);
-         istr++;  str += (uint32)strlen(p) + 1;
+         istr++;  str += (uint32_t)strlen(p) + 1;
       }
    }
 
@@ -526,7 +526,7 @@ void CMACHO<MACSTRUCTURES>::Dump(int options) {
 template <class TMAC_header, class TMAC_segment_command, class TMAC_section, class TMAC_nlist, class MInt>
 void CMACHO<MACSTRUCTURES>::PublicNames(CMemoryBuffer * Strings, CSList<SStringEntry> * Index, int m) {
    // Make list of public names
-   uint32 i;
+   uint32_t i;
    SStringEntry se;                    // Entry in Index
 
    // Interpret header:
@@ -568,9 +568,9 @@ void MacSymbolTableBuilder<TMAC_nlist, MInt>::AddSymbol(int OldIndex, const char
       Push(&rec, sizeof(rec));                   // Put empty record in memory buffer
    }
 */
-   rec.n_type = (uint8)type;                     // Copy values
-   rec.n_sect = (uint8)section;
-   rec.n_desc = (int16)Desc;
+   rec.n_type = (uint8_t)type;                     // Copy values
+   rec.n_sect = (uint8_t)section;
+   rec.n_desc = (int16_t)Desc;
    rec.n_value = value;
    rec.Name = StringBuffer.PushString(name);     // Copy name and store index
    rec.OldIndex = OldIndex;                      // Remember old index
@@ -590,8 +590,8 @@ void MacSymbolTableBuilder<TMAC_nlist, MInt>::SortList() {
    MacSymbolRecord<TMAC_nlist> temp;
    for (i = 0; i < (int)GetNumEntries(); i++) {
       for (j = 0; j < (int)GetNumEntries() - i - 1; j++) {
-         s1 = StringBuffer.Buf() + p[j].Name;
-         s2 = StringBuffer.Buf() + p[j+1].Name;
+         s1 = (char*)StringBuffer.Buf() + p[j].Name;
+         s2 = (char*)StringBuffer.Buf() + p[j+1].Name;
          if (strcmp(s1, s2) > 0) {
             // Swap records
             temp = p[j];
@@ -633,8 +633,8 @@ void MacSymbolTableBuilder<TMAC_nlist, MInt>::StoreList(CMemoryBuffer * SymbolTa
 
    MacSymbolRecord<TMAC_nlist> * p = (MacSymbolRecord<TMAC_nlist>*)Buf();     // Point to list
 
-   for (uint32 i = 0; i < GetNumEntries(); i++, p++) {
-      p->n_strx = StringTable->PushString(StringBuffer.Buf()+p->Name);   // Put name in string table
+   for (uint32_t i = 0; i < GetNumEntries(); i++, p++) {
+      p->n_strx = StringTable->PushString((char*)StringBuffer.Buf()+p->Name);   // Put name in string table
       SymbolTable->Push(p, sizeof(TMAC_nlist));        // Store only the TMAC_nlist part of the record in SymbolTable
    }
 }
@@ -644,7 +644,7 @@ int MacSymbolTableBuilder<TMAC_nlist, MInt>::Search(const char * name) {
    // Search for name. Return -1 if not found.
    MacSymbolRecord<TMAC_nlist> * p = (MacSymbolRecord<TMAC_nlist>*)Buf();     // Point to list
    for (int i = 0; i < (int)GetNumEntries(); i++) {
-      if (strcmp(StringBuffer.Buf()+p[i].Name, name) == 0) {
+      if (strcmp((char*)StringBuffer.Buf()+p[i].Name, name) == 0) {
          return i;  // Found
       }
    }
@@ -652,9 +652,9 @@ int MacSymbolTableBuilder<TMAC_nlist, MInt>::Search(const char * name) {
 }
 
 template <class TMAC_nlist, class MInt>
-MacSymbolRecord<TMAC_nlist> & MacSymbolTableBuilder<TMAC_nlist, MInt>::operator[] (uint32 i) {
+MacSymbolRecord<TMAC_nlist> & MacSymbolTableBuilder<TMAC_nlist, MInt>::operator[] (uint32_t i) {
    // Access member
-   uint32 Offset = i * sizeof(MacSymbolRecord<TMAC_nlist>);
+   uint32_t Offset = i * sizeof(MacSymbolRecord<TMAC_nlist>);
    if (i + sizeof(MacSymbolRecord<TMAC_nlist>) > this->GetDataSize()) {
       err.submit(9003);  Offset = 0;
    }
@@ -675,15 +675,15 @@ void CMACUNIV::Go(int options) {
    if (GetDataSize() < 28) return;
 
    // Read number of components
-   uint32 NumComponents = EndianChange(Get<MAC_UNIV_FAT_HEADER>(0).num_arch);
+   uint32_t NumComponents = EndianChange(Get<MAC_UNIV_FAT_HEADER>(0).num_arch);
    if (NumComponents == 0 || NumComponents > 10) {
       // Number of components too big or too small
       err.submit(2701, NumComponents);
       return;
    }
 
-   uint32 i;                                     // Component number
-   uint32 fo;                                    // File offset of component pointer
+   uint32_t i;                                     // Component number
+   uint32_t fo;                                    // File offset of component pointer
    CConverter ComponentBuffer;                   // Used for converting component
    CConverter OutputBuffer;                      // Temporary storage of output file
    int DesiredWordSize = cmd.DesiredWordSize;    // Desired word size, if specified on command line
@@ -695,8 +695,8 @@ void CMACUNIV::Go(int options) {
       MAC_UNIV_FAT_ARCH & ComponentPointer = Get<MAC_UNIV_FAT_ARCH>(fo);
 
       // Get offset and size of component
-      uint32 ComponentOffset = EndianChange(ComponentPointer.offset);
-      uint32 ComponentSize   = EndianChange(ComponentPointer.size);
+      uint32_t ComponentOffset = EndianChange(ComponentPointer.offset);
+      uint32_t ComponentSize   = EndianChange(ComponentPointer.size);
 
       // Check within range
       if (ComponentOffset + ComponentSize > GetDataSize()) {
@@ -712,7 +712,7 @@ void CMACUNIV::Go(int options) {
       printf("\n\n\nComponent file number %i:\n", i + 1);
 
       // Check type
-      uint32 ComponentType = ComponentBuffer.GetFileType();
+      uint32_t ComponentType = ComponentBuffer.GetFileType();
       if (DesiredWordSize && DesiredWordSize != ComponentBuffer.WordSize) {
          err.submit(1151, ComponentBuffer.WordSize);
       }
@@ -751,5 +751,5 @@ void CMACUNIV::Go(int options) {
 // Make template instances for 32 and 64 bits
 template class CMACHO<MAC32STRUCTURES>;
 template class CMACHO<MAC64STRUCTURES>;
-template class MacSymbolTableBuilder<MAC_nlist_32, int32>;
-template class MacSymbolTableBuilder<MAC_nlist_64, int64>;
+template class MacSymbolTableBuilder<MAC_nlist_32, int32_t>;
+template class MacSymbolTableBuilder<MAC_nlist_64, int64_t>;

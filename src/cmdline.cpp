@@ -1,14 +1,14 @@
 /****************************  cmdline.cpp  **********************************
 * Author:        Agner Fog
 * Date created:  2006-07-25
-* Last modified: 2018-01-29
+* Last modified: 2022-04-28
 * Project:       objconv
 * Module:        cmdline.cpp
 * Description:
 * This module is for interpretation of command line options
 * Also contains symbol change function
 *
-* Copyright 2006-2018 GNU General Public License http://www.gnu.org/licenses
+* Copyright 2006-2022 GNU General Public License http://www.gnu.org/licenses
 *****************************************************************************/
 
 #include "stdafx.h"
@@ -39,14 +39,14 @@ static SIntTxt SubtypeNames[] = {
     {SUBTYPE_MASM,  "asm"},
     {SUBTYPE_MASM,  "masm"},
     {SUBTYPE_MASM,  "tasm"},
-    {SUBTYPE_YASM,  "nasm"},
-    {SUBTYPE_YASM,  "yasm"},
+    {SUBTYPE_NASM,  "nasm"},
+    {SUBTYPE_NASM,  "yasm"},
     {SUBTYPE_GASM,  "gasm"},
     {SUBTYPE_GASM,  "gas"}
 };
 
 // List of standard names that are always translated
-const uint32 MaxType = FILETYPE_MACHO_LE;
+const uint32_t MaxType = FILETYPE_MACHO_LE;
 
 // Standard names in 32-bit mode
 const char * StandardNames32[][MaxType+1] = {
@@ -173,7 +173,7 @@ void CCommandLineInterpreter::ReadCommandFile(char * filename) {
     ResponseFiles[NumBuffers-1].Read();
 
     // Get buffer with file contents
-    char * buffer = ResponseFiles[NumBuffers-1].Buf();
+    char * buffer = (char*)ResponseFiles[NumBuffers-1].Buf();
     char * ItemBegin, * ItemEnd;  // Mark begin and end of token in buffer
 
     // Check if buffer is allocated
@@ -183,13 +183,13 @@ void CCommandLineInterpreter::ReadCommandFile(char * filename) {
         while (*buffer) {
 
             // Skip whitespace
-            while (*buffer != 0 && uint8(*buffer) <= uint8(' ')) buffer++;
+            while (*buffer != 0 && uint8_t(*buffer) <= uint8_t(' ')) buffer++;
             if (*buffer == 0) break; // End of buffer found
             ItemBegin = buffer;
 
             // Find end of token
             ItemEnd = buffer+1;
-            while (uint8(*ItemEnd) > uint8(' ')) ItemEnd++;
+            while (uint8_t(*ItemEnd) > uint8_t(' ')) ItemEnd++;
             if (*ItemEnd == 0) {
                 buffer = ItemEnd;
             }
@@ -436,8 +436,8 @@ void CCommandLineInterpreter::AddObjectToLibrary(char * filename, char * membern
     }
 
     // Truncate name and store it in MemberNames
-    //uint32 Name1Offset = MemberNames.PushString(CLibrary::TruncateMemberName(membername));
-    uint32 Name1Offset = MemberNames.PushString(membername);
+    //uint32_t Name1Offset = MemberNames.PushString(CLibrary::TruncateMemberName(membername));
+    uint32_t Name1Offset = MemberNames.PushString(membername);
     Sym.Name1 = (char*)(MemberNames.Buf() + Name1Offset);
     CLibrary::StripMemberName(Sym.Name1);
 
@@ -648,7 +648,7 @@ void CCommandLineInterpreter::InterpretSymbolNameChangeOption(char * string) {
         }
         if (name2 && name2[0]) {
             // name2 found. check if it ends with ':'
-            for (uint32 i = 0; i < (uint32)strlen(name2); i++) {
+            for (uint32_t i = 0; i < (uint32_t)strlen(name2); i++) {
                 if (name2[i] == ':') name2[i] = 0;
             }
         }
@@ -787,7 +787,7 @@ void CCommandLineInterpreter::InterpretImagebaseOption(char * string) {
         // Must be divisible by page size
         err.submit(2331, string);
     }
-    if ((int32)ImageBase <= 0) {
+    if ((int32_t)ImageBase <= 0) {
         // Cannot be zero or > 2^31
         err.submit(2332, string);
     }
@@ -819,7 +819,7 @@ void CCommandLineInterpreter::CheckExtractSuccess() {
     // Check if library members to extract were found
 
     // Search through SymbolList for extract records
-    for (uint32 i = 0; i < SymbolList.GetDataSize(); i += sizeof(SSymbolChange)) {
+    for (uint32_t i = 0; i < SymbolList.GetDataSize(); i += sizeof(SSymbolChange)) {
         SSymbolChange * Sym = (SSymbolChange *)(SymbolList.Buf() + i);
         if (Sym->Action == SYMA_EXTRACT_MEMBER && Sym->Done == 0) {
             // Member has not been extracted
@@ -833,7 +833,7 @@ void CCommandLineInterpreter::CheckSymbolModifySuccess() {
     // Check if symbols to modify were found
 
     // Search through SymbolList for symbol change records
-    for (uint32 i = 0; i < SymbolList.GetDataSize(); i += sizeof(SSymbolChange)) {
+    for (uint32_t i = 0; i < SymbolList.GetDataSize(); i += sizeof(SSymbolChange)) {
         SSymbolChange * Sym = (SSymbolChange *)(SymbolList.Buf() + i);
         if (Sym->Action >= SYMA_MAKE_WEAK && Sym->Action < SYMA_ADD_MEMBER && Sym->Done == 0) {
             // Member has not been extracted
@@ -869,7 +869,7 @@ int CCommandLineInterpreter::SymbolChange(char const * oldname, char const ** ne
 
     // Convert standard names if type conversion
     if (cmd.InputType != cmd.OutputType
-        && uint32(cmd.InputType) <= MaxType && uint32(cmd.OutputType) <= MaxType) {
+        && uint32_t(cmd.InputType) <= MaxType && uint32_t(cmd.OutputType) <= MaxType) {
             if (DesiredWordSize == 32) {
                 // Look for standard names to translate, 32-bit
                 for (i = 0; i < NumStandardNames; i++) {
@@ -1053,7 +1053,7 @@ int CCommandLineInterpreter::SymbolChange(char const * oldname, char const ** ne
                 static char const * StandardSectionNames[] = {
                 ".text", ".data", ".bss", ".comment", ".lib"
                 };
-                for (uint32 i = 0; i < sizeof(StandardSectionNames)/sizeof(StandardSectionNames[0]); i++) {
+                for (uint32_t i = 0; i < sizeof(StandardSectionNames)/sizeof(StandardSectionNames[0]); i++) {
                 if (stricmp(oldname,StandardSectionNames[i]) == 0) {
                 // Standard name. Don't change
                 return SYMA_NOCHANGE;
@@ -1186,7 +1186,7 @@ void CCommandLineInterpreter::ReportStatistics() {
 void CCommandLineInterpreter::Help() {
     // Print help message
     printf("\nObject file converter version %.2f for x86 and x86-64 platforms.", OBJCONV_VERSION);
-    printf("\nCopyright (c) 2018 by Agner Fog. Gnu General Public License.");
+    printf("\nCopyright (c) 2022 by Agner Fog. Gnu General Public License.");
     printf("\n\nUsage: objconv options inputfile [outputfile]");
     printf("\n\nOptions:");
     printf("\n-fXXX[SS]  Output file format XXX, word size SS. Supported formats:");

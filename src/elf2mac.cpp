@@ -65,8 +65,8 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSectionsIndex() {
    // symbol tables and relocation tables, and we must make the symbol tables before
    // the relocation tables, and we must make the relocation tables together with the
    // sections.
-   uint32 oldsec;                         // Section number in old file
-   uint32 newsec = 0;                     // Section number in new file
+   uint32_t oldsec;                         // Section number in old file
+   uint32_t newsec = 0;                     // Section number in new file
    NewSectIndex. SetNum(this->NSections); // Allocate size for section index table
    NewSectIndex. SetZero();               // Initialize
    NewSectOffset.SetNum(this->NSections); // Allocate buffer for section offset table
@@ -81,7 +81,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSectionsIndex() {
 
       // Get section name
       const char * sname = "";
-      uint32 namei = this->SectionHeaders[oldsec].sh_name;
+      uint32_t namei = this->SectionHeaders[oldsec].sh_name;
       if (namei >= this->SecStringTableLen) {
          err.submit(2112);
       }
@@ -130,7 +130,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSectionsIndex() {
       // much to do with the final address, but it is needed in relocation entries.
 
       // Alignment
-      int NewAlign = FloorLog2((uint32)this->SectionHeaders[oldsec].sh_addralign);
+      int NewAlign = FloorLog2((uint32_t)this->SectionHeaders[oldsec].sh_addralign);
       if (NewAlign > 12) NewAlign = 12;   // What is the limit for highest alignment?
       int AlignBy = 1 << NewAlign;
 
@@ -180,22 +180,22 @@ template <class TELF_Header, class TELF_SectionHeader, class TELF_Symbol, class 
           class TMAC_header, class TMAC_segment_command, class TMAC_section, class TMAC_nlist, class MInt>
 void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSymbolTable() {
    // Convert subfunction: Symbol table and string tables
-   uint32 oldsec;                  // Section number in old file
+   uint32_t oldsec;                  // Section number in old file
    TELF_SectionHeader OldHeader;   // Old section header
    int FoundSymTab = 0;            // Found symbol table
-   int8 * strtab;                  // Old symbol string table
-   int8 * symtab;                  // Old symbol table
-   uint32 symtabsize;              // Size of old symbol table
-   int8 * symtabend;               // End of old symbol table
-   uint32 entrysize;               // Size of each entry in old symbol table
+   char * strtab;                    // Old symbol string table
+   int8_t * symtab;                  // Old symbol table
+   uint32_t symtabsize;              // Size of old symbol table
+   int8_t * symtabend;               // End of old symbol table
+   uint32_t entrysize;               // Size of each entry in old symbol table
    TELF_Symbol OldSym;             // Old symbol table record
-   uint32 OldSymI;                 // Symbol index in old symbol table
+   uint32_t OldSymI;                 // Symbol index in old symbol table
    const char * symname;           // Symbol name
    int NewSection = 0;             // New section index
    int NewType;                    // New symbol type
    int NewDesc;                    // New symbol reference type
    MInt Value;                     // Symbol value
-   uint32 Scope;                   // 0: Local, 1: Public, 2: External
+   uint32_t Scope;                   // 0: Local, 1: Public, 2: External
 
    // Loop through old sections to find symbol table
    for (oldsec = 0; oldsec < this->NSections; oldsec++) {
@@ -209,17 +209,17 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSymbolTable() {
          OldHeader = this->SectionHeaders[oldsec];
 
          // Find associated string table
-         if (OldHeader.sh_link >= (uint32)(this->NSections)) {
+         if (OldHeader.sh_link >= (uint32_t)(this->NSections)) {
             err.submit(2035); OldHeader.sh_link = 0;
          }
-         strtab = this->Buf() + (uint32)this->SectionHeaders[OldHeader.sh_link].sh_offset;
+         strtab = (char*)this->Buf() + (uint32_t)this->SectionHeaders[OldHeader.sh_link].sh_offset;
 
          // Find old symbol table
-         entrysize = (uint32)OldHeader.sh_entsize;
+         entrysize = (uint32_t)OldHeader.sh_entsize;
          if (entrysize < sizeof(TELF_Symbol)) {err.submit(2033); entrysize = sizeof(TELF_Symbol);}
 
-         symtab = this->Buf() + (uint32)OldHeader.sh_offset;
-         symtabsize = (uint32)OldHeader.sh_size;
+         symtab = this->Buf() + (uint32_t)OldHeader.sh_offset;
+         symtabsize = (uint32_t)OldHeader.sh_size;
          symtabend = symtab + symtabsize;
 
          if (NewSymTab[0].GetNumEntries() == 0) {
@@ -255,7 +255,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSymbolTable() {
                char tempbuf[80];
                sprintf(tempbuf, "?unnamed%i", OldSymI);
                int os = UnnamedSymbolsTable.PushString(tempbuf);
-               symname = UnnamedSymbolsTable.Buf() + os;
+               symname = (char*)UnnamedSymbolsTable.Buf() + os;
             }
 
             NewType = NewDesc = 0; // New symbol type
@@ -267,12 +267,12 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSymbolTable() {
             if (OldSym.st_shndx == SHN_UNDEF) {
                NewSection = 0; // External
             }
-            else if ((int16)(OldSym.st_shndx) == SHN_ABS) {
+            else if ((int16_t)(OldSym.st_shndx) == SHN_ABS) {
                NewType |= MAC_N_ABS; // Absolute symbol
                NewDesc |= MAC_N_NO_DEAD_STRIP;
                NewSection = 0;
             }
-            else if ((int16)(OldSym.st_shndx) == SHN_COMMON) {
+            else if ((int16_t)(OldSym.st_shndx) == SHN_COMMON) {
                NewType |= MAC_N_ABS; // Common symbol. Translate to abs and make warning
                NewDesc |= MAC_N_NO_DEAD_STRIP;
                NewSection = 0;
@@ -384,7 +384,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSymbolTable() {
 
 template <class TELF_Header, class TELF_SectionHeader, class TELF_Symbol, class TELF_Relocation,
           class TMAC_header, class TMAC_segment_command, class TMAC_section, class TMAC_nlist, class MInt>
-void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf32_Shdr & OldRelHeader, MAC_section_32 & NewHeader, uint32 NewRawDataOffset, uint32 oldsec) {
+void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf32_Shdr & OldRelHeader, MAC_section_32 & NewHeader, uint32_t NewRawDataOffset, uint32_t oldsec) {
    // Convert 32-bit relocations from ELF to MAC
    // (This function has two template instances, only the 32-bit instance is used)
 
@@ -393,12 +393,12 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf32_Shdr & OldR
    memset(&scat, 0, sizeof(scat));
 
    // Get pointer to old relocation table
-   int8 * reltab = this->Buf() + OldRelHeader.sh_offset;
-   int8 * reltabend = reltab + OldRelHeader.sh_size;
+   int8_t * reltab = this->Buf() + OldRelHeader.sh_offset;
+   int8_t * reltabend = reltab + OldRelHeader.sh_size;
 
    // Get entry size
-   uint32 entrysize = (uint32)OldRelHeader.sh_entsize;
-   uint32 expectedentrysize = (OldRelHeader.sh_type == SHT_REL) ? sizeof(Elf32_Rel) : sizeof(Elf32_Rela);
+   uint32_t entrysize = (uint32_t)OldRelHeader.sh_entsize;
+   uint32_t expectedentrysize = (OldRelHeader.sh_type == SHT_REL) ? sizeof(Elf32_Rel) : sizeof(Elf32_Rela);
    if (entrysize < expectedentrysize) {err.submit(2033); entrysize = expectedentrysize;}
 
    // File pointer to relocations
@@ -412,7 +412,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf32_Shdr & OldR
       memcpy(&OldRelocation, reltab, entrysize);
 
       // Find inline addend
-      uint32 InlinePosition = (uint32)(NewRawDataOffset + OldRelocation.r_offset);
+      uint32_t InlinePosition = (uint32_t)(NewRawDataOffset + OldRelocation.r_offset);
 
       // Check that address is valid
       if (InlinePosition >= this->GetDataSize()) {
@@ -421,15 +421,15 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf32_Shdr & OldR
       }
 
       // Pointer to inline addend
-      int32 * piaddend = (int32*)(NewRawData.Buf() + InlinePosition);
+      int32_t * piaddend = (int32_t*)(NewRawData.Buf() + InlinePosition);
 
       // Add old addend if any
-      *piaddend += (int32)OldRelocation.r_addend;
+      *piaddend += (int32_t)OldRelocation.r_addend;
 
       // Define relocation parameters
-      uint32  r_address = 0;      // section-relative offset to relocation source
-      uint32  r_symbolnum = 0;    // symbol index if r_extern == 1 or section ordinal if r_extern == 0
-      // uint32  r_value = 0;        // value of relocation target
+      uint32_t  r_address = 0;      // section-relative offset to relocation source
+      uint32_t  r_symbolnum = 0;    // symbol index if r_extern == 1 or section ordinal if r_extern == 0
+      // uint32_t  r_value = 0;        // value of relocation target
       // int     r_scattered = 0;    // use scattered relocation
       int     r_pcrel = 0;        // self relative
       int     r_length = 2;       // size of source: 0=byte, 1=2 bytes, 2=4 bytes, 3=8 bytes
@@ -438,7 +438,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf32_Shdr & OldR
       int     Scope = 0;          // Symbol scope: 0 = local, 1 = public, 2 = external
 
       // source offset
-      r_address = (uint32)OldRelocation.r_offset;
+      r_address = (uint32_t)OldRelocation.r_offset;
 
       // target scope
       if (OldRelocation.r_sym < NumOldSymbols) {
@@ -478,7 +478,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf32_Shdr & OldR
          r_symbolnum = NewSymTab[Scope][newindex].n_sect;
 
          // Absolute address of target stored inline in source
-         *piaddend  += (uint32)NewSymTab[Scope][newindex].n_value;
+         *piaddend  += (uint32_t)NewSymTab[Scope][newindex].n_value;
       }
 
       // Get relocation type and fix addend
@@ -509,7 +509,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf32_Shdr & OldR
          // instead. This probably occurs only in assembler-coded self-relative 32-bit code.
          // (Use asmlib A_strtoupper and A_strcspn as test cases - they fail if dummy data
          // at the end of .data section is removed)
-         *piaddend -= r_address + (uint32)NewHeader.addr;
+         *piaddend -= r_address + (uint32_t)NewHeader.addr;
          break;
 
       case R_UNSUPPORTED_IMAGEREL:  // 32-bit image-relative
@@ -584,7 +584,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf32_Shdr & OldR
 
 template <class TELF_Header, class TELF_SectionHeader, class TELF_Symbol, class TELF_Relocation,
           class TMAC_header, class TMAC_segment_command, class TMAC_section, class TMAC_nlist, class MInt>
-void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf64_Shdr & OldRelHeader, MAC_section_64 & NewHeader, uint32 NewRawDataOffset, uint32 oldsec) {
+void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf64_Shdr & OldRelHeader, MAC_section_64 & NewHeader, uint32_t NewRawDataOffset, uint32_t oldsec) {
    // Convert 64-bit relocations from ELF to MAC
    // (This function has two template instances, only the 64-bit instance is used)
 
@@ -595,12 +595,12 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf64_Shdr & OldR
    Elf64_Rela OldRelocation;  // Old relocation table entry
 
    // Get pointer to old relocation table
-   int8 * reltab = this->Buf() + OldRelHeader.sh_offset;
-   int8 * reltabend = reltab + OldRelHeader.sh_size;
+   int8_t * reltab = this->Buf() + OldRelHeader.sh_offset;
+   int8_t * reltabend = reltab + OldRelHeader.sh_size;
 
    // Get entry size
-   uint32 entrysize = (uint32)OldRelHeader.sh_entsize;
-   uint32 expectedentrysize = (OldRelHeader.sh_type == SHT_REL) ? sizeof(Elf64_Rel) : sizeof(Elf64_Rela);
+   uint32_t entrysize = (uint32_t)OldRelHeader.sh_entsize;
+   uint32_t expectedentrysize = (OldRelHeader.sh_type == SHT_REL) ? sizeof(Elf64_Rel) : sizeof(Elf64_Rela);
    if (entrysize < expectedentrysize) {err.submit(2033); entrysize = expectedentrysize;}
 
    // File pointer to relocations
@@ -614,7 +614,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf64_Shdr & OldR
       memcpy(&OldRelocation, reltab, entrysize);
 
       // Find inline addend
-      uint32 InlinePosition = (uint32)(NewRawDataOffset + OldRelocation.r_offset);
+      uint32_t InlinePosition = (uint32_t)(NewRawDataOffset + OldRelocation.r_offset);
 
       // Check that address is valid
       if (InlinePosition >= this->GetDataSize()) {
@@ -624,15 +624,15 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf64_Shdr & OldR
       }
 
       // Pointer to inline addend
-      int32 * piaddend = (int32*)(NewRawData.Buf() + InlinePosition);
+      int32_t * piaddend = (int32_t*)(NewRawData.Buf() + InlinePosition);
 
       // Add old addend if any
-      *piaddend += (uint32)OldRelocation.r_addend;
+      *piaddend += (uint32_t)OldRelocation.r_addend;
 
       // Define relocation parameters
-      uint32  r_address = 0;      // section-relative offset to relocation source
-      uint32  r_symbolnum = 0;    // symbol index if r_extern == 1 or section ordinal if r_extern == 0
-      // uint32  r_value = 0;        // value of relocation target
+      uint32_t  r_address = 0;      // section-relative offset to relocation source
+      uint32_t  r_symbolnum = 0;    // symbol index if r_extern == 1 or section ordinal if r_extern == 0
+      // uint32_t  r_value = 0;        // value of relocation target
       // int     r_scattered = 0;    // scattered relocations not used in 64 bit
       int     r_pcrel = 0;        // self relative
       int     r_length = 2;       // size of source: 0=byte, 1=2 bytes, 2=4 bytes, 3=8 bytes
@@ -641,7 +641,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::Elf2MacRelocations(Elf64_Shdr & OldR
       int     Scope = 0;          // Symbol scope: 0 = local, 1 = public, 2 = external
 
       // source offset
-      r_address = (uint32)OldRelocation.r_offset;
+      r_address = (uint32_t)OldRelocation.r_offset;
 
       // target scope
       if (OldRelocation.r_sym < NumOldSymbols) {
@@ -807,13 +807,13 @@ template <class TELF_Header, class TELF_SectionHeader, class TELF_Symbol, class 
           class TMAC_header, class TMAC_segment_command, class TMAC_section, class TMAC_nlist, class MInt>
 void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSections() {
    // Convert subfunction: Make sections and relocation tables
-   uint32 oldsec;                  // Section number in old file
-   uint32 relsec;                  // Relocation section in old file
+   uint32_t oldsec;                  // Section number in old file
+   uint32_t relsec;                  // Relocation section in old file
    TMAC_section NewHeader;         // New section header
    TELF_SectionHeader OldHeader;   // Old section header
    TELF_SectionHeader OldRelHeader;// Old relocation section header
-   uint32 NewVirtualAddress = 0;   // Virtual address of new section
-   uint32 NewRawDataOffset = 0;    // Offset into NewRawData of section.
+   uint32_t NewVirtualAddress = 0;   // Virtual address of new section
+   uint32_t NewRawDataOffset = 0;    // Offset into NewRawData of section.
    // NewRawDataOffset is different from NewVirtualAddress if alignment of sections in
    // the object file is different from alignment of sections in memory
 
@@ -846,7 +846,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSections() {
 
          // Section name
          const char * sname = "";
-         uint32 namei = OldHeader.sh_name;
+         uint32_t namei = OldHeader.sh_name;
          if (namei >= this->SecStringTableLen) err.submit(2112);
          else sname = this->SecStringTable + namei;
 
@@ -898,7 +898,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSections() {
 
          if (OldHeader.sh_size && OldHeader.sh_type != SHT_NOBITS) { // Not for .bss segment
             // Copy raw data
-            NewRawDataOffset = NewRawData.Push(this->Buf()+(uint32)OldHeader.sh_offset, (uint32)OldHeader.sh_size);
+            NewRawDataOffset = NewRawData.Push(this->Buf()+(uint32_t)OldHeader.sh_offset, (uint32_t)OldHeader.sh_size);
             NewRawData.Align(4);
          }
 
@@ -911,7 +911,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSections() {
          }
 
          // Alignment
-         NewHeader.align = FloorLog2((uint32)OldHeader.sh_addralign);
+         NewHeader.align = FloorLog2((uint32_t)OldHeader.sh_addralign);
          if (NewHeader.align > 12) NewHeader.align = 12;   // What is the limit for highest alignment?
          int AlignBy = 1 << NewHeader.align;
 
@@ -920,7 +920,7 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSections() {
 
          // Virtual memory address of new section
          NewHeader.addr = NewVirtualAddress;
-         NewVirtualAddress += (uint32)OldHeader.sh_size;
+         NewVirtualAddress += (uint32_t)OldHeader.sh_size;
 
          // Find relocation table for this section by searching through all sections
          for (relsec = 1; relsec < this->NSections; relsec++) {
@@ -966,15 +966,15 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::FindUnusedSymbols() {
    }
 
    // Loop through section headers
-   for (uint32 sc = 0; sc < this->NSections; sc++) {
-      uint32 entrysize = uint32(this->SectionHeaders[sc].sh_entsize);
+   for (uint32_t sc = 0; sc < this->NSections; sc++) {
+      uint32_t entrysize = uint32_t(this->SectionHeaders[sc].sh_entsize);
       // printf("\n%2i Name: %-18s ", sc, SecStringTable + sheader.sh_name);
 
       if ((this->SectionHeaders[sc].sh_type==SHT_REL || this->SectionHeaders[sc].sh_type==SHT_RELA)) {
          // Relocation list
-         int8 * reltab = this->Buf() + uint32(this->SectionHeaders[sc].sh_offset);
-         int8 * reltabend = reltab + uint32(this->SectionHeaders[sc].sh_size);
-         uint32 expectedentrysize = this->SectionHeaders[sc].sh_type == SHT_RELA ?
+         int8_t * reltab = this->Buf() + uint32_t(this->SectionHeaders[sc].sh_offset);
+         int8_t * reltabend = reltab + uint32_t(this->SectionHeaders[sc].sh_size);
+         uint32_t expectedentrysize = this->SectionHeaders[sc].sh_type == SHT_RELA ?
             sizeof(TELF_Relocation) :              // Elf32_Rela, Elf64_Rela
             sizeof(TELF_Relocation) - this->WordSize/8;  // Elf32_Rel,  Elf64_Rel
          if (entrysize < expectedentrysize) {err.submit(2033); entrysize = expectedentrysize;}
@@ -1024,13 +1024,13 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeBinaryFile() {
    ToFile.Push(&dysymtab, sizeof(dysymtab));
 
    // Store section data
-   uint32 Current = ToFile.Push(NewRawData.Buf(), NewRawData.GetDataSize());
+   uint32_t Current = ToFile.Push(NewRawData.Buf(), NewRawData.GetDataSize());
    if (Current != RawDataOffset) err.submit(9000);
 
    ToFile.Align(4);
 
    // Store relocation tables
-   uint32 Reltabs = ToFile.Push(NewRelocationTab.Buf(), NewRelocationTab.GetDataSize());
+   uint32_t Reltabs = ToFile.Push(NewRelocationTab.Buf(), NewRelocationTab.GetDataSize());
 
    // Initialize new string table. First string is empty
    NewStringTable.Push(0, 1);
@@ -1038,15 +1038,15 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeBinaryFile() {
    // Store symbol tables and make string table
    // Tables are not sorted alphabetically yet. This will be done subsequently
    // by CMAC2MAC
-   uint32 Symtabs = ToFile.GetDataSize();
-   uint32 NumSyms = 0;
+   uint32_t Symtabs = ToFile.GetDataSize();
+   uint32_t NumSyms = 0;
    for (i = 0; i < 3; i++) {
       NumSyms += NewSymTab[i].GetNumEntries();
       NewSymTab[i].StoreList(&ToFile, &NewStringTable);
    }
 
    // Store string table
-   uint32 StringTab = ToFile.Push(NewStringTable.Buf(), NewStringTable.GetDataSize());
+   uint32_t StringTab = ToFile.Push(NewStringTable.Buf(), NewStringTable.GetDataSize());
 
    // Set missing values in file header
    ((TMAC_header*)ToFile.Buf())->sizeofcmds = RawDataOffset - sizeof(TMAC_header);
