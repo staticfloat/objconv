@@ -1,14 +1,14 @@
 /****************************  library.cpp  **********************************
 * Author:        Agner Fog
 * Date created:  2006-08-27
-* Last modified: 2017-07-27
+* Last modified: 2022-05-07
 * Project:       objconv
 * Module:        library.cpp
 * Description:
 * This module contains code for reading, writing and manipulating function
 * libraries (archives) of the UNIX type and OMF type.
 *
-* Copyright 2006-2017 GNU General Public License http://www.gnu.org/licenses
+* Copyright 2006-2022 GNU General Public License http://www.gnu.org/licenses
 *****************************************************************************/
 
 #include "stdafx.h"
@@ -366,7 +366,7 @@ void CLibrary::RebuildUNIX() {
     // Rebuild UNIX style library
     // Make member names unique and without path. Rebuild symbol table
     char const * MemberName1 = 0;  // Name of library member
-    uint32 OutputFileType;
+    uint32_t OutputFileType;
 
     // Save OutputType before changing it
     OutputFileType = cmd.OutputType;
@@ -377,7 +377,7 @@ void CLibrary::RebuildUNIX() {
         // Properties of member
         MemberBuffer.FileName = MemberBuffer.OutputFileName = MemberName1;
         // Check if import library
-        if (MemberBuffer.Get<uint32>(0) == 0xFFFF0000) {
+        if (MemberBuffer.Get<uint32_t>(0) == 0xFFFF0000) {
             // Import library. Cannot do anything sensible
             err.submit(2507, cmd.InputFile);  return;
         }
@@ -417,7 +417,7 @@ void CLibrary::RebuildOMF() {
     char * ModuleName;                            // Module name
     SStringEntry se;                              // String entry record to save
     COMFFileBuilder NewBuffer;                    // Buffer for rebuilt library
-    uint32 Align;                                 // Alignment
+    uint32_t Align;                                 // Alignment
 
     // Remember member file type
     cmd.MemberType = FILETYPE_OMF;
@@ -431,7 +431,7 @@ void CLibrary::RebuildOMF() {
     // Read library header
     DictionaryOffset = rec.GetDword();
     DictionarySize = rec.GetWord();
-    if ((uint64)DictionaryOffset + DictionarySize >= GetDataSize()) {err.submit(2035); return;}
+    if ((uint64_t)DictionaryOffset + DictionarySize >= GetDataSize()) {err.submit(2035); return;}
 
     rec.GetByte(); // Ignore flag
     // Page size / alignment for members
@@ -494,7 +494,7 @@ void CLibrary::RebuildOMF() {
 
     // Put dictionary offset in LIBHEAD record
     DictionaryOffset = NewBuffer.GetDataSize();
-    NewBuffer.Get<uint32>(3) = DictionaryOffset;
+    NewBuffer.Get<uint32_t>(3) = DictionaryOffset;
 
     // Take over modified library file
     *this << NewBuffer;
@@ -514,7 +514,7 @@ void CLibrary::StripMemberNamesUNIX() {
     while ((MemberName1 = ExtractMember(&MemberBuffer)) != 0) {
         // Properties of member
         // Check if import library
-        if (MemberBuffer.Get<uint32>(0) == 0xFFFF0000) {
+        if (MemberBuffer.Get<uint32_t>(0) == 0xFFFF0000) {
             // Import library. Cannot do anything sensible
             err.submit(2507, cmd.InputFile);  return;
         }
@@ -558,17 +558,17 @@ void CLibrary::Dump() {
 
 void CLibrary::DumpOMF() {
     // Print contents of OMF style library
-    uint8  Flags;                                 // Dictionary flags
-    uint32 i;                                     // Loop counter
-    uint32 Align;                                 // Member alignment
-    uint32 RecordEnd;                             // End of OMF record
+    uint8_t  Flags;                                 // Dictionary flags
+    uint32_t i;                                     // Loop counter
+    uint32_t Align;                                 // Member alignment
+    uint32_t RecordEnd;                             // End of OMF record
     SOMFRecordPointer rec;                        // Current OMF record
     char * MemberName;                            // Name of library member
     char * SymbolName;                            // Name of public symbol in member
-    uint32 MemberStart = 0;                       // Start of member
-    uint32 MemberEnd;                             // End of member
-    uint32 MemberNum = 0;                         // Member number
-    uint32 FirstPublic;                           // Index to first public name of current member
+    uint32_t MemberStart = 0;                       // Start of member
+    uint32_t MemberEnd;                             // End of member
+    uint32_t MemberNum = 0;                         // Member number
+    uint32_t FirstPublic;                           // Index to first public name of current member
     CMemoryBuffer Strings;                        // Local string buffer
     CSList<SStringEntry> MemberIndex;             // Local member index buffer
     COMF Member;                                  // Local buffer for member
@@ -592,7 +592,7 @@ void CLibrary::DumpOMF() {
             // Read library header
             DictionaryOffset = rec.GetDword();
             DictionarySize = rec.GetWord();
-            if ((uint64)DictionaryOffset + DictionarySize >= GetDataSize()) {err.submit(2035); return;}
+            if ((uint64_t)DictionaryOffset + DictionarySize >= GetDataSize()) {err.submit(2035); return;}
             Flags = rec.GetByte();
             // Page size / alignment for members
             PageSize = rec.End + 1;
@@ -628,11 +628,11 @@ void CLibrary::DumpOMF() {
 
             // Print public names
             for (i = FirstPublic; i < MemberIndex.GetNumEntries(); i++) {
-                SymbolName = Strings.Buf() + MemberIndex[i].String;
+                SymbolName = (char*)Strings.Buf() + MemberIndex[i].String;
                 printf("\n  %s", SymbolName);
             }
             // Align next member by PageSize;
-            MemberEnd = (MemberEnd + PageSize - 1) & - (int32)PageSize;
+            MemberEnd = (MemberEnd + PageSize - 1) & - (int32_t)PageSize;
             rec.End = MemberEnd - rec.FileOffset - 1;
             break;
 
@@ -648,20 +648,20 @@ void CLibrary::DumpOMF() {
     CheckOMFHash(Strings, MemberIndex);
 
     // Check if there is an extended library dictionary
-    uint32 ExtendedDictionaryOffset = DictionaryOffset + DictionarySize * 512;
+    uint32_t ExtendedDictionaryOffset = DictionaryOffset + DictionarySize * 512;
 
     if (ExtendedDictionaryOffset > GetDataSize()) {
         err.submit(2500);                          // File is truncated
     }
     if (ExtendedDictionaryOffset < GetDataSize()) {
         // Library contains extended dictionary
-        uint32 ExtendedDictionarySize = GetDataSize() - ExtendedDictionaryOffset;
-        uint8 DictionaryType = Get<uint8>(ExtendedDictionaryOffset); // Read first byte of extended dictionary
+        uint32_t ExtendedDictionarySize = GetDataSize() - ExtendedDictionaryOffset;
+        uint8_t DictionaryType = Get<uint8_t>(ExtendedDictionaryOffset); // Read first byte of extended dictionary
         if (DictionaryType == OMF_LIBEXT) {
             // Extended dictionary in the official format
             printf("\nExtended dictionary IBM/MS format. size %i", ExtendedDictionarySize);
         }
-        else if (ExtendedDictionarySize >= 10 && (DictionaryType == 0xAD || Get<uint16>(ExtendedDictionaryOffset + 2) == MemberNum)) {
+        else if (ExtendedDictionarySize >= 10 && (DictionaryType == 0xAD || Get<uint16_t>(ExtendedDictionaryOffset + 2) == MemberNum)) {
             // Extended dictionary in the proprietary Borland format, documented only in US Patent 5408665, 1995
             printf("\nExtended dictionary Borland format. size %i", ExtendedDictionarySize);
         }
@@ -684,9 +684,9 @@ void CLibrary::DumpUNIX() {
     if (cmd.DumpOptions & DUMP_SECTHDR) {
         // dump headers
         SUNIXLibraryHeader * Header = 0;    // Member header
-        uint32 MemberSize = 0;              // Size of member
-        //uint32 HeaderExtra = 0;             // Extra added to size of header
-        //uint32 NameIndex;                 // Index into long names member
+        uint32_t MemberSize = 0;              // Size of member
+        //uint32_t HeaderExtra = 0;             // Extra added to size of header
+        //uint32_t NameIndex;                 // Index into long names member
         char * Name = 0;                    // Name of member
         int symindex = 0;                   // count symbol index records
         int i;                              // loop counter
@@ -697,7 +697,7 @@ void CLibrary::DumpUNIX() {
             // Extract next library member from input library
             Header = &Get<SUNIXLibraryHeader>(CurrentOffset);
             // Size of member
-            MemberSize = (uint32)atoi(Header->FileSize);
+            MemberSize = (uint32_t)atoi(Header->FileSize);
             // Member name
             Name = Header->Name;
             // Terminate name
@@ -711,7 +711,7 @@ void CLibrary::DumpUNIX() {
             if (strncmp(Name, "//", 2) == 0) {
                 // This is the long names member.
                 printf("\nLongnames header \"%s\". Offset 0x%X, size 0x%X", Name,
-                    CurrentOffset + (uint32)sizeof(SUNIXLibraryHeader), MemberSize);
+                    CurrentOffset + (uint32_t)sizeof(SUNIXLibraryHeader), MemberSize);
             }
             else if (Name[0] == '/' && Name[1] <= ' ') {
                 // Symbol index
@@ -808,7 +808,7 @@ void CLibrary::DumpUNIX() {
 
         case IMPORT_LIBRARY_MEMBER: {
             // This is an import library
-            char * name1 = MemberBuffer.Buf() + 20;
+            char * name1 = (char*)MemberBuffer.Buf() + 20;
             printf("\n  Import %s from %s", name1, name1 + strlen(name1) + 1);
             break;}
 
@@ -818,22 +818,22 @@ void CLibrary::DumpUNIX() {
         }
 
         // Loop through table of public names
-        for (uint32 i = 0; i < StringEntries.GetNumEntries(); i++) {
-            uint32 j = StringEntries[i].String;
+        for (uint32_t i = 0; i < StringEntries.GetNumEntries(); i++) {
+            uint32_t j = StringEntries[i].String;
             printf("\n   %s", StringBuffer.Buf() + j);
         }
     }
 }
 
 
-uint32 CLibrary::NextHeader(uint32 Offset) {
+uint32_t CLibrary::NextHeader(uint32_t Offset) {
 
     // Loop through library headers.
     // Input = current offset. Output = next offset
     SUNIXLibraryHeader * Header;   // Member header
-    int32 MemberSize;          // Size of member
-    //uint32 HeaderExtra = 0;    // Extra added to size of header
-    uint32 NextOffset;         // Offset of next header
+    int32_t MemberSize;          // Size of member
+    //uint32_t HeaderExtra = 0;    // Extra added to size of header
+    uint32_t NextOffset;         // Offset of next header
 
     if (Offset + sizeof(SUNIXLibraryHeader) >= DataSize) {
         // No more members
@@ -879,7 +879,7 @@ void CLibrary::StartExtracting() {
         rec.GetByte();                             // Read flag
         // Page size / alignment for members
         PageSize = rec.End + 1;
-        uint32 align = 1 << FloorLog2(PageSize);   // Make power of 2
+        uint32_t align = 1 << FloorLog2(PageSize);   // Make power of 2
         if (PageSize != align) {
             err.submit(2601, PageSize);             // Error: not a power of 2
         }
@@ -909,11 +909,11 @@ char * CLibrary::ExtractMember(CFileBuffer * Destination) {
 char * CLibrary::ExtractMemberOMF(CFileBuffer * Destination) {
     // Extract member of OMF style library
 
-    uint32 RecordEnd;                             // End of OMF record
+    uint32_t RecordEnd;                             // End of OMF record
     SOMFRecordPointer rec;                        // Current OMF record
     char * MemberName = 0;                        // Name of library member
-    uint32 MemberStart = 0;                       // Start of member
-    uint32 MemberEnd = 0;                         // End of member
+    uint32_t MemberStart = 0;                       // Start of member
+    uint32_t MemberEnd = 0;                         // End of member
 
     if (CurrentOffset >= DictionaryOffset) return 0;// No more members
 
@@ -969,9 +969,9 @@ char * CLibrary::ExtractMemberUNIX(CFileBuffer * Destination) {
     // Extract member of UNIX style library
     // This function is called repeatedly to get each member of library/archive
     SUNIXLibraryHeader * Header = 0;     // Member header
-    uint32 MemberSize = 0;              // Size of member
-    uint32 HeaderExtra = 0;             // Extra added to size of header
-    uint32 NameIndex;                   // Index into long names member
+    uint32_t MemberSize = 0;              // Size of member
+    uint32_t HeaderExtra = 0;             // Extra added to size of header
+    uint32_t NameIndex;                   // Index into long names member
     char * Name = 0;                    // Name of member
     int Skip = 1;                       // Skip record and search for next
     int i;                              // Loop counter
@@ -988,7 +988,7 @@ char * CLibrary::ExtractMemberUNIX(CFileBuffer * Destination) {
         // Extract next library member from input library
         Header = &Get<SUNIXLibraryHeader>(CurrentOffset);
         // Size of member
-        MemberSize = (uint32)atoi(Header->FileSize);
+        MemberSize = (uint32_t)atoi(Header->FileSize);
         if (MemberSize + CurrentOffset + sizeof(SUNIXLibraryHeader) > DataSize) {
             err.submit(2500);  // Points outside file
             return 0;
@@ -1002,11 +1002,11 @@ char * CLibrary::ExtractMemberUNIX(CFileBuffer * Destination) {
             // The long names are terminated by '/' or 0, depending on system,
             // but may contain non-terminating '/'. Find out which type we have:
             // Pointer to LongNames record
-            p = Buf() + LongNames;
+            p = (char*)Buf() + LongNames;
             // Find out whether we have terminating zeroes:
             if ((LongNamesSize > 1 && p[LongNamesSize-1] == '/') || (p[LongNamesSize-1] <= ' ' && p[LongNamesSize-2] == '/')) {
                 // Names are terminated by '/'. Replace all '/' by 0 in the longnames record
-                for (uint32 j = 0; j < LongNamesSize; j++, p++) {
+                for (uint32_t j = 0; j < LongNamesSize; j++, p++) {
                     if (*p == '/') *p = 0;
                 }
             }
@@ -1020,7 +1020,7 @@ char * CLibrary::ExtractMemberUNIX(CFileBuffer * Destination) {
             // Name contains index into LongNames record
             NameIndex = atoi(Name+1);
             if (NameIndex < LongNamesSize) {
-                Name = Buf() + LongNames + NameIndex;
+                Name = (char*)Buf() + LongNames + NameIndex;
             }
             else {
                 Name = (char*)"NoName!";
@@ -1066,7 +1066,7 @@ char * CLibrary::ExtractMemberUNIX(CFileBuffer * Destination) {
     if (Destination) {
         Destination->SetSize(0);       // Make sure destination buffer is empty
         Destination->FileType = Destination->WordSize = 0;
-        Destination->Push((int8*)Header + sizeof(SUNIXLibraryHeader) + HeaderExtra, MemberSize);
+        Destination->Push((int8_t*)Header + sizeof(SUNIXLibraryHeader) + HeaderExtra, MemberSize);
     }
 
     // Check name
@@ -1097,7 +1097,7 @@ void CLibrary::InsertMemberOMF(CFileBuffer * member) {
     WordSize = member->WordSize;
 
     // Store offset
-    uint32 offset = DataBuffer.GetDataSize();
+    uint32_t offset = DataBuffer.GetDataSize();
     Indexes.Push(offset);
 
     // Store member
@@ -1105,7 +1105,7 @@ void CLibrary::InsertMemberOMF(CFileBuffer * member) {
     DataBuffer.Align(PageSize);
 
     // Member index
-    uint32 mindex = Indexes.GetNumEntries() - 1;
+    uint32_t mindex = Indexes.GetNumEntries() - 1;
 
     // Get public string table
     COMF omf;
@@ -1117,8 +1117,8 @@ void CLibrary::InsertMemberOMF(CFileBuffer * member) {
 
 void CLibrary::InsertMemberUNIX(CFileBuffer * member) {
     // Add next library member to output library
-    uint32 RawSize = 0;                 // Size of binary file
-    uint32 AlignmentPadding = 0;        // Padding after file
+    uint32_t RawSize = 0;                 // Size of binary file
+    uint32_t AlignmentPadding = 0;        // Padding after file
     char * name = 0;                    // Name of member
     int NameLength = 0;                 // length of name
     int NameAfter = 0;                  // length of name after MachO header
@@ -1142,7 +1142,7 @@ void CLibrary::InsertMemberUNIX(CFileBuffer * member) {
         // Remove path from library member name. Original long name is overwritten
         name = StripMemberName((char*)(member->OutputFileName));
     }
-    NameLength = strlen(name);
+    NameLength = (int)strlen(name);
 
     if (cmd.OutputType == FILETYPE_MACHO_LE && cmd.LibrarySubtype != LIBTYPE_SHORTNAMES) {
         // Mach-O library stores name after header record.
@@ -1177,7 +1177,7 @@ void CLibrary::InsertMemberUNIX(CFileBuffer * member) {
     }
 
     // Date
-    sprintf(header.Date, "%u ", (uint32)time(0));
+    sprintf(header.Date, "%u ", (uint32_t)time(0));
 
     // User and group id
     header.UserID[0] = '0';
@@ -1188,7 +1188,7 @@ void CLibrary::InsertMemberUNIX(CFileBuffer * member) {
     RawSize = member->GetDataSize();
     // Calculate alignment padding
     if (AlignBy) {
-        AlignmentPadding = uint32(-int32(RawSize)) & (AlignBy-1);
+        AlignmentPadding = uint32_t(-int32_t(RawSize)) & (AlignBy-1);
     }
 
     // File size including name string
@@ -1199,12 +1199,12 @@ void CLibrary::InsertMemberUNIX(CFileBuffer * member) {
     header.HeaderEnd[1] = '\n';
 
     // Remove terminating zeroes
-    for (uint32 i = 0; i < sizeof(SUNIXLibraryHeader); i++) {
+    for (uint32_t i = 0; i < sizeof(SUNIXLibraryHeader); i++) {
         if (((char*)&header)[i] == 0) ((char*)&header)[i] = ' ';
     }
 
     // Store offset
-    uint32 offset = DataBuffer.GetDataSize();
+    uint32_t offset = DataBuffer.GetDataSize();
     Indexes.Push(offset);
 
     // Store member header
@@ -1223,12 +1223,12 @@ void CLibrary::InsertMemberUNIX(CFileBuffer * member) {
     DataBuffer.Push(member->Buf(), RawSize);
 
     // Align by padding with '\n'
-    for (uint32 i = 0; i < AlignmentPadding; i++) {
+    for (uint32_t i = 0; i < AlignmentPadding; i++) {
         DataBuffer.Push("\n", 1);
     }
 
     // Member index
-    uint32 mindex = Indexes.GetNumEntries() - 1;
+    uint32_t mindex = Indexes.GetNumEntries() - 1;
 
     // Get public string table
     switch(member->GetFileType()) {
@@ -1347,7 +1347,7 @@ char * CLibrary::TruncateMemberName(char const * name) {
     // Remove any spaces or other illegal characters
     len = (int)strlen(TruncName);
     for (i = 0; i < len; i++) {
-        if ((uint8)TruncName[i] <= 0x20) TruncName[i] = '_';
+        if ((uint8_t)TruncName[i] <= 0x20) TruncName[i] = '_';
     }
 
     // Add default extension
@@ -1419,7 +1419,7 @@ char * CLibrary::StripMemberName(char * name) {
     // Remove any spaces or other illegal characters
     len = (int)strlen(name);
     for (i = 0; i < nlen; i++) {
-        if ((uint8)name[i] <= 0x20 || name[i] == '.') name[i] = '_';
+        if ((uint8_t)name[i] <= 0x20 || name[i] == '.') name[i] = '_';
     }
 
     // Check if any name remains
@@ -1479,7 +1479,7 @@ char * CLibrary::ShortenMemberName(char const *name) {
 
     // Remove any spaces or other illegal characters
     for (i = 0; i < len0; i++) {
-        if ((uint8)fixedName[i] <= 0x20 || fixedName[i] == '.') fixedName[i] = '_';
+        if ((uint8_t)fixedName[i] <= 0x20 || fixedName[i] == '.') fixedName[i] = '_';
     }
 
     // Check if any name remains
@@ -1528,7 +1528,7 @@ char * CLibrary::ShortenMemberName(char const *name) {
 int CLibrary::MemberNameExistsUNIX(char * name) {
     // Check if DataBuffer contains a member with this name
     char Name1[20], Name2[20];
-    uint32 i, j;
+    uint32_t i, j;
 
     // Terminate name without extension
     memcpy(Name1, name, 16);
@@ -1538,7 +1538,7 @@ int CLibrary::MemberNameExistsUNIX(char * name) {
 
     // Loop through previous members in DataBuffer
     for (i = 0; i < Indexes.GetNumEntries(); i++) {
-        uint32 offset = Indexes[i];
+        uint32_t offset = Indexes[i];
         // Copy name of member i
         memcpy(Name2, DataBuffer.Buf() + offset, 16);
         // Terminate name2
@@ -1560,7 +1560,7 @@ void CLibrary::SortStringTable() {
     // Sort the string table in ASCII order
 
     // Length of table
-    int32 n = StringEntries.GetNumEntries();
+    int32_t n = StringEntries.GetNumEntries();
     if (n <= 0) return;
 
     // Point to table of SStringEntry records
@@ -1571,11 +1571,11 @@ void CLibrary::SortStringTable() {
     SStringEntry temp;
 
     // Simple Bubble sort:
-    int32 i, j;
+    int32_t i, j;
     for (i = 0; i < n; i++) {
         for (j = 0; j < n - i - 1; j++) {
-            s1 = StringBuffer.Buf() + Table[j].String;
-            s2 = StringBuffer.Buf() + Table[j+1].String;
+            s1 = (char*)StringBuffer.Buf() + Table[j].String;
+            s2 = (char*)StringBuffer.Buf() + Table[j+1].String;
             if (strcmp(s1, s2) > 0) {
                 // Swap records
                 temp = Table[j];
@@ -1588,7 +1588,7 @@ void CLibrary::SortStringTable() {
     CMemoryBuffer SortedStringBuffer;    // Temporary buffer for strings in sort order
     for (i = 0; i < n; i++) {
         // Pointer to old string
-        s1 = StringBuffer.Buf() + Table[i].String;
+        s1 = (char*)StringBuffer.Buf() + Table[i].String;
         // Update table to point to new string
         Table[i].String = SortedStringBuffer.GetDataSize();
         // Put string into SortedStringBuffer
@@ -1603,13 +1603,13 @@ void CLibrary::SortStringTable() {
 
     // Check for duplicate symbols
     for (i = 0; i < n-1; i++) {
-        s1 = StringBuffer.Buf() + Table[i].String;
+        s1 = (char*)StringBuffer.Buf() + Table[i].String;
         for (j = i + 1; j < n; j++) {
-            s2 = StringBuffer.Buf() + Table[j].String;
+            s2 = (char*)StringBuffer.Buf() + Table[j].String;
             if (strcmp(s1,s2) == 0) {
                 // Duplicate found
                 // Compose error string "Modulename1 and Modulename2"
-                uint32 errstring = LongNamesBuffer.GetDataSize();
+                uint32_t errstring = LongNamesBuffer.GetDataSize();
                 LongNamesBuffer.PushString(GetModuleName(Table[i].Member));
                 LongNamesBuffer.SetSize(LongNamesBuffer.GetDataSize()-1); // remove terminating zero
                 LongNamesBuffer.Push(" and ", 5);
@@ -1626,30 +1626,30 @@ void CLibrary::SortStringTable() {
 }
 
 
-uint32 EndianChange(uint32 n) {
+uint32_t EndianChange(uint32_t n) {
     // Convert little-endian to big-endian number, or vice versa
     return (n << 24) | ((n & 0x0000FF00) << 8) | ((n & 0x00FF0000) >> 8) | (n >> 24);
 }
 
 
-uint32 RoundEven(uint32 n) {
+uint32_t RoundEven(uint32_t n) {
     // Round up number to nearest even
-    return (n + 1) & uint32(-2);
+    return (n + 1) & uint32_t(-2);
 }
 
 
-uint32 Round4(uint32 n) {
+uint32_t Round4(uint32_t n) {
     // Round up number to nearest multiple of 4
-    return (n + 3) & uint32(-4);
+    return (n + 3) & uint32_t(-4);
 }
 
 
 void CLibrary::MakeSymbolTableUnix() {
     // Make symbol table for COFF, ELF or MACHO library
     // Uses UNIX archive format for COFF, BSD and Mac
-    uint32 i;                              // Loop counter
-    uint32 MemberOffset;                   // Offset to member
-    uint32 LongNameSize = 0;               // Length of symbol table name if stored after record
+    uint32_t i;                              // Loop counter
+    uint32_t MemberOffset;                   // Offset to member
+    uint32_t LongNameSize = 0;               // Length of symbol table name if stored after record
 
     int SymbolTableType = cmd.OutputType;  // FILETYPE_COFF       = 1: COFF
     // FILETYPE_ELF        = 3: ELF
@@ -1664,9 +1664,9 @@ void CLibrary::MakeSymbolTableUnix() {
     SymTab.Name[0] = '/';                  // Name = '/'
     // The silly Mac linker requires that the symbol table has a date stamp not
     // older than the .a file. Fix this by post-dating the symbol table:
-    uint32 PostDate = 0;
+    uint32_t PostDate = 0;
     if (SymbolTableType & 0x10000000) PostDate = 100; // Post-date if mac sorted symbol table
-    sprintf(SymTab.Date, "%u ", (uint32)time(0) + PostDate); // Date stamp for symbol table
+    sprintf(SymTab.Date, "%u ", (uint32_t)time(0) + PostDate); // Date stamp for symbol table
 
     SymTab.UserID[0] = '0';                // UserID = 0  (may be omitted in COFF)
     SymTab.GroupID[0] = '0';               // GroupID = 0 (may be omitted in COFF)
@@ -1678,19 +1678,19 @@ void CLibrary::MakeSymbolTableUnix() {
     // File header
     OutFile.Push("!<arch>\n", 8);
 
-    uint32 NumMembers = Indexes.GetNumEntries();        // Number of members
-    uint32 NumStrings = StringEntries.GetNumEntries();  // Number of symbol names
-    uint32 StringsLen = StringBuffer.GetDataSize();     // Size of string table
+    uint32_t NumMembers = Indexes.GetNumEntries();        // Number of members
+    uint32_t NumStrings = StringEntries.GetNumEntries();  // Number of symbol names
+    uint32_t StringsLen = StringBuffer.GetDataSize();     // Size of string table
 
     // Calculate sizes of string index records, not including header
     // Unsorted index, used in ELF and COFF libraries
-    uint32 Index1Size = (NumStrings+1)*4 + StringsLen;
+    uint32_t Index1Size = (NumStrings+1)*4 + StringsLen;
     // Sorted index, used in COFF libraries as second member
-    uint32 Index2Size = (NumMembers+2)*4 + NumStrings*2 + StringsLen;
+    uint32_t Index2Size = (NumMembers+2)*4 + NumStrings*2 + StringsLen;
     // Sorted index, used in Mach-O libraries
-    uint32 Index3Size = Round4(NumStrings*8 + 8 + StringsLen);
+    uint32_t Index3Size = Round4(NumStrings*8 + 8 + StringsLen);
     // Longnames member
-    uint32 LongnamesMemberSize = 0;
+    uint32_t LongnamesMemberSize = 0;
     // Official MS COFF reference says that the "//" longnames member must be present,
     // even if it is unused, but MS LIB does not make it unless it is needed.
     // Here, we will include the longnames member only if it is needed
@@ -1699,7 +1699,7 @@ void CLibrary::MakeSymbolTableUnix() {
     }
 
     // Offset to first member
-    uint32 FirstMemberOffset = 0;
+    uint32_t FirstMemberOffset = 0;
     switch (SymbolTableType) {
     case FILETYPE_COFF:
         FirstMemberOffset = 8 + 2*sizeof(SUNIXLibraryHeader) + RoundEven(Index1Size)
@@ -1734,7 +1734,7 @@ void CLibrary::MakeSymbolTableUnix() {
         OutFile.Push(&SymTab, sizeof(SymTab));
 
         // Store table of offsets
-        uint32 BigEndian;             // Number converted to big-endian
+        uint32_t BigEndian;             // Number converted to big-endian
         BigEndian = EndianChange(NumStrings);
         OutFile.Push(&BigEndian, sizeof(BigEndian));  // Number of symbols
 
@@ -1793,7 +1793,7 @@ void CLibrary::MakeSymbolTableUnix() {
             // Get record in temporary symbol table
             SStringEntry * psym = &StringEntries[i];
             // Get member index, 16 bits
-            uint16 MemberI = (uint16)(psym->Member + 1);
+            uint16_t MemberI = (uint16_t)(psym->Member + 1);
             OutFile.Push(&MemberI, sizeof(MemberI));
         }
 
@@ -1840,7 +1840,7 @@ void CLibrary::MakeSymbolTableUnix() {
             // Unsorted table. "__.SYMDEF" stored as short name
             memcpy(SymTab.Name, "__.SYMDEF       ", 16);
             // Put file size into symbol table header
-            sprintf(SymTab.FileSize, "%u ", Index3Size);
+            sprintf(SymTab.FileSize, "%u ", Index3Size & 0x3FFFFFF); // prevent string overflow
         }
 
         // Remove terminating zeroes
@@ -1858,7 +1858,7 @@ void CLibrary::MakeSymbolTableUnix() {
 
         // Store an array of records of string index and member offsets
         // Store length first
-        uint32 ArrayLength = NumStrings * sizeof(SStringEntry);
+        uint32_t ArrayLength = NumStrings * sizeof(SStringEntry);
         OutFile.Push(&ArrayLength, sizeof(ArrayLength));
 
         // Loop through strings
@@ -1897,17 +1897,17 @@ void CLibrary::MakeBinaryFile() {
 
 void CLibrary::MakeBinaryFileOMF() {
     // Make OMF library
-    uint32 PageSize;                              // Page size / alignment for output library
-    uint32 temp;                                  // Temporary
-    uint16 temp16;                                // Temporary
-    uint8  temp8;                                 // Temporary
-    uint32 MemberI;                               // Member number
-    uint32 MemberOffset;                          // File offset of member in output file
-    uint32 MemberStart;                           // Start of member in DataBuffer
-    uint32 MemberEnd;                             // End of member in DataBuffer
-    uint32 SymbolI;                               // Public symbol number
-    uint32 DictionaryOffset2;                     // Offset to hash table
-    CSList<uint32> MemberPageIndex;               // Remember page index of each member
+    uint32_t PageSize;                              // Page size / alignment for output library
+    uint32_t temp;                                  // Temporary
+    uint16_t temp16;                                // Temporary
+    uint8_t  temp8;                                 // Temporary
+    uint32_t MemberI;                               // Member number
+    uint32_t MemberOffset;                          // File offset of member in output file
+    uint32_t MemberStart;                           // Start of member in DataBuffer
+    uint32_t MemberEnd;                             // End of member in DataBuffer
+    uint32_t SymbolI;                               // Public symbol number
+    uint32_t DictionaryOffset2;                     // Offset to hash table
+    CSList<uint32_t> MemberPageIndex;               // Remember page index of each member
 
     // Check number of entries
     if (DataBuffer.GetNumEntries() >= 0x8000) {
@@ -1985,10 +1985,10 @@ void CLibrary::MakeBinaryFileOMF() {
 
     // Insert missing values in library header
     // Hash table offset
-    OutFile.Get<uint32>(3) = DictionaryOffset2;
+    OutFile.Get<uint32_t>(3) = DictionaryOffset2;
 
     // Hash table size
-    OutFile.Get<uint16>(7) = (OutFile.GetDataSize() - DictionaryOffset2) / OMFBlockSize;
+    OutFile.Get<uint16_t>(7) = (OutFile.GetDataSize() - DictionaryOffset2) / OMFBlockSize;
 }
 
 
@@ -2017,12 +2017,12 @@ void CLibrary::MakeBinaryFileUNIX() {
 
 void CLibrary::CheckOMFHash(CMemoryBuffer &stringbuf, CSList<SStringEntry> &index) {
     // Check if OMF library hash table has correct entries for all symbol names
-    uint32 i;                                     // Loop counter
-    int8 * Name;                                  // Public symbol name
-    COMFHashTable HashTab;                        // OMF hash table interpreter
-    uint32 NString;                               // Number of occurrences of Name in hash table
-    uint32 Module;                                // Module with first occurrence of Name
-    uint32 Conf, ConfSum = 0;                     // Count number of conflicting entries in hash table
+    uint32_t i;                                     // Loop counter
+    char * Name;                                    // Public symbol name
+    COMFHashTable HashTab;                          // OMF hash table interpreter
+    uint32_t NString;                               // Number of occurrences of Name in hash table
+    uint32_t Module;                                // Module with first occurrence of Name
+    uint32_t Conf, ConfSum = 0;                     // Count number of conflicting entries in hash table
 
     // Initialize hash table interpreter
     HashTab.Init(&Get<SOMFHashBlock>(DictionaryOffset), DictionarySize);
@@ -2030,7 +2030,7 @@ void CLibrary::CheckOMFHash(CMemoryBuffer &stringbuf, CSList<SStringEntry> &inde
     // Loop through public symbol names
     for (i = 0; i < index.GetNumEntries(); i++) {
         // Get public name
-        Name = stringbuf.Buf() + index[i].String;
+        Name = (char*)stringbuf.Buf() + index[i].String;
         // Make hash
         HashTab.MakeHash(Name);
         // Search for string
@@ -2049,12 +2049,12 @@ void CLibrary::CheckOMFHash(CMemoryBuffer &stringbuf, CSList<SStringEntry> &inde
 }
 
 
-const char * CLibrary::GetModuleName(uint32 Index) {
+const char * CLibrary::GetModuleName(uint32_t Index) {
     // Get name of module from index (UNIX) or page index (OMF)
     static char name[32];
     if (cmd.OutputType == FILETYPE_OMF || cmd.OutputType == FILETYPE_OMFLIBRARY) {
         // Get name of module in OMF library
-        if (Index * PageSize < OutFile.GetDataSize() && OutFile.Get<uint8>(Index * PageSize) == OMF_THEADR) {
+        if (Index * PageSize < OutFile.GetDataSize() && OutFile.Get<uint8_t>(Index * PageSize) == OMF_THEADR) {
             SOMFRecordPointer rec;                     // Record pointer
             rec.Start(OutFile.Buf(), Index * PageSize, OutFile.GetDataSize());
             if (rec.Type2 == OMF_THEADR) {
@@ -2072,7 +2072,7 @@ const char * CLibrary::GetModuleName(uint32 Index) {
     // UNIX style library.
     if (Index < Indexes.GetNumEntries()) {
         // Get offset from Index
-        uint32 Offset = Indexes[Index];
+        uint32_t Offset = Indexes[Index];
         if (Offset < DataBuffer.GetDataSize()) {
             // Copy name from header
             memcpy(name, DataBuffer.Buf() + Offset, 16);
@@ -2083,9 +2083,9 @@ const char * CLibrary::GetModuleName(uint32 Index) {
             }
             else if (name[0] == '/') {
                 // Long name in longnames record
-                uint32 NameIndex = atoi(name+1);
+                uint32_t NameIndex = atoi(name+1);
                 if (NameIndex < LongNamesSize) {
-                    return Buf() + LongNames + NameIndex;
+                    return (char*)Buf() + LongNames + NameIndex;
                 }
                 else {
                     return "?";

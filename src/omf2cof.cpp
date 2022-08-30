@@ -12,7 +12,7 @@
 #include "stdafx.h"
 
 // Alignment value translation table
-static const uint32 OMFAlignTranslate[8] = {0,1,2,16,256,4,0,0};
+static const uint32_t OMFAlignTranslate[8] = {0,1,2,16,256,4,0,0};
 
 COMF2COF::COMF2COF() {
     // Constructor
@@ -44,7 +44,7 @@ void COMF2COF::MakeFileHeader() {
     // Convert subfunction: File header
     // Make PE file header
     NewFileHeader.Machine = PE_MACHINE_I386;
-    NewFileHeader.TimeDateStamp = (uint32)time(0);
+    NewFileHeader.TimeDateStamp = (uint32_t)time(0);
     NewFileHeader.SizeOfOptionalHeader = 0;
     NewFileHeader.Flags = 0;
 
@@ -85,13 +85,13 @@ void COMF2COF::MakeSymbolTable1() {
     // Define structure of attributes
     OMF_SAttrib Attributes;
     // Other segment properties
-    uint32 SegLength, NameIndex, ClassIndex;
-    //uint32 Offset;
+    uint32_t SegLength, NameIndex, ClassIndex;
+    //uint32_t Offset;
     const char * sname;                           // Segment/section name
-    uint32 SegNum = 0;                            // Segment/section number
-    uint32 StringI;                               // New sting table index
-    uint32 i;                                     // Record number
-    int32  j, n;                                  // Temporary
+    uint32_t SegNum = 0;                            // Segment/section number
+    uint32_t StringI;                               // New sting table index
+    uint32_t i;                                     // Record number
+    int32_t  j, n;                                  // Temporary
 
     // Loop through segments of old file
     for (i = 0; i < NumRecords; i++) {
@@ -133,7 +133,7 @@ void COMF2COF::MakeSymbolTable1() {
 
                 // Put name into symbol table
                 //COFF_PutNameInSymbolTable(sym, sname, NewStringTable);
-                ((uint32*)(sym.s.Name))[1] = StringI;
+                ((uint32_t*)(sym.s.Name))[1] = StringI;
 
                 sym.s.SectionNumber = ++SegNum;        // Count section number
                 sym.s.StorageClass = COFF_CLASS_STATIC;
@@ -188,7 +188,7 @@ void COMF2COF::MakeSymbolTable1() {
                 ClassName = GetLocalName(ClassIndex);
 
                 // Convert class name to upper case
-                n = (int32)strlen(ClassName);
+                n = (int32_t)strlen(ClassName);
                 for (j = 0; j < n; j++) ClassName[j] &= ~0x20;
 
                 // Search for known class names.
@@ -234,9 +234,9 @@ void COMF2COF::MakeSymbolTable1() {
 
 void COMF2COF::MakeSymbolTable2() {
     // Make symbol table and string table entries for external symbols
-    uint32 i;
+    uint32_t i;
     SCOFF_SymTableEntry sym;                      // new symbol table entry
-    uint32 NumExtSym = SymbolNameOffset.GetNumEntries(); // Number of external symbols
+    uint32_t NumExtSym = SymbolNameOffset.GetNumEntries(); // Number of external symbols
     ExtdefTranslation.SetNum(NumExtSym+1);          // Allocate space in translation table
 
     // Loop through external symbol names
@@ -262,11 +262,11 @@ void COMF2COF::MakeSymbolTable2() {
 void COMF2COF::MakeSymbolTable3() {
     // Make symbol table and string table entries for public symbols
     SCOFF_SymTableEntry sym;                      // new symbol table entry
-    uint32 i;                                     // Record index
+    uint32_t i;                                     // Record index
     char * string;                                // Symbol name
-    uint32 Segment;                               // Segment
-    uint32 Offset;                                // Offset
-    uint32 Namei;                                 // Index into symbol table
+    uint32_t Segment;                               // Segment
+    uint32_t Offset;                                // Offset
+    uint32_t Namei;                                 // Index into symbol table
     SOMFLocalSymbol localsym;                     // Entry into LocalSymbols
 
     // Search for PUBDEF records
@@ -299,7 +299,7 @@ void COMF2COF::MakeSymbolTable3() {
 
                 // Section number = segment number
                 if (Segment == 0) sym.s.SectionNumber = COFF_SECTION_ABSOLUTE;
-                else sym.s.SectionNumber = (int16)Segment;
+                else sym.s.SectionNumber = (int16_t)Segment;
 
                 // Store symbol table entry
                 NewSymbolTable.Push(sym);
@@ -331,17 +331,17 @@ void COMF2COF::MakeSymbolTable5() {
     // through all FIXUPP records for relocation targets and assign arbitrary
     // names to them.
 
-    uint32 i;                                     // Loop counter
-    uint32 Target, TargetDisplacement;            // Contents of FIXUPP record
-    uint8 byte1, byte2;                           // First two bytes of FIXUPP subrecord
+    uint32_t i;                                     // Loop counter
+    uint32_t Target, TargetDisplacement;            // Contents of FIXUPP record
+    uint8_t byte1, byte2;                           // First two bytes of FIXUPP subrecord
     // Bitfields in subrecords
     OMF_SLocat Locat;                             // Structure of first two bytes of FIXUP subrecord swapped = Locat field
     OMF_SFixData FixData;                         // Structure of FixData field in FIXUP subrecord of FIXUPP record
     OMF_STrdDat TrdDat;                           // Structure of Thread Data field in THREAD subrecord of FIXUPP record
-    int8 * LastDataRecordPointer = 0;             // Pointer to data in the data record that relocations refer to
-    uint32 LastDataRecordSize = 0;                // Size of the data record that relocations refer to
+    int8_t * LastDataRecordPointer = 0;             // Pointer to data in the data record that relocations refer to
+    uint32_t LastDataRecordSize = 0;                // Size of the data record that relocations refer to
     SOMFLocalSymbol localsym;                     // Entry into LocalSymbols
-    uint32 LocalSymNum = 0;                       // Number of unnamed local symbols
+    uint32_t LocalSymNum = 0;                       // Number of unnamed local symbols
     char NewName[32];                             // Buffer for making new name
     SCOFF_SymTableEntry sym;                      // New symbol table entry
 
@@ -387,16 +387,16 @@ void COMF2COF::MakeSymbolTable5() {
                     if (FixData.s.T == 0) {
                         // Target specified
                         Target = Records[i].GetIndex();
-                        //uint32 TargetMethod = FixData.s.Target + FixData.s.P * 4;
+                        //uint32_t TargetMethod = FixData.s.Target + FixData.s.P * 4;
                     }
                     if (FixData.s.P == 0) {
                         TargetDisplacement = Records[i].GetNumeric();
                     }
                     // Get inline addend
                     if (LastDataRecordPointer && Locat.s.Offset < LastDataRecordSize) {
-                        int8 * inlinep = LastDataRecordPointer + Locat.s.Offset;
+                        int8_t * inlinep = LastDataRecordPointer + Locat.s.Offset;
                         if (Locat.s.Location == 9 || Locat.s.Location == 13) {
-                            TargetDisplacement += *(int32*)inlinep;
+                            TargetDisplacement += *(int32_t*)inlinep;
                         }
                     }
                     if (FixData.s.T == 0 && (FixData.s.Target == 0 || FixData.s.Target == 1)) {
@@ -461,22 +461,22 @@ void COMF2COF::MakeSymbolTable5() {
 
 void COMF2COF::MakeSections() {
     // Make sections and relocation tables
-    uint32 SegNum;                                // Index into NewSectionHeaders = segment - 1
-    uint32 DesiredSegment;                        // Old segment number = new section number
-    uint32 RecNum;                                // Old record number
+    uint32_t SegNum;                                // Index into NewSectionHeaders = segment - 1
+    uint32_t DesiredSegment;                        // Old segment number = new section number
+    uint32_t RecNum;                                // Old record number
     CMemoryBuffer TempBuf;                        // Temporary buffer for building raw data
     CMemoryBuffer RelocationTable;                // Temporary buffer for building new relocation table
     SCOFF_Relocation rel;                         // New relocation table record
-    uint32 LastDataRecord = 0;                    // Index to the data record that relocations refer to
-    uint32 LastDataRecordSize = 0;                // Size of the data record that relocations refer to
-    int8 * LastDataRecordPointer = 0;             // Pointer to data in the data record that relocations refer to
-    uint32 Segment = 0;                           // Segment of last LEDATA, LIDATA or COMDEF record
-    uint32 Offset;                                // Offset of LEDATA or LIDATA record to segment
-    uint32 Size;                                  // Size of data in LEDATA or LIDATA record
-    uint32 SegmentSize;                           // Total size of segment
-    uint32 LastOffset;                            // Offset after last LEDATA into segment
-    uint32 FileOffsetData;                        // File offset of first raw data and relocations in new file
-    uint32 FileOffset;                            // File offset of current raw data or relocations
+    uint32_t LastDataRecord = 0;                    // Index to the data record that relocations refer to
+    uint32_t LastDataRecordSize = 0;                // Size of the data record that relocations refer to
+    int8_t * LastDataRecordPointer = 0;             // Pointer to data in the data record that relocations refer to
+    uint32_t Segment = 0;                           // Segment of last LEDATA, LIDATA or COMDEF record
+    uint32_t Offset;                                // Offset of LEDATA or LIDATA record to segment
+    uint32_t Size;                                  // Size of data in LEDATA or LIDATA record
+    uint32_t SegmentSize;                           // Total size of segment
+    uint32_t LastOffset;                            // Offset after last LEDATA into segment
+    uint32_t FileOffsetData;                        // File offset of first raw data and relocations in new file
+    uint32_t FileOffset;                            // File offset of current raw data or relocations
 
     // File offset of first data = size of file header and section headers
     FileOffsetData = sizeof(SCOFF_FileHeader) + NewSectionHeaders.GetNumEntries() * sizeof(SCOFF_SectionHeader);
@@ -589,9 +589,9 @@ void COMF2COF::MakeSections() {
 
                 if (Segment != DesiredSegment) continue; // Does not refer to this segment
 
-                uint32 Target, TargetDisplacement; // Contents of FIXUPP record
-                //uint32 Frame; // Contents of FIXUPP record
-                uint8 byte1, byte2;                 // First two bytes of subrecord
+                uint32_t Target, TargetDisplacement; // Contents of FIXUPP record
+                //uint32_t Frame; // Contents of FIXUPP record
+                uint8_t byte1, byte2;                 // First two bytes of subrecord
 
                 // Bitfields in subrecords
                 OMF_SLocat Locat;         // Structure of first two bytes of FIXUP subrecord swapped = Locat field
@@ -643,7 +643,7 @@ void COMF2COF::MakeSections() {
                         if (FixData.s.T == 0) {
                             // Target specified
                             Target = Records[RecNum].GetIndex();
-                            //uint32 TargetMethod = FixData.s.Target + FixData.s.P * 4;
+                            //uint32_t TargetMethod = FixData.s.Target + FixData.s.P * 4;
                         }
                         else {
                             // Target specified in previous thread
@@ -660,7 +660,7 @@ void COMF2COF::MakeSections() {
                         // Get inline addend and check relocation method
                         if (LastDataRecordPointer && Locat.s.Offset < LastDataRecordSize) {
                             // Pointer to relocation source inline in raw data:
-                            int8 * inlinep = LastDataRecordPointer + Locat.s.Offset;
+                            int8_t * inlinep = LastDataRecordPointer + Locat.s.Offset;
 
                             switch (Locat.s.Location) { // Relocation method
 
@@ -671,17 +671,17 @@ void COMF2COF::MakeSections() {
                                 // symbol table entry.
 
                                 // Add the inline offset to the explicit offset
-                                TargetDisplacement += *(uint32*)inlinep;
+                                TargetDisplacement += *(uint32_t*)inlinep;
 
                                 // Remove the inline addend to avoid adding it twice:
                                 // We have to do this in the new buffer TempBuf because
                                 // the data have already been copied to TempBuf
-                                if (*(uint32*)(TempBuf.Buf() + LastOffset + Locat.s.Offset) != *(uint32*)inlinep) {
+                                if (*(uint32_t*)(TempBuf.Buf() + LastOffset + Locat.s.Offset) != *(uint32_t*)inlinep) {
                                     // Check that the data in Buf() and TempBuf.Buf() are the same
                                     err.submit(9000);
                                 }
                                 // Remove the inline addend to avoid adding it twice
-                                *(uint32*)(TempBuf.Buf() + LastOffset + Locat.s.Offset) = 0;
+                                *(uint32_t*)(TempBuf.Buf() + LastOffset + Locat.s.Offset) = 0;
                                 break;
 
                             case 0: case 4:  // 8 bit. Not supported
@@ -703,7 +703,7 @@ void COMF2COF::MakeSections() {
                         rel.VirtualAddress = Locat.s.Offset + LastOffset;
 
                         SOMFLocalSymbol locsym; // Symbol record for search in LocalSymbols table
-                        int32 LocalSymbolsIndex; // Index into LocalSymbols table
+                        int32_t LocalSymbolsIndex; // Index into LocalSymbols table
 
                         // Relocation type: direct or EIP-relative
                         // (The displacement between relocation source and EIP for
@@ -741,7 +741,7 @@ void COMF2COF::MakeSections() {
 
                             // Put addend inline in new file
                             if (LastOffset + Locat.s.Offset < SegmentSize) {
-                                *(uint32*)(TempBuf.Buf() + LastOffset + Locat.s.Offset) = TargetDisplacement;
+                                *(uint32_t*)(TempBuf.Buf() + LastOffset + Locat.s.Offset) = TargetDisplacement;
                             }
                             break;
 
@@ -787,12 +787,12 @@ void COMF2COF::MakeSections() {
         NewSectionHeaders[SegNum].PRelocations = FileOffsetData + FileOffset;
 
         // Put number of relocations into section header
-        NewSectionHeaders[SegNum].NRelocations = (uint16)(RelocationTable.GetNumEntries());
+        NewSectionHeaders[SegNum].NRelocations = (uint16_t)(RelocationTable.GetNumEntries());
 
         // Put number of relocations into symbol table auxiliary entry.
         // Search for the symbol table entry for this section:
-        for (uint32 sym = 0; sym < NewSymbolTable.GetNumEntries(); sym++) {
-            if ((uint32)NewSymbolTable[sym].s.SectionNumber == DesiredSegment
+        for (uint32_t sym = 0; sym < NewSymbolTable.GetNumEntries(); sym++) {
+            if ((uint32_t)NewSymbolTable[sym].s.SectionNumber == DesiredSegment
                 && NewSymbolTable[sym].s.StorageClass == COFF_CLASS_STATIC
                 && NewSymbolTable[sym].s.NumAuxSymbols == 1) {
                     // Found right symbol table entry. Insert NumberOfRelocations
@@ -806,9 +806,9 @@ void COMF2COF::MakeSections() {
 
 void COMF2COF::CheckUnsupportedRecords() {
     // Make warnings if file containes unsupported record types
-    uint32 RecNum;                                // Record number
-    uint32 NumComdat = 0;                         // Number of COMDAT records
-    uint32 NumComent = 0;                         // Number of COMENT records
+    uint32_t RecNum;                                // Record number
+    uint32_t NumComdat = 0;                         // Number of COMDAT records
+    uint32_t NumComent = 0;                         // Number of COMENT records
 
     // Loop through all records
     for (RecNum = 0; RecNum < NumRecords; RecNum++) {
@@ -842,7 +842,7 @@ void COMF2COF::CheckUnsupportedRecords() {
 
 void COMF2COF::MakeBinaryFile() {
     // Putting sections together
-    uint32 i;
+    uint32_t i;
 
     // Get number of symbols and sections into file header
     NewFileHeader.NumberOfSymbols = NewSymbolTable.GetNumEntries();
@@ -868,7 +868,7 @@ void COMF2COF::MakeBinaryFile() {
     }
 
     // Insert string table size
-    NewStringTable.Get<uint32>(0) = NewStringTable.GetDataSize();
+    NewStringTable.Get<uint32_t>(0) = NewStringTable.GetDataSize();
 
     // Put string table into new file
     ToFile.Push(NewStringTable.Buf(), NewStringTable.GetDataSize());

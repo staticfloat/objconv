@@ -252,8 +252,9 @@ void CErrorReporter::submit(int ErrorNumber, char const * extra) {
    // ErrorTexts[ErrorNumber] must contain %s where extra is to be inserted
    char text[MAX_ERROR_TEXT_LENGTH];
    SErrorText * err = FindError(ErrorNumber);
-   strcpy (text, err->Text);
-   strncat( text, extra, MAX_ERROR_TEXT_LENGTH/2);
+   sprintf(text, err->Text, extra);
+   //strcpy (text, err->Text);
+   //strncat( text, extra, MAX_ERROR_TEXT_LENGTH/2);
    HandleError(err, text);
 }
 

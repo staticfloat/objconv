@@ -60,9 +60,9 @@ template <class TMAC_header, class TMAC_segment_command, class TMAC_section, cla
 void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeSegments() {
    // Convert subfunction: Make segment headers and code/data segments
    TELF_SectionHeader NewSecHeader; // New section header
-   uint32 oldsec;                   // Section index in old file
-   uint32 newsec;                   // Section index in new file
-   uint32 SecNameIndex;             // Section name index into shstrtab
+   uint32_t oldsec;                   // Section index in old file
+   uint32_t newsec;                   // Section index in new file
+   uint32_t SecNameIndex;             // Section name index into shstrtab
    char const * SecName;            // Name of new section
    const int MAXSECTIONNAMELENGTH = 256;
    char RelocationSectionName[MAXSECTIONNAMELENGTH];
@@ -79,7 +79,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeSegments() {
    stabstr     = 4;               // Debug string table section number
 
    // Number of special segments = number of names in SpecialSegmentNames:
-   const uint32 NumSpecialSegments = sizeof(SpecialSegmentNames)/sizeof(SpecialSegmentNames[0]);
+   const uint32_t NumSpecialSegments = sizeof(SpecialSegmentNames)/sizeof(SpecialSegmentNames[0]);
 
    // Make first section header string table entry empty
    NewSections[shstrtab].PushString("");
@@ -126,12 +126,12 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeSegments() {
    }
 
    // Find sections in old file
-   uint32 icmd;                        // Current load command
-   uint32 command;                     // Load command
-   uint32 cmdsize = 0;                 // Command size
+   uint32_t icmd;                        // Current load command
+   uint32_t command;                     // Load command
+   uint32_t cmdsize = 0;                 // Command size
 
    // Pointer to current position in old file
-   uint8 * currentp = (uint8*)(this->Buf() + sizeof(TMAC_header));
+   uint8_t * currentp = (uint8_t*)(this->Buf() + sizeof(TMAC_header));
 
    // Loop through file commands
    for (icmd = 1; icmd <= this->FileHeader.ncmds; icmd++, currentp += cmdsize) {
@@ -194,15 +194,15 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeSegments() {
 
             // Store section data
             if (sectp->size > 0 && !((sectp->flags & MAC_SECTION_TYPE) == MAC_S_ZEROFILL || (sectp->flags & MAC_SECTION_TYPE)==MAC_S_GB_ZEROFILL)) {
-               NewSections[newsec].Push(this->Buf()+sectp->offset, uint32(sectp->size));
+               NewSections[newsec].Push(this->Buf()+sectp->offset, uint32_t(sectp->size));
             }
 
             // Put data into new section header:
             // Initialize to zero
             memset(&NewSecHeader, 0, sizeof(NewSecHeader));
 
-            uint32 type = sectp->flags & MAC_SECTION_TYPE;
-            uint32 attributes = sectp->flags & MAC_SECTION_ATTRIBUTES;
+            uint32_t type = sectp->flags & MAC_SECTION_TYPE;
+            uint32_t attributes = sectp->flags & MAC_SECTION_ATTRIBUTES;
 
             // Section type
             if (type == MAC_S_ZEROFILL || type == MAC_S_GB_ZEROFILL) {
@@ -256,7 +256,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeSegments() {
             NewSecHeader.sh_size = sectp->size;
 
             // Section alignment
-            NewSecHeader.sh_addralign = uint32(1 << sectp->align);
+            NewSecHeader.sh_addralign = uint32_t(1 << sectp->align);
 
             // Put section header into temporary buffer
             NewSectionHeaders[newsec] = NewSecHeader;
@@ -287,7 +287,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeSegments() {
                RelocationSectionName[MAXSECTIONNAMELENGTH-1] = 0;
 
                // Put name into section header string table
-               uint32 SecNameIndex = NewSections[shstrtab].PushString(RelocationSectionName);
+               uint32_t SecNameIndex = NewSections[shstrtab].PushString(RelocationSectionName);
 
                // Put name into new section header
                NewSecHeader.sh_name = SecNameIndex;
@@ -315,8 +315,8 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeSegments() {
                if (sectp->reloff >= this->GetDataSize()) {err.submit(2035); break;}
                MAC_relocation_info * relp = (MAC_relocation_info*)(this->Buf() + sectp->reloff);
                // Loop through old relocations
-               for (uint32 oldr = 1; oldr <= sectp->nreloc; oldr++, relp++) {
-                  uint32 RType = relp->r_type;         // relocation type
+               for (uint32_t oldr = 1; oldr <= sectp->nreloc; oldr++, relp++) {
+                  uint32_t RType = relp->r_type;         // relocation type
                   // No scattered relocation in 64-bit mode. GOT only in 64-bit mode
                   if (WordSize == 64 && (RType == MAC64_RELOC_GOT_LOAD || RType == MAC64_RELOC_GOT)) {
                      HasGOT++;
@@ -366,12 +366,12 @@ template <class TMAC_header, class TMAC_segment_command, class TMAC_section, cla
           class TELF_Header, class TELF_SectionHeader, class TELF_Symbol, class TELF_Relocation>
 void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeSymbolTable() {
    // Convert subfunction: Make symbol table and string tables
-   uint32 isym;            // current old symbol table entry
-   uint32 OldSectionIndex; // Index into old section table. 1-based
-   uint32 NewSectionIndex; // Index into new section table. 0-based
+   uint32_t isym;            // current old symbol table entry
+   uint32_t OldSectionIndex; // Index into old section table. 1-based
+   uint32_t NewSectionIndex; // Index into new section table. 0-based
    const char * name1;     // Name of symbol
    TELF_Symbol sym;        // Temporary symbol table record
-   uint32 DebugRemoved = 0;// Debug symbols removed
+   uint32_t DebugRemoved = 0;// Debug symbols removed
 
    // pointer to old string table
    char * oldstringtab = (char*)(this->Buf() + this->StringTabOffset);
@@ -394,8 +394,8 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeSymbolTable() {
 
    // Make symbol records for the start of each section in case they are needed
    // by section-relative relocations (r_extern = 0 in MAC_relocation_info)
-   for (uint32 sec = 1; sec < NumSectionsNew; sec++) {
-      uint32 type = NewSectionHeaders[sec].sh_type;
+   for (uint32_t sec = 1; sec < NumSectionsNew; sec++) {
+      uint32_t type = NewSectionHeaders[sec].sh_type;
       if (type == SHT_PROGBITS || type == SHT_NOBITS) {
          // Make unnamed symbol table entry for this section
          memset(&sym, 0, sizeof(sym));
@@ -458,7 +458,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeSymbolTable() {
          // (Also in 64-bit mode)
          sym.st_value -= NewSectionHeaders[NewSectionIndex].sh_addr;
       }
-      sym.st_shndx = (uint16)NewSectionIndex;
+      sym.st_shndx = (uint16_t)NewSectionIndex;
 
       if (OldSectionIndex && !NewSectionIndex) {
          // Section has been removed. Remove symbol also
@@ -466,7 +466,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeSymbolTable() {
       }
 
       // Check symbol type
-      int32 RefType = symp->n_desc & MAC_REF_TYPE;
+      int32_t RefType = symp->n_desc & MAC_REF_TYPE;
       if (RefType == MAC_REF_FLAG_UNDEFINED_LAZY || RefType == MAC_REF_FLAG_PRIVATE_UNDEFINED_LAZY) {
          // Lazy binding
          err.submit(1061, name1);
@@ -474,7 +474,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeSymbolTable() {
       else if ((symp->n_type & MAC_N_TYPE) == MAC_N_ABS) {
          // Absolute symbol
          sym.st_type  = STT_NOTYPE;
-         sym.st_shndx = (uint16)SHN_ABS;
+         sym.st_shndx = (uint16_t)SHN_ABS;
          if (sym.st_bind == STB_LOCAL) {
             continue; // Remove absolute local symbol (not allowed in COFF)
          }
@@ -482,7 +482,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeSymbolTable() {
       else if (sym.st_shndx == 0) {  // added by Vladimir 'phcoder' Serbinenko:
          // This is an external
          sym.st_type = STT_NOTYPE;
-      }
+      }		
       else {
          // This is a data definition record
          if (NewSectionHeaders[NewSectionIndex].sh_flags & SHF_EXECINSTR) {
@@ -526,24 +526,24 @@ template <class TMAC_header, class TMAC_segment_command, class TMAC_section, cla
 void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeRelocationTables(MAC_header_32&) {
    // Convert subfunction: Relocation tables, 32-bit version
 
-   uint32 oldsec;        // Relocated section number in source file
-   uint32 newsec;        // Relocated section number in destination file
-   uint32 newsecr;       // Relocation table section number in destination file
+   uint32_t oldsec;        // Relocated section number in source file
+   uint32_t newsec;        // Relocated section number in destination file
+   uint32_t newsecr;       // Relocation table section number in destination file
    MInt   SectAddr;      // Section address of relocation source
    MInt   SourceAddress; // Address of relocation source including section address
    MInt   TargetAddress; // Target address including section address
-   uint32 TargetSection; // New section index of relocation target
-   uint32 TargetOffset;  // Section-relative offset of relocation target
-   uint32 RefAddress;    // Reference point address including section address
-   uint32 RefSection;    // New section index of reference point
-   uint32 RefOffset;     // Section-relative offset of reference point
-   int32 * inlinep = 0;  // Pointer to inline addend
+   uint32_t TargetSection; // New section index of relocation target
+   uint32_t TargetOffset;  // Section-relative offset of relocation target
+   uint32_t RefAddress;    // Reference point address including section address
+   uint32_t RefSection;    // New section index of reference point
+   uint32_t RefOffset;     // Section-relative offset of reference point
+   int32_t * inlinep = 0;  // Pointer to inline addend
    //const int WordSize = sizeof(MInt) * 8;
 
    TELF_SectionHeader * NewRelTableSecHeader;  // Section header for new relocation table
 
    // Number of symbols
-   uint32 NumSymbols = NewSections[symtab].GetNumEntries();
+   uint32_t NumSymbols = NewSections[symtab].GetNumEntries();
 
    // New symbol table
    //Elf32_Sym * NewSymbolTable = (Elf32_Sym *)(NewSections[symtab].Buf());
@@ -592,7 +592,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeRelocationTables(MAC_header_32&)
             MAC_relocation_info * relp = (MAC_relocation_info*)(this->Buf() + sectp->reloff);
 
             // Loop through old relocations
-            for (uint32 oldr = 1; oldr <= sectp->nreloc; oldr++, relp++) {
+            for (uint32_t oldr = 1; oldr <= sectp->nreloc; oldr++, relp++) {
 
                // Make new relocation entry and set to zero
                Elf32_Rel NewRelocEntry;
@@ -609,7 +609,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeRelocationTables(MAC_header_32&)
                      err.submit(2035); continue; // Out of range
                   }
                   // Pointer to inline addend
-                  inlinep = (int32*)(NewSections[newsec].Buf() + NewRelocEntry.r_offset);
+                  inlinep = (int32_t*)(NewSections[newsec].Buf() + NewRelocEntry.r_offset);
                   if (scatp->r_pcrel) {
                      // Self-relative scattered
                      if (scatp->r_type != MAC32_RELOC_VANILLA) {
@@ -632,7 +632,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeRelocationTables(MAC_header_32&)
 
                      // inline contains full relative address
                      // compensate by subtracting relative address to target section
-                     *inlinep -= int32(NewSectionHeaders[TargetSection].sh_addr - SourceAddress);
+                     *inlinep -= int32_t(NewSectionHeaders[TargetSection].sh_addr - SourceAddress);
                      // Relocation type
                      NewRelocEntry.r_type = R_386_PC32;
                   }
@@ -699,11 +699,11 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeRelocationTables(MAC_header_32&)
                      err.submit(2035); continue; // Out of range
                   }
                   // Pointer to inline addend
-                  inlinep = (int32*)(NewSections[newsec].Buf() + NewRelocEntry.r_offset);
+                  inlinep = (int32_t*)(NewSections[newsec].Buf() + NewRelocEntry.r_offset);
 
                   if (relp->r_extern) {
                      // r_extern = 1: target indicated by symbol index
-                     uint32 symold = relp->r_symbolnum;
+                     uint32_t symold = relp->r_symbolnum;
                      if (symold >= this->SymTabNumber) {
                         err.submit(2031); continue; // index out of range
                      }
@@ -712,13 +712,13 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeRelocationTables(MAC_header_32&)
                         // Self-relative.
                         // Inline contains -(source address)
                         // Add (source address) to compensate
-                        *inlinep += int32(SectAddr + relp->r_address);
+                        *inlinep += int32_t(SectAddr + relp->r_address);
                      }
                   }
                   else {
                      // r_extern = 0. Target indicated by section + offset
                      // Old section number
-                     uint32 secold = relp->r_symbolnum;
+                     uint32_t secold = relp->r_symbolnum;
                      if (secold > this->NumSections) {
                         err.submit(2031); continue; // index out of range
                      }
@@ -733,9 +733,9 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeRelocationTables(MAC_header_32&)
                         // Subtract this to compensate
 
                         // Target section address
-                        TargetOffset = uint32(NewSectionHeaders[TargetSection].sh_addr);
+                        TargetOffset = uint32_t(NewSectionHeaders[TargetSection].sh_addr);
                         SourceAddress = SectAddr + relp->r_address;
-                        *inlinep -= int32(TargetOffset - SourceAddress);
+                        *inlinep -= int32_t(TargetOffset - SourceAddress);
                      }
                      else {
                         // Absolute reference
@@ -745,7 +745,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeRelocationTables(MAC_header_32&)
                            err.submit(2035); continue;
                         }
                         // Translate to section-relative address by subtracting target section address
-                        *inlinep -= int32(NewSectionHeaders[TargetSection].sh_addr);
+                        *inlinep -= int32_t(NewSectionHeaders[TargetSection].sh_addr);
                      }
                   }
                   // relocation type (32-bit non-scattered)
@@ -782,22 +782,22 @@ template <class TMAC_header, class TMAC_segment_command, class TMAC_section, cla
 void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeRelocationTables(MAC_header_64&) {
    // Convert subfunction: Relocation tables, 64-bit version
 
-   uint32 oldsec;        // Relocated section number in source file
-   uint32 newsec;        // Relocated section number in destination file
-   uint32 newsecr;       // Relocation table section number in destination file
-   uint32 symold;        // Old index of symbol
-   uint32 TargetSym;     // Target symbol
-   uint32 TargetSection; // New section index of relocation target
-   uint32 RefSym;        // Reference symbol
-   uint32 RefSection;    // New section index of reference point
-   int64  RefOffset;     // Section-relative offset of reference point
-   int64  SectAddr;      // Address of current section
+   uint32_t oldsec;        // Relocated section number in source file
+   uint32_t newsec;        // Relocated section number in destination file
+   uint32_t newsecr;       // Relocation table section number in destination file
+   uint32_t symold;        // Old index of symbol
+   uint32_t TargetSym;     // Target symbol
+   uint32_t TargetSection; // New section index of relocation target
+   uint32_t RefSym;        // Reference symbol
+   uint32_t RefSection;    // New section index of reference point
+   int64_t  RefOffset;     // Section-relative offset of reference point
+   int64_t  SectAddr;      // Address of current section
    //const int WordSize = sizeof(MInt) * 8;  // Word size, 32 or 64 bits
 
    TELF_SectionHeader * NewRelTableSecHeader;  // Section header for new relocation table
 
    // Number of symbols
-   //uint32 NumSymbols = NewSections[symtab].GetNumEntries();
+   //uint32_t NumSymbols = NewSections[symtab].GetNumEntries();
 
    // New symbol table
    Elf64_Sym * NewSymbolTable = (Elf64_Sym *)(NewSections[symtab].Buf());
@@ -848,14 +848,14 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeRelocationTables(MAC_header_64&)
             MAC_relocation_info * relp = (MAC_relocation_info*)(this->Buf() + sectp->reloff);
 
             // Loop through old relocations
-            for (uint32 oldr = 1; oldr <= sectp->nreloc; oldr++, relp++) {
+            for (uint32_t oldr = 1; oldr <= sectp->nreloc; oldr++, relp++) {
 
                // Make new relocation entry and set to zero
                Elf64_Rela NewRelocEntry;
                memset(&NewRelocEntry, 0, sizeof(NewRelocEntry));
 
                // Pointer to inline addend
-               int32 * inlinep = 0;
+               int32_t * inlinep = 0;
 
                if (relp->r_address & R_SCATTERED) {
                   // scattered not allowed in 64-bit
@@ -869,7 +869,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeRelocationTables(MAC_header_64&)
                      err.submit(2035); continue; // Out of range
                   }
                   // Pointer to inline addend
-                  inlinep = (int32*)(NewSections[newsec].Buf() + NewRelocEntry.r_offset);
+                  inlinep = (int32_t*)(NewSections[newsec].Buf() + NewRelocEntry.r_offset);
 
                   // Symbol index of target
                   symold = relp->r_symbolnum;
@@ -889,9 +889,9 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeRelocationTables(MAC_header_64&)
                         // Inline contains (target address)-(source address)
                         // Subtract this to compensate
                         // Target section address
-                        uint64 TargetSectAddr = NewSectionHeaders[TargetSection].sh_addr;
-                        uint64 SourceAddress = SectAddr + relp->r_address;
-                        *inlinep -= int32(TargetSectAddr - SourceAddress);
+                        uint64_t TargetSectAddr = NewSectionHeaders[TargetSection].sh_addr;
+                        uint64_t SourceAddress = SectAddr + relp->r_address;
+                        *inlinep -= int32_t(TargetSectAddr - SourceAddress);
                         *inlinep += 4; // Compensate for subtracting 4 below
                      }
                   }
@@ -949,10 +949,10 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeRelocationTables(MAC_header_64&)
                         err.submit(2044); oldr++; relp++; continue;
                      }
                      if (relp->r_length == 2) {
-                        *inlinep += int32(NewRelocEntry.r_offset) - int32(RefOffset);
+                        *inlinep += int32_t(NewRelocEntry.r_offset) - int32_t(RefOffset);
                      }
                      else if (relp->r_length == 3) {
-                        *(int64*)inlinep += NewRelocEntry.r_offset - RefOffset;
+                        *(int64_t*)inlinep += NewRelocEntry.r_offset - RefOffset;
                         // there is no 64-bit self-relative relocation in ELF,
                         // use 32-bit self-relative and hope there is no carry
                         err.submit(1302); // Warn. This will fail if inline value changes sign
@@ -994,10 +994,10 @@ template <class TMAC_header, class TMAC_segment_command, class TMAC_section, cla
 void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeBinaryFile() {
    // Convert subfunction: Make section headers and file header,
    // and combine everything into a single memory buffer.
-   uint32 newsec;              // Section index
-   uint32 SecOffset;           // Section offset in file
-   uint32 SecSize;             // Section size in file
-   uint32 SectionHeaderOffset; // File offset to section headers
+   uint32_t newsec;              // Section index
+   uint32_t SecOffset;           // Section offset in file
+   uint32_t SecSize;             // Section size in file
+   uint32_t SectionHeaderOffset; // File offset to section headers
    const int WordSize = sizeof(MInt) * 8;
 
    // Set file type in ToFile
@@ -1070,10 +1070,10 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeBinaryFile() {
    FileHeader.e_shentsize = sizeof(TELF_SectionHeader);
 
    // Number of section headers
-   FileHeader.e_shnum = (uint16)NumSectionsNew;
+   FileHeader.e_shnum = (uint16_t)NumSectionsNew;
 
    // Section header string table index
-   FileHeader.e_shstrndx = (uint16)shstrtab;
+   FileHeader.e_shstrndx = (uint16_t)shstrtab;
 
    // Put file header into beginning of ToFile where we made space for it
    memcpy(ToFile.Buf(), &FileHeader, sizeof(FileHeader));
@@ -1083,23 +1083,23 @@ template <class TMAC_header, class TMAC_segment_command, class TMAC_section, cla
           class TELF_Header, class TELF_SectionHeader, class TELF_Symbol, class TELF_Relocation>
 void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeImportTables() {
    // Convert subfunction: Fill import tables
-   uint32 oldsec;            // Old section number
-   uint32 Type;              // Old section type
-   uint32 NumEntries;        // Number of entries in import table
-   uint32 EntrySize;         // Entry size of import table
-   uint32 NewSec1;           // New section number of import table
-   uint32 NewSec2;           // New section number of relocation for import table
-   uint32 Offset;            // Offset of relocation source
-   uint32 OldSymbol;         // Old symbol number of import
-   uint32 i;                 // Loop counter
-   uint32 * IndSymTab;       // Pointer to indirect symbol table
-   uint32 IndSymi;           // Index into indirect symbol table
-   uint32 IndSymNum;         // Number of entries in indirect symbol table
+   uint32_t oldsec;            // Old section number
+   uint32_t Type;              // Old section type
+   uint32_t NumEntries;        // Number of entries in import table
+   uint32_t EntrySize;         // Entry size of import table
+   uint32_t NewSec1;           // New section number of import table
+   uint32_t NewSec2;           // New section number of relocation for import table
+   uint32_t Offset;            // Offset of relocation source
+   uint32_t OldSymbol;         // Old symbol number of import
+   uint32_t i;                 // Loop counter
+   uint32_t * IndSymTab;       // Pointer to indirect symbol table
+   uint32_t IndSymi;           // Index into indirect symbol table
+   uint32_t IndSymNum;         // Number of entries in indirect symbol table
    TELF_Relocation NewRelocEntry; // New relocation entry
    const int WordSize = sizeof(MInt) * 8;
 
    // Machine code of jmp instruction
-   static const int8 JmpInstruction[5] = {int8(0xE9), int8(0xFC), int8(0xFF), int8(0xFF), int8(0xFF)};
+   static const int8_t JmpInstruction[5] = {int8_t(0xE9), int8_t(0xFC), int8_t(0xFF), int8_t(0xFF), int8_t(0xFF)};
 
    // Number of indirect symbols
    IndSymNum = this->IndirectSymTabNumber;
@@ -1107,7 +1107,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeImportTables() {
       return; // No indirect symbols
    }
    // Find indirect symbol table
-   IndSymTab = (uint32*)(this->Buf() + this->IndirectSymTabOffset);
+   IndSymTab = (uint32_t*)(this->Buf() + this->IndirectSymTabOffset);
 
    // Find first section header
    TMAC_section * sectp = (TMAC_section*)(this->Buf() + this->SectionHeaderOffset);
@@ -1128,7 +1128,7 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeImportTables() {
 
          // Find new section
          NewSec1 = NewSectIndex[oldsec];
-         NumEntries = uint32(NewSectionHeaders[NewSec1].sh_size) / EntrySize;
+         NumEntries = uint32_t(NewSectionHeaders[NewSec1].sh_size) / EntrySize;
 
          // Find new relocation section
          NewSec2 = NewSec1 + 1;
@@ -1198,17 +1198,17 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeImportTables() {
 
 template <class TMAC_header, class TMAC_segment_command, class TMAC_section, class TMAC_nlist, class MInt,
           class TELF_Header, class TELF_SectionHeader, class TELF_Symbol, class TELF_Relocation>
-void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::TranslateAddress(MInt addr, uint32 & section, uint32 & offset) {
+void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::TranslateAddress(MInt addr, uint32_t & section, uint32_t & offset) {
    // Translate 32-bit address to section + offset
    // (Sections are not necessarily ordered by address)
-   uint32 sec;
+   uint32_t sec;
    MInt secstart;
    for (sec = 1; sec < NumSectionsNew; sec++) {
       secstart = NewSectionHeaders[sec].sh_addr;
       if (addr >= secstart && addr < secstart + MInt(NewSectionHeaders[sec].sh_size)) {
          // Section found
          section = sec;
-         offset = uint32(addr - secstart);
+         offset = uint32_t(addr - secstart);
          return;
       }
    }
@@ -1218,10 +1218,10 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::TranslateAddress(MInt addr, uint32 &
 
 template <class TMAC_header, class TMAC_segment_command, class TMAC_section, class TMAC_nlist, class MInt,
           class TELF_Header, class TELF_SectionHeader, class TELF_Symbol, class TELF_Relocation>
-uint32 CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeGOTEntry(int symbol) {
+uint32_t CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeGOTEntry(int symbol) {
    // Make entry in fake GOT for symbol
-   uint32 NumGOTEntries = GOTSymbols.GetNumEntries();
-   uint32 symi;  // Symbol index
+   uint32_t NumGOTEntries = GOTSymbols.GetNumEntries();
+   uint32_t symi;  // Symbol index
    const int WordSize = sizeof(MInt) * 8;
 
    // Get symbol for start of GOT
@@ -1246,14 +1246,14 @@ void CMAC2ELF<MACSTRUCTURES,ELFSTRUCTURES>::MakeGOT() {
    const int WordSize = sizeof(MInt) * 8;
    if (!HasGOT) return;
 
-   uint32 NumEntries = GOTSymbols.GetNumEntries();
+   uint32_t NumEntries = GOTSymbols.GetNumEntries();
    NewSections[FakeGOTSection].Push(0, NumEntries*(WordSize/8));
 
    // Make relocations for GOT
    Elf64_Rela NewRelocEntry;
    memset(&NewRelocEntry, 0, sizeof(NewRelocEntry));
 
-   for (uint32 i = 0; i < NumEntries; i++) {
+   for (uint32_t i = 0; i < NumEntries; i++) {
       NewRelocEntry.r_offset = i * (WordSize/8);
       NewRelocEntry.r_sym = GOTSymbols[i];
       NewRelocEntry.r_type = R_X86_64_64;

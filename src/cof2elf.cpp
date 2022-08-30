@@ -1,13 +1,13 @@
 /****************************  cof2elf.cpp   ********************************
 * Author:        Agner Fog
 * Date created:  2006-07-20
-* Last modified: 2008-05-22
+* Last modified: 2022-05-21
 * Project:       objconv
 * Module:        cof2elf.cpp
 * Description:
 * Module for converting PE/COFF file to ELF file
 *
-* Copyright 2006-2008 GNU General Public License http://www.gnu.org/licenses
+* Copyright 2006-2022 GNU General Public License http://www.gnu.org/licenses
 *****************************************************************************/
 #include "stdafx.h"
 
@@ -51,7 +51,7 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeSegments() {
    TELF_SectionHeader NewSecHeader;    // New section header
    int oldsec;                         // Section index in old file
    int newsec;                         // Section index in new file
-   uint32 SecNameIndex;                // Section name index into shstrtab
+   uint32_t SecNameIndex;                // Section name index into shstrtab
    char const * SecName;               // Name of new section
    const int WordSize = sizeof(NewFileHeader.e_entry) * 8; // word size 32 or 64 bits
 
@@ -213,7 +213,7 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeSegments() {
 
       // Section alignment
       if (SectionHeader->Flags & PE_SCN_ALIGN_MASK) {
-         NewSecHeader.sh_addralign = uint32(1 << (((SectionHeader->Flags & PE_SCN_ALIGN_MASK) / PE_SCN_ALIGN_1) - 1));
+         NewSecHeader.sh_addralign = uint32_t(1 << (((SectionHeader->Flags & PE_SCN_ALIGN_MASK) / PE_SCN_ALIGN_1) - 1));
       }
 
       // Put section header into temporary buffer
@@ -239,7 +239,7 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeSegments() {
          RelocationSectionName[MAXSECTIONNAMELENGTH-1] = 0;
 
          // Put name into section header string table
-         uint32 SecNameIndex = NewSections[shstrtab].PushString(RelocationSectionName);
+         uint32_t SecNameIndex = NewSections[shstrtab].PushString(RelocationSectionName);
 
          // Put name into new section header
          NewSecHeader.sh_name = SecNameIndex;
@@ -274,7 +274,7 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeSymbolTable() {
    // Pointer to old symbol table
    union {
       SCOFF_SymTableEntry * p;         // Symtab entry pointer
-      int8 * b;                        // Used for increment
+      int8_t * b;                        // Used for increment
    } OldSymtab;
 
    // Make the first record empty
@@ -327,7 +327,7 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeSymbolTable() {
             continue; // Section has been removed. Remove symbol too
          }
 
-         sym.st_shndx = (uint16)NewSectionIndex;
+         sym.st_shndx = (uint16_t)NewSectionIndex;
 
          // Check symbol type
          if (OldSymtab.p->s.StorageClass == COFF_CLASS_FILE) {
@@ -341,7 +341,7 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeSymbolTable() {
                NewSections[stabstr].PushString(filename);
             }
             // Attributes for filename record
-            sym.st_shndx  = (uint16)SHN_ABS;
+            sym.st_shndx  = (uint16_t)SHN_ABS;
             sym.st_type   = STT_FILE;
             sym.st_bind   = STB_LOCAL;
             sym.st_value  = 0;
@@ -358,7 +358,7 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeSymbolTable() {
          else if (OldSymtab.p->s.SectionNumber < 0) {
             // This is an absolute or debug symbol
             sym.st_type  = STT_NOTYPE;
-            sym.st_shndx = (uint16)SHN_ABS;
+            sym.st_shndx = (uint16_t)SHN_ABS;
          }
          else if (OldSymtab.p->s.Type == 0 && OldSymtab.p->s.StorageClass == COFF_CLASS_FUNCTION) {
             // This is a .bf, .lf, or .ef record following a function record
@@ -432,11 +432,11 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeSymbolTable() {
          if (NewSectionIndex == COFF_SECTION_REMOVE_ME) {
             continue; // Section has been removed. Remove symbol too
          }
-         if ((int16)OldSectionIndex == COFF_SECTION_ABSOLUTE) {
+         if ((int16_t)OldSectionIndex == COFF_SECTION_ABSOLUTE) {
             NewSectionIndex = SHN_ABS;
          }
 
-         sym.st_shndx = (uint16)NewSectionIndex;
+         sym.st_shndx = (uint16_t)NewSectionIndex;
 
          // Check symbol type
          if (OldSymtab.p->s.SectionNumber < 0) {
@@ -487,9 +487,9 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeSymbolTable() {
 template <class TELF_Header, class TELF_SectionHeader, class TELF_Symbol, class TELF_Relocation>
 void CCOF2ELF<ELFSTRUCTURES>::MakeRelocationTables() {
    // Convert subfunction: Relocation tables
-   int32 oldsec;                                 // Relocated section number in source file
-   int32 newsec;                                 // Relocated section number in destination file
-   int32 newsecr;                                // Relocation table section number in destination file
+   int32_t oldsec;                                 // Relocated section number in source file
+   int32_t newsec;                                 // Relocated section number in destination file
+   int32_t newsecr;                                // Relocation table section number in destination file
    TELF_SectionHeader * NewRelTableSecHeader;    // Section header for new relocation table
    char TempText[32];                            // Temporary text buffer
    const int WordSize = sizeof(NewFileHeader.e_entry) * 8; // word size 32 or 64 bits
@@ -531,7 +531,7 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeRelocationTables() {
          // Pointer to old relocation entry
          union {
             SCOFF_Relocation * p;  // pointer to record
-            int8 * b;              // used for address calculation and incrementing
+            int8_t * b;              // used for address calculation and incrementing
          } OldReloc;
 
          // Loop through relocations
@@ -547,8 +547,8 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeRelocationTables() {
             NewRelocEntry.r_offset = OldReloc.p->VirtualAddress;
 
             // Target symbol
-            uint32 TargetSymbol = OldReloc.p->SymbolTableIndex;
-            if (TargetSymbol >= (uint32)NumberOfSymbols) {
+            uint32_t TargetSymbol = OldReloc.p->SymbolTableIndex;
+            if (TargetSymbol >= (uint32_t)NumberOfSymbols) {
                err.submit(2031);  // Symbol not in table
             }
             else {  // Translate symbol number
@@ -690,7 +690,7 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeRelocationTables() {
             }
 
             // Find inline addend
-            int32 * paddend = 0;
+            int32_t * paddend = 0;
             if (OldReloc.p->VirtualAddress + 4 > NewSections[newsec].GetDataSize()
                || NewSectionHeaders[newsec].sh_type == SHT_NOBITS) {
                   // Address of relocation is invalid
@@ -698,7 +698,7 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeRelocationTables() {
                }
             else {
                // Make pointer to inline addend
-               paddend = (int32*)(NewSections[newsec].Buf()
+               paddend = (int32_t*)(NewSections[newsec].Buf()
                   + NewSectionHeaders[newsec].sh_offset + OldReloc.p->VirtualAddress);
             }
 
@@ -707,7 +707,7 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeRelocationTables() {
                if (NewRelocEntry.r_addend != 0) {
                   // Use inline addends in 32 bit ELF (SHT_REL)
                   // Put addend inline
-                  * paddend += uint32(NewRelocEntry.r_addend);
+                  if (paddend) *paddend += uint32_t(NewRelocEntry.r_addend);
                   NewRelocEntry.r_addend = 0;
                }
 
@@ -738,10 +738,10 @@ template <class TELF_Header, class TELF_SectionHeader, class TELF_Symbol, class 
 void CCOF2ELF<ELFSTRUCTURES>::MakeBinaryFile() {
    // Convert subfunction: Make section headers and file header,
    // and combine everything into a single memory buffer.
-   int32  newsec;              // Section index
-   uint32 SecOffset;           // Section offset in file
-   uint32 SecSize;             // Section size in file
-   uint32 SectionHeaderOffset; // File offset to section headers
+   int32_t  newsec;              // Section index
+   uint32_t SecOffset;           // Section offset in file
+   uint32_t SecSize;             // Section size in file
+   uint32_t SectionHeaderOffset; // File offset to section headers
 
    // Set file type in ToFile
    ToFile.SetFileType(FILETYPE_ELF);
@@ -811,10 +811,10 @@ void CCOF2ELF<ELFSTRUCTURES>::MakeBinaryFile() {
    FileHeader.e_shentsize = sizeof(TELF_SectionHeader);
 
    // Number of section headers
-   FileHeader.e_shnum = (uint16)NumSectionsNew;
+   FileHeader.e_shnum = (uint16_t)NumSectionsNew;
 
    // Section header string table index
-   FileHeader.e_shstrndx = (uint16)shstrtab;
+   FileHeader.e_shstrndx = (uint16_t)shstrtab;
 
    // Put file header into beginning of ToFile where we made space for it
    memcpy(ToFile.Buf(), &FileHeader, sizeof(FileHeader));

@@ -1,7 +1,7 @@
 /****************************  disasm1.cpp   ********************************
 * Author:        Agner Fog
 * Date created:  2007-02-25
-* Last modified: 2016-11-09
+* Last modified: 2022-08-02
 * Project:       objconv
 * Module:        disasm1.cpp
 * Description:
@@ -11,7 +11,7 @@
 * Instruction tables are in opcodes.cpp.
 * All functions relating to file output are in disasm2.cpp
 *
-* Copyright 2007-2016 GNU General Public License http://www.gnu.org/licenses
+* Copyright 2007-2022 GNU General Public License http://www.gnu.org/licenses
 *****************************************************************************/
 #include "stdafx.h"
 
@@ -61,8 +61,8 @@ CSymbolTable::CSymbolTable() {
     SymbolNameBuffer.Push(0, 1);                  // Make string 0 empty
 }
 
-uint32 CSymbolTable::AddSymbol(int32 Section, uint32 Offset, uint32 Size,
-uint32 Type, uint32 Scope, uint32 OldIndex, const char * Name, const char * DLLName) {
+uint32_t CSymbolTable::AddSymbol(int32_t Section, uint32_t Offset, uint32_t Size,
+uint32_t Type, uint32_t Scope, uint32_t OldIndex, const char * Name, const char * DLLName) {
     // Add symbol from original file to symbol table.
     // If name is not known then set Name = 0. A name will then be assigned
     // OldIndex is the identifier used in relocation records. If the symbol is known
@@ -85,7 +85,7 @@ uint32 Type, uint32 Scope, uint32 OldIndex, const char * Name, const char * DLLN
         NewSym.Name = SymbolNameBuffer.GetDataSize();
         if (DLLName) {
             // Imported from DLL. Prefix name with "imp_"
-            SymbolNameBuffer.Push(ImportTablePrefix, (uint32)strlen(ImportTablePrefix));
+            SymbolNameBuffer.Push(ImportTablePrefix, (uint32_t)strlen(ImportTablePrefix));
         }
         // Store name
         SymbolNameBuffer.PushString(Name);
@@ -103,7 +103,7 @@ uint32 Type, uint32 Scope, uint32 OldIndex, const char * Name, const char * DLLN
 
     if (OldIndex == 0) {
         // Make non-unique entry
-        uint32 NewIndex = NewSymbol(NewSym);
+        uint32_t NewIndex = NewSymbol(NewSym);
         // Get old index
         OldIndex = List[NewIndex].OldIndex;
     }
@@ -118,7 +118,7 @@ uint32 Type, uint32 Scope, uint32 OldIndex, const char * Name, const char * DLLN
     return OldIndex;
 }
 
-uint32 CSymbolTable::NewSymbol(SASymbol & sym) {
+uint32_t CSymbolTable::NewSymbol(SASymbol & sym) {
     // Add symbol to symbol table.
     // Will not add a new symbol if one already exists at this address and
     // either the new symbol or the existing symbol has no name.
@@ -129,7 +129,7 @@ uint32 CSymbolTable::NewSymbol(SASymbol & sym) {
     // has no name.
 
     // Find new index of any existing symbol with same address
-    int32 SIndex = FindByAddress(sym.Section, sym.Offset);
+    int32_t SIndex = FindByAddress(sym.Section, sym.Offset);
 
     if (SIndex > 0 && !(List[SIndex].Type & 0x80000000)
         && !(sym.Name && List[SIndex].Name)) {
@@ -165,7 +165,7 @@ uint32 CSymbolTable::NewSymbol(SASymbol & sym) {
 }
 
 
-uint32 CSymbolTable::NewSymbol(int32 Section, uint32 Offset, uint32 Scope) {
+uint32_t CSymbolTable::NewSymbol(int32_t Section, uint32_t Offset, uint32_t Scope) {
     // Add symbol to jump target or code block that doesn't have a name.
     // Will not add a new symbol if one already exists at this address.
     // The return value is the new index to a new or existing symbol.
@@ -186,8 +186,8 @@ uint32 CSymbolTable::NewSymbol(int32 Section, uint32 Offset, uint32 Scope) {
 void CSymbolTable::AssignNames() {
     // Assign names to symbols that do not have a name
 
-    uint32 i;                                     // New symbol index
-    uint32 NumDigits;                             // Number of digits in new symbol names
+    uint32_t i;                                     // New symbol index
+    uint32_t NumDigits;                             // Number of digits in new symbol names
     char name[64];                                // Buffer for making symbol name
     static char Format[64];
 
@@ -236,7 +236,7 @@ void CSymbolTable::AssignNames() {
 #endif
 }
 
-uint32 CSymbolTable::FindByAddress(int32 Section, uint32 Offset, uint32 * Last, uint32 * NextAfter) {
+uint32_t CSymbolTable::FindByAddress(int32_t Section, uint32_t Offset, uint32_t * Last, uint32_t * NextAfter) {
     // Find symbols by address
     // The return value will be the new index to the first symbol at the
     // specified address. The return value will be zero if no symbol found.
@@ -246,9 +246,9 @@ uint32 CSymbolTable::FindByAddress(int32 Section, uint32 Offset, uint32 * Last, 
     // address higher than the specified address in the same section, or
     // zero if none.
 
-    uint32 i1;                                    // New index of first symbol
-    uint32 i2;                                    // New index of last symbol
-    uint32 i3;                                    // New index of first symbol after address
+    uint32_t i1;                                    // New index of first symbol
+    uint32_t i2;                                    // New index of last symbol
+    uint32_t i3;                                    // New index of first symbol after address
 
     // Make dummy symbol record for searching
     SASymbol sym;
@@ -295,14 +295,14 @@ uint32 CSymbolTable::FindByAddress(int32 Section, uint32 Offset, uint32 * Last, 
     return i1;
 }
 
-uint32 CSymbolTable::FindByAddress(int32 Section, uint32 Offset) {
+uint32_t CSymbolTable::FindByAddress(int32_t Section, uint32_t Offset) {
     // Find symbols by address
     // The return value will be the new index to a first symbol at the
     // specified address. If more than one symbol is found at the same
     // address then the one with the highest scope (and which is not
     // a section record) is returned;
-    uint32 s0, s1, s2 = 0;
-    uint32 MaxScope = 0;
+    uint32_t s0, s1, s2 = 0;
+    uint32_t MaxScope = 0;
     // Find all symbols at this address
     s0 = s1 = FindByAddress(Section, Offset, &s2);
     // Check if any symbols found
@@ -319,7 +319,7 @@ uint32 CSymbolTable::FindByAddress(int32 Section, uint32 Offset) {
     return s0;
 }
 
-uint32 CSymbolTable::Old2NewIndex(uint32 OldIndex) {
+uint32_t CSymbolTable::Old2NewIndex(uint32_t OldIndex) {
     // Translate old symbol index to new symbol index
 
     // Check if TranslateOldIndex is up to date
@@ -331,7 +331,7 @@ uint32 CSymbolTable::Old2NewIndex(uint32 OldIndex) {
     if (OldIndex >= OldNum) OldIndex = 0;
 
     // Translate old index to new index
-    uint32 NewIndex = TranslateOldIndex[OldIndex];
+    uint32_t NewIndex = TranslateOldIndex[OldIndex];
 
     // Check limit
     if (NewIndex >= NewNum) NewIndex = 0;
@@ -340,14 +340,14 @@ uint32 CSymbolTable::Old2NewIndex(uint32 OldIndex) {
     return NewIndex;
 }
 
-const char * CSymbolTable::HasName(uint32 symo) {
+const char * CSymbolTable::HasName(uint32_t symo) {
     // Ask if symbol has a name, input = old index, output = name or 0
     // Returns 0 if symbol has no name yet.
     // Use HasName rather than GetName or GetNameO during pass 1 to avoid
     // naming symbols in random order.
 
     // Get new index
-    uint32 symi = Old2NewIndex(symo);
+    uint32_t symi = Old2NewIndex(symo);
     // Check if valid
     if (symi == 0 || symi >= NewNum) return 0;
     // Check if symbol has a name
@@ -356,16 +356,16 @@ const char * CSymbolTable::HasName(uint32 symo) {
     return GetName(symi);
 }
 
-const char * CSymbolTable::GetName(uint32 symi) {
+const char * CSymbolTable::GetName(uint32_t symi) {
     // Get symbol name from new index.
     // A name will be assigned to the symbol if it doesn't have one
 
     // Get name index from symbol record
-    uint32 NameIndex = (*this)[symi].Name;
+    uint32_t NameIndex = (*this)[symi].Name;
     if (NameIndex == 0) {
         // Symbol has no name
         // Search for other symbol with same address
-        uint32 Alias = FindByAddress((*this)[symi].Section,(*this)[symi].Offset);
+        uint32_t Alias = FindByAddress((*this)[symi].Section,(*this)[symi].Offset);
         if ((*this)[Alias].Name) {
             // A named symbol with same address found
             NameIndex = (*this)[Alias].Name;
@@ -386,46 +386,46 @@ const char * CSymbolTable::GetName(uint32 symi) {
         return "ErrorNoName";
     }
     // Return name
-    return SymbolNameBuffer.Buf() + NameIndex;
+    return (char*)SymbolNameBuffer.Buf() + NameIndex;
 }
 
-const char * CSymbolTable::GetNameO(uint32 symo) {
+const char * CSymbolTable::GetNameO(uint32_t symo) {
     // Get symbol name by old index.
     // A name will be assigned to the symbol if it doesn't have one
     return GetName(Old2NewIndex(symo));
 }
 
-const char * CSymbolTable::GetDLLName(uint32 symi) {
+const char * CSymbolTable::GetDLLName(uint32_t symi) {
     // Get import DLL name from old index
     if ((*this)[symi].DLLName == 0) {
         // No name
         return "ErrorNoName";
     }
     // Get name DLL index from symbol record
-    uint32 NameIndex = (*this)[symi].DLLName;
+    uint32_t NameIndex = (*this)[symi].DLLName;
     // Check if valid
     if (NameIndex == 0 || NameIndex >= SymbolNameBuffer.GetDataSize()) {
         // NameIndex is invalid
         return "ErrorNoName";
     }
     // Return name
-    return SymbolNameBuffer.Buf() + NameIndex;
+    return (char*)SymbolNameBuffer.Buf() + NameIndex;
 }
 
-void CSymbolTable::AssignName(uint32 symi, const char *name) {
+void CSymbolTable::AssignName(uint32_t symi, const char *name) {
     // Give symbol a specific name
     (*this)[symi].Name = SymbolNameBuffer.PushString(name);
 }
 
 void CSymbolTable::UpdateIndex() {
     // Update TranslateOldIndex
-    uint32 i;                                     // New index
+    uint32_t i;                                     // New index
 
     // Allocate array with sufficient size
     TranslateOldIndex.SetNum(OldNum);
 
     // Initialize to zeroes
-    memset(&TranslateOldIndex[0], 0, TranslateOldIndex.GetNumEntries() * sizeof(uint32));
+    memset(&TranslateOldIndex[0], 0, TranslateOldIndex.GetNumEntries() * sizeof(uint32_t));
 
     for (i = 0; i < List.GetNumEntries(); i++) {
         if (List[i].OldIndex < OldNum) {
@@ -469,27 +469,27 @@ CDisassembler::CDisassembler() {
     }
 };
 
-void CDisassembler::Init(uint32 ExeType, int64 ImageBase) {
+void CDisassembler::Init(uint32_t ExeType, int64_t ImageBase) {
     // Define file type and imagebase if executable file
     this->ExeType = ExeType;
     this->ImageBase = ImageBase;
 }
 
 void CDisassembler::AddSection(
-uint8 * Buffer,                               // Buffer containing raw data
-uint32  InitSize,                             // Size of initialized data in section
-uint32  TotalSize,                            // Size of initialized and uninitialized data in section
-uint32  SectionAddress,                       // Start address to be added to offset in listing
-uint32  Type,                                 // 0 = unknown, 1 = code, 2 = data, 3 = uninitialized data, 4 = constant data
-uint32  Align,                                // Alignment = 1 << Align
-uint32  WordSize,                             // Segment word size: 16, 32 or 64
+uint8_t * Buffer,                               // Buffer containing raw data
+uint32_t  InitSize,                             // Size of initialized data in section
+uint32_t  TotalSize,                            // Size of initialized and uninitialized data in section
+uint32_t  SectionAddress,                       // Start address to be added to offset in listing
+uint32_t  Type,                                 // 0 = unknown, 1 = code, 2 = data, 3 = uninitialized data, 4 = constant data
+uint32_t  Align,                                // Alignment = 1 << Align
+uint32_t  WordSize,                             // Segment word size: 16, 32 or 64
 const char * Name,                            // Name of section
-uint32  NameLength) {                         // Length of name if not zero terminated
+uint32_t  NameLength) {                         // Length of name if not zero terminated
 
     // Check values
     if (Buffer == 0) Type = 3;
     if (Name == 0) Name = "?";
-    if (NameLength == 0) NameLength = (uint32)strlen(Name);
+    if (NameLength == 0) NameLength = (uint32_t)strlen(Name);
     if (TotalSize < InitSize) TotalSize = InitSize;
 
     // Define section to be disassembled
@@ -530,7 +530,7 @@ uint32  NameLength) {                         // Length of name if not zero term
     }
 }
 
-int32 CDisassembler::AddSectionGroup(const char * Name, int32 MemberSegment) {
+int32_t CDisassembler::AddSectionGroup(const char * Name, int32_t MemberSegment) {
     // Define section group (from OMF file).
     // Must be called after all segments have been defined.
     // To define a group with multiple members, you must call AddSectionGroup
@@ -543,14 +543,14 @@ int32 CDisassembler::AddSectionGroup(const char * Name, int32 MemberSegment) {
     if (Name == 0) Name = "?";
 
     // Find preceding segment or group definition
-    int32 LastIndex = Sections.GetNumEntries() - 1;
+    int32_t LastIndex = Sections.GetNumEntries() - 1;
     // Index of group record
-    int32 GroupIndex = LastIndex;
+    int32_t GroupIndex = LastIndex;
 
     const char * LastName = "?";
     if (Sections[LastIndex].Name < NameBuffer.GetDataSize()) {
         // Last name valid
-        LastName = NameBuffer.Buf() + Sections[LastIndex].Name;
+        LastName = (char*)NameBuffer.Buf() + Sections[LastIndex].Name;
     }
     // Check if group name already defined
     if (strcmp(Name, LastName) != 0) {
@@ -579,13 +579,13 @@ int32 CDisassembler::AddSectionGroup(const char * Name, int32 MemberSegment) {
     return GroupIndex;
 }
 
-uint32 CDisassembler::AddSymbol(
-int32  Section,                            // Section number (1-based). ASM_SEGMENT_UNKNOWN = external, ASM_SEGMENT_ABSOLUTE = absolute, ASM_SEGMENT_IMGREL = image-relative
-uint32 Offset,                             // Offset into section. (Value for absolute symbol)
-uint32 Size,                               // Number of bytes used by symbol or function. 0 = unknown
-uint32 Type,                               // Symbol type. Use values listed above for SOpcodeDef operands. 0 = unknown type
-uint32 Scope,                              // 1 = function local, 2 = file local, 4 = public, 8 = weak public, 0x10 = communal, 0x20 = external
-uint32 OldIndex,                           // Unique identifier used in relocation entries. Value must be > 0 and limited because an array is created with this as index.
+uint32_t CDisassembler::AddSymbol(
+int32_t  Section,                            // Section number (1-based). ASM_SEGMENT_UNKNOWN = external, ASM_SEGMENT_ABSOLUTE = absolute, ASM_SEGMENT_IMGREL = image-relative
+uint32_t Offset,                             // Offset into section. (Value for absolute symbol)
+uint32_t Size,                               // Number of bytes used by symbol or function. 0 = unknown
+uint32_t Type,                               // Symbol type. Use values listed above for SOpcodeDef operands. 0 = unknown type
+uint32_t Scope,                              // 1 = function local, 2 = file local, 4 = public, 8 = weak public, 0x10 = communal, 0x20 = external
+uint32_t OldIndex,                           // Unique identifier used in relocation entries. Value must be > 0 and limited because an array is created with this as index.
 const char * Name,                         // Name of symbol. Zero-terminated
 const char * DLLName) {                    // Name of DLL if imported dynamically
 
@@ -605,7 +605,7 @@ const char * DLLName) {                    // Name of DLL if imported dynamicall
     // Check if image-relative
     if (Section == ASM_SEGMENT_IMGREL) {
         // Translate absolute virtual address to section and offset
-        TranslateAbsAddress(ImageBase + (int32)Offset, Section, Offset);
+        TranslateAbsAddress(ImageBase + (int32_t)Offset, Section, Offset);
     }
 
     // Define symbol for disassembler
@@ -613,20 +613,20 @@ const char * DLLName) {                    // Name of DLL if imported dynamicall
 }
 
 void CDisassembler::AddRelocation(
-int32  Section,                               // Section of relocation source
-uint32 Offset,                                // Offset of relocation source into section
-int32  Addend,                                // Addend to add to target address,
+int32_t  Section,                               // Section of relocation source
+uint32_t Offset,                                // Offset of relocation source into section
+int32_t  Addend,                                // Addend to add to target address,
 // including distance from source to instruction pointer in self-relative addresses,
 // not including inline addend.
-uint32 Type,                                  // Relocation type. See SARelocation in disasm.h for definition of values
-uint32 Size,                                  // 1 = byte, 2 = word, 4 = dword, 8 = qword
-uint32 TargetIndex,                           // Symbol index of target
-uint32 ReferenceIndex) {                      // Symbol index of reference point if Type = 8 or 0x10
+uint32_t Type,                                  // Relocation type. See SARelocation in disasm.h for definition of values
+uint32_t Size,                                  // 1 = byte, 2 = word, 4 = dword, 8 = qword
+uint32_t TargetIndex,                           // Symbol index of target
+uint32_t ReferenceIndex) {                      // Symbol index of reference point if Type = 8 or 0x10
 
     // Check if image-relative
     if (Section == ASM_SEGMENT_IMGREL) {
         // Translate absolute virtual address to section and offset
-        if (!TranslateAbsAddress(ImageBase + (int32)Offset, Section, Offset)) {
+        if (!TranslateAbsAddress(ImageBase + (int32_t)Offset, Section, Offset)) {
             err.submit(1304);
         }
     }
@@ -648,7 +648,7 @@ uint32 ReferenceIndex) {                      // Symbol index of reference point
     }
     else {
         // Make entry in procedure linkage table
-        uint32 targetsym = Symbols.Old2NewIndex(TargetIndex);
+        uint32_t targetsym = Symbols.Old2NewIndex(TargetIndex);
         if (targetsym && Symbols[targetsym].DLLName) {
             // Put label on entry in procedure linkage table (import table)
             // Copy Name and DLLName from target symbol
@@ -695,7 +695,7 @@ void CDisassembler::Go() {
 #if 0 //
     // Show function list. For debugging only
     printf("\n\nFunctionList:");
-    for (uint32 i = 0; i < FunctionList.GetNumEntries(); i++) {
+    for (uint32_t i = 0; i < FunctionList.GetNumEntries(); i++) {
         printf("\nsect %i, start %X, end %X, scope %i, name %s",
             FunctionList[i].Section, FunctionList[i].Start, FunctionList[i].End,
             FunctionList[i].Scope, Symbols.GetNameO(FunctionList[i].OldSymbolIndex));
@@ -704,7 +704,7 @@ void CDisassembler::Go() {
 #if 0
     // For debugging: list all relocations
     printf("\n\nRelocations:");
-    for (uint32 i = 0; i < Relocations.GetNumEntries(); i++) {
+    for (uint32_t i = 0; i < Relocations.GetNumEntries(); i++) {
         printf("\nsect %i, os %X, type %X, size %i, add %X, target %X",
             Relocations[i].Section, Relocations[i].Offset, Relocations[i].Type,
             Relocations[i].Size, Relocations[i].Addend, Relocations[i].TargetOldIndex);
@@ -713,7 +713,7 @@ void CDisassembler::Go() {
 #if 0
     // For debugging: list all sections
     printf("\n\nSections:");
-    for (uint32 s = 1; s < Sections.GetNumEntries(); s++) {
+    for (uint32_t s = 1; s < Sections.GetNumEntries(); s++) {
         printf("\n%2i, %s", s, NameBuffer.Buf() + Sections[s].Name);
     }
 #endif
@@ -821,7 +821,7 @@ void CDisassembler::Pass1() {
 
 void CDisassembler::FindLabels() {
     // Find any labels at current position and next during pass 1
-    uint32 sym1, sym2 = 0, sym3 = 0;              // Symbol indices
+    uint32_t sym1, sym2 = 0, sym3 = 0;              // Symbol indices
 
     // Search for labels from IBegin
     sym1 = Symbols.FindByAddress(Section, IBegin, &sym2, &sym3);
@@ -876,7 +876,7 @@ void CDisassembler::CheckForMisplacedLabel() {
 
 int CDisassembler::NextLabel() {
     // Loop through labels from IEnd. Pass 2
-    uint32 sym, sym1, sym2 = 0, sym3 = 0;         // Symbol indices
+    uint32_t sym, sym1, sym2 = 0, sym3 = 0;         // Symbol indices
 
     // Make ready for next instruction
     IBegin = IEnd;
@@ -998,7 +998,7 @@ int CDisassembler::NextFunction2() {
 
 void CDisassembler::CheckForFunctionBegin() {
     // Check if function begins at current position
-    uint32 sym1, sym2 = 0, sym3 = 0;              // Symbol indices
+    uint32_t sym1, sym2 = 0, sym3 = 0;              // Symbol indices
     SFunctionRecord fun;                          // New function record
     IBegin = IEnd;
 
@@ -1093,19 +1093,19 @@ void CDisassembler::CheckForFunctionEnd() {
 }
 
 
-void CDisassembler::CheckRelocationTarget(uint32 IRel, uint32 TargetType, uint32 TargetSize) {
+void CDisassembler::CheckRelocationTarget(uint32_t IRel, uint32_t TargetType, uint32_t TargetSize) {
     // Update relocation record and its target.
     // This function updates the symbol type and size of a relocation target.
     // If the relocation target is a section:offset address then a new
     // symbol record is made
-    uint32 SymOldI;                               // Old index of target symbol
-    uint32 SymNewI;                               // New index of target symbol
-    int32  TargetSection;                         // Section of target symbol
-    uint32 TargetOffset;                          // Offset of target symbol
+    uint32_t SymOldI;                               // Old index of target symbol
+    uint32_t SymNewI;                               // New index of target symbol
+    int32_t  TargetSection;                         // Section of target symbol
+    uint32_t TargetOffset;                          // Offset of target symbol
 
     // Check if relocation valid
     if (!IRel || IRel >= Relocations.GetNumEntries() || !Relocations[IRel].TargetOldIndex
-        || Relocations[IRel].Section <= 0 || uint32(Relocations[IRel].Section) >= Sections.GetNumEntries()) {
+        || Relocations[IRel].Section <= 0 || uint32_t(Relocations[IRel].Section) >= Sections.GetNumEntries()) {
             return;
     }
 
@@ -1127,17 +1127,17 @@ void CDisassembler::CheckRelocationTarget(uint32 IRel, uint32 TargetType, uint32
         TargetOffset  = Symbols[SymNewI].Offset + Relocations[IRel].Addend;
 
         // Pointer to relocation source address
-        uint8 * RelSource = Sections[Relocations[IRel].Section].Start + Relocations[IRel].Offset;
+        uint8_t * RelSource = Sections[Relocations[IRel].Section].Start + Relocations[IRel].Offset;
 
         // Inline Addend;
-        int32 InlineA = 0;
+        int32_t InlineA = 0;
         switch (Relocations[IRel].Size) {
         case 1:
-            InlineA = *(int8*)RelSource;  break;
+            InlineA = *(int8_t*)RelSource;  break;
         case 2:
-            InlineA = *(int16*)RelSource;  break;
+            InlineA = *(int16_t*)RelSource;  break;
         case 4:  case 8:
-            InlineA = *(int32*)RelSource;  break;
+            InlineA = *(int32_t*)RelSource;  break;
         }
         // Add inline addend to target address
         TargetOffset += InlineA;
@@ -1191,7 +1191,7 @@ void CDisassembler::CheckRelocationTarget(uint32 IRel, uint32 TargetType, uint32
 }
 
 
-void CDisassembler::CheckJumpTarget(uint32 symi) {
+void CDisassembler::CheckJumpTarget(uint32_t symi) {
     // Extend range of current function to jump target, if needed
 
     // Check if current section is valid
@@ -1201,7 +1201,7 @@ void CDisassembler::CheckJumpTarget(uint32 symi) {
     if (IFunction == 0 || IFunction >= FunctionList.GetNumEntries()) return;
 
     // Check if target is in same section
-    if (Symbols[symi].Section != (int32)Section) return;
+    if (Symbols[symi].Section != (int32_t)Section) return;
 
     // Check if target extends current function
     if (Symbols[symi].Offset > FunctionList[IFunction].End && Symbols[symi].Offset <= Sections[Section].InitSize) {
@@ -1224,7 +1224,7 @@ void CDisassembler::CheckJumpTarget(uint32 symi) {
         SFunctionRecord fun;
         fun.Section = Symbols[symi].Section;
         fun.Start   = Symbols[symi].Offset;
-        uint32 IFun = FunctionList.Exists(fun);
+        uint32_t IFun = FunctionList.Exists(fun);
         if (IFun > 0 && IFun < FunctionList.GetNumEntries()) {
             // Target is the beginning of a known function. No need to extend current function
             return;
@@ -1462,8 +1462,8 @@ Values of SATracer::Regist[i] tells what kind of information register i contains
 
 void CDisassembler::UpdateTracer() {
     // Trace register values. See explanation above
-    uint32 reg;                                   // Destination register number
-    uint32 srcreg;                                // Source register number
+    uint32_t reg;                                   // Destination register number
+    uint32_t srcreg;                                // Source register number
 
     if (s.Operands[0] & 0xFF) {
         // There is a destination operand
@@ -1472,7 +1472,7 @@ void CDisassembler::UpdateTracer() {
             switch (s.Operands[0] & 0xF0000) {
             case 0x20000:
                 // Register indicated by last bits of opcode byte
-                reg = Get<uint8>(s.OpcodeStart2) & 7;
+                reg = Get<uint8_t>(s.OpcodeStart2) & 7;
                 // Check REX.B prefix
                 if (s.Prefixes[7] & 1) reg |= 8;     // Add 8 if REX.B prefix
                 break;
@@ -1537,14 +1537,14 @@ void CDisassembler::UpdateTracer() {
         // Save value
         switch (s.ImmediateFieldSize) {
         case 1:
-            t.Value[reg] = Get<uint8>(s.ImmediateField);
+            t.Value[reg] = Get<uint8_t>(s.ImmediateField);
             break;
         case 2:
-            t.Value[reg] = Get<uint16>(s.ImmediateField);
+            t.Value[reg] = Get<uint16_t>(s.ImmediateField);
             break;
         case 4:
         case 8: // 64-bit value truncated to 32 bits
-            t.Value[reg] = Get<uint32>(s.ImmediateField);
+            t.Value[reg] = Get<uint32_t>(s.ImmediateField);
             break;
         default:
             // Error. Should not occur
@@ -1723,10 +1723,10 @@ void CDisassembler::UpdateSymbols() {
     // update symbol list, call CheckJumpTarget if jump/call.
     // This function is called during pass 1 for every instruction
 
-    uint32 OpI;                                   // Operand index
-    uint32 OperandType;                           // Type of operand
-    uint32 SymOldI;                               // Symbol table old index
-    uint32 SymNewI;                               // Symbol table new index
+    uint32_t OpI;                                   // Operand index
+    uint32_t OperandType;                           // Type of operand
+    uint32_t SymOldI;                               // Symbol table old index
+    uint32_t SymNewI;                               // Symbol table new index
 
     // Loop through all operands for one instruction
     for (OpI = 0; OpI < 4; OpI++) {
@@ -1747,11 +1747,11 @@ void CDisassembler::UpdateSymbols() {
                     // Has no reference to other symbol. Make one
 
                     // Relocation type
-                    uint32 RelocationType = 2;        // Self relative
+                    uint32_t RelocationType = 2;        // Self relative
                     if ((OperandType & 0xFE) == 0x84) RelocationType = 8; // Far
 
                     // Scope
-                    uint32 TargetScope = 1;           // Function local
+                    uint32_t TargetScope = 1;           // Function local
                     if ((OperandType & 0xFF) >= 0x83) TargetScope = 2;  // Call or far. File scope
 
                     // Make relocation and target symbol
@@ -1785,7 +1785,7 @@ void CDisassembler::UpdateSymbols() {
                             Symbols[SymNewI].Type = (Symbols[SymNewI].Type & ~0xFF) | OperandType;
                         }
                         // Check if jump target is in data segment
-                        if (Symbols[SymNewI].Section > 0 && (uint16)(Symbols[SymNewI].Section) < Sections.GetNumEntries()
+                        if (Symbols[SymNewI].Section > 0 && (uint16_t)(Symbols[SymNewI].Section) < Sections.GetNumEntries()
                             && (Sections[Symbols[SymNewI].Section].Type & 0xFF) > 1) {
                                 s.Warnings1 |= 0x80000;
                         }
@@ -1808,7 +1808,7 @@ void CDisassembler::UpdateSymbols() {
                     }
                     else if (s.AddressFieldSize >= 4) {
                         // Relocation missing. Make one if possible
-                        uint32 TargetType = OperandType;
+                        uint32_t TargetType = OperandType;
                         if (Opcodei == 0x8D) {
                             // Source of LEA instruction has no type
                             TargetType = 0;
@@ -1855,7 +1855,7 @@ void CDisassembler::UpdateSymbols() {
                 // Indirect jump or call. Find jump table or virtual table
 
                 // Default relocation type for jump table is direct
-                uint32 RelocationType = 1;
+                uint32_t RelocationType = 1;
 
                 // Find symbol table entry for jump pointer or call pointer
                 if (s.AddressRelocation && Relocations[s.AddressRelocation].TargetOldIndex) {
@@ -1938,20 +1938,20 @@ void CDisassembler::UpdateSymbols() {
 }
 
 
-void CDisassembler::FollowJumpTable(uint32 symi, uint32 RelType) {
+void CDisassembler::FollowJumpTable(uint32_t symi, uint32_t RelType) {
     // Check jump/call table and its targets
-    uint32 sym1, sym2, sym3 = 0;                  // Symbol indices
-    uint32 NextLabel;                             // Offset of next label
-    uint32 Pos;                                   // Current position
+    uint32_t sym1, sym2, sym3 = 0;                  // Symbol indices
+    uint32_t NextLabel;                             // Offset of next label
+    uint32_t Pos;                                   // Current position
     SARelocation rel;                             // Relocation record for searching
-    int32  Reli;                                  // Index to relocation
-    uint32 NewType = 0;                           // Type to assign to symbol
-    int32  SourceSection;                         // Section of relocation source
-    uint32 SourceOffset;                          // Offset of relocation source
-    uint32 SourceSize;                            // Size of relocation source
-    uint32 TargetType;                            // Type for relocation target
-    uint32 RefPoint = 0;                          // Reference point if relocationtype = 0x10
-    int32  Addend = 0;                            // Inline addend
+    int32_t  Reli;                                  // Index to relocation
+    uint32_t NewType = 0;                           // Type to assign to symbol
+    int32_t  SourceSection;                         // Section of relocation source
+    uint32_t SourceOffset;                          // Offset of relocation source
+    uint32_t SourceSize;                            // Size of relocation source
+    uint32_t TargetType;                            // Type for relocation target
+    uint32_t RefPoint = 0;                          // Reference point if relocationtype = 0x10
+    int32_t  Addend = 0;                            // Inline addend
 
     // Check if sym is  valid
     if (Symbols[symi].OldIndex == 0) return;
@@ -1982,7 +1982,7 @@ void CDisassembler::FollowJumpTable(uint32 symi, uint32 RelType) {
     }
 
     // Check symbol type
-    if (uint32(s.OpcodeDef->Destination & 0xFF) > (Symbols[symi].Type & 0xFF)) {
+    if (uint32_t(s.OpcodeDef->Destination & 0xFF) > (Symbols[symi].Type & 0xFF)) {
         // No type assigned yet, or new type overrides old type
         Symbols[symi].Type = s.OpcodeDef->Destination | 0x4000000;
     }
@@ -2028,12 +2028,12 @@ void CDisassembler::FollowJumpTable(uint32 symi, uint32 RelType) {
         else {
             // No relocation here. Make one if possible
 
-            uint32 symi = MakeMissingRelocation(rel.Section, rel.Offset, RelType, TargetType, 2, 0, RefPoint);
+            uint32_t symi = MakeMissingRelocation(rel.Section, rel.Offset, RelType, TargetType, 2, 0, RefPoint);
             if (!symi) {
                 // Failed to make a meaningful relocation. End jump table
                 break;
             }
-            int32 TargetSection = Symbols[symi].Section;
+            int32_t TargetSection = Symbols[symi].Section;
             if (!TargetSection || (Sections[TargetSection].Type & 0xFF) != 1) {
                 // Target is not in code section. End jump table
                 break;
@@ -2048,7 +2048,7 @@ void CDisassembler::FollowJumpTable(uint32 symi, uint32 RelType) {
             break;
         }
         // Find relocation target
-        uint32 TargetSymI = Symbols.Old2NewIndex(Relocations[Reli].TargetOldIndex);
+        uint32_t TargetSymI = Symbols.Old2NewIndex(Relocations[Reli].TargetOldIndex);
         if (!TargetSymI) {
             // Target invalid
             break;
@@ -2061,23 +2061,23 @@ void CDisassembler::FollowJumpTable(uint32 symi, uint32 RelType) {
 
             switch (SourceSize) {
             case 2:
-                Addend += *(int16*)(Sections[SourceSection].Start + Pos);
+                Addend += *(int16_t*)(Sections[SourceSection].Start + Pos);
                 break;
             case 4: case 8:
-                Addend += *(int32*)(Sections[SourceSection].Start + Pos);
+                Addend += *(int32_t*)(Sections[SourceSection].Start + Pos);
                 break;
             default:
                 Addend += 0;
             }
             if (Addend) {
                 // Make new symbol at target address
-                uint32 NewSymOffset = Addend;
+                uint32_t NewSymOffset = Addend;
                 if (Relocations[Reli].Type & 2) {  // relative
                     if (RelType == 0x10) {  // arbitrary reference point
                         NewSymOffset -= (Relocations[Reli].Offset - SourceOffset);
                     }
                 }
-                uint32 NewSym = Symbols.NewSymbol(Symbols[TargetSymI].Section, NewSymOffset, 2);
+                uint32_t NewSym = Symbols.NewSymbol(Symbols[TargetSymI].Section, NewSymOffset, 2);
                 if (NewSym) TargetSymI = NewSym;
             }
         }
@@ -2107,7 +2107,7 @@ void CDisassembler::FollowJumpTable(uint32 symi, uint32 RelType) {
 }
 
 
-uint32 CDisassembler::MakeMissingRelocation(int32 Section, uint32 Offset, uint32 RelType, uint32 TargetType, uint32 TargetScope, uint32 SourceSize, uint32 RefPoint) {
+uint32_t CDisassembler::MakeMissingRelocation(int32_t Section, uint32_t Offset, uint32_t RelType, uint32_t TargetType, uint32_t TargetScope, uint32_t SourceSize, uint32_t RefPoint) {
     // Make a relocation and its target symbol from inline address
     /* This function is used for executable files that have already been
     relocated for making the relocation information that has been
@@ -2132,13 +2132,13 @@ uint32 CDisassembler::MakeMissingRelocation(int32 Section, uint32 Offset, uint32
     SARelocation Rel;                             // Temporary relocation record
     SASymbol Sym;                                 // Temporary symbol record for target
     Sym.Reset();
-    int32  irel;                                  // Relocation index
-    uint32 isym = 0;                              // Symbol new index
-    int64  InlineA;                               // Inline address or displacement
-    int64  TargetAbsAddr;                         // Absolute address of target
+    int32_t  irel;                                  // Relocation index
+    uint32_t isym = 0;                              // Symbol new index
+    int64_t  InlineA;                               // Inline address or displacement
+    int64_t  TargetAbsAddr;                         // Absolute address of target
 
     // Check if Section valid
-    if (Section <= 0 || (uint32)Section >= Sections.GetNumEntries() || Offset >= Sections[Section].InitSize || !Sections[Section].Start) {
+    if (Section <= 0 || (uint32_t)Section >= Sections.GetNumEntries() || Offset >= Sections[Section].InitSize || !Sections[Section].Start) {
         return 0;
     }
 
@@ -2184,16 +2184,16 @@ uint32 CDisassembler::MakeMissingRelocation(int32 Section, uint32 Offset, uint32
 
     // Get inline address or displacement from source address
     if (SourceSize == 8) {
-        InlineA = *(int64*)(Sections[Section].Start + Offset);
+        InlineA = *(int64_t*)(Sections[Section].Start + Offset);
     }
     else if (SourceSize == 4) {
-        InlineA = *(int32*)(Sections[Section].Start + Offset);
+        InlineA = *(int32_t*)(Sections[Section].Start + Offset);
     }
     else if (SourceSize == 2) {
-        InlineA = *(int16*)(Sections[Section].Start + Offset);
+        InlineA = *(int16_t*)(Sections[Section].Start + Offset);
     }
     else { // 1
-        InlineA = *(int8*)(Sections[Section].Start + Offset);
+        InlineA = *(int8_t*)(Sections[Section].Start + Offset);
     }
 
     // Get absolute virtual address of target
@@ -2207,7 +2207,7 @@ uint32 CDisassembler::MakeMissingRelocation(int32 Section, uint32 Offset, uint32
     }
     else if (RelType & 0x10) {
         // Relative to reference point. Translate relative to absolute address
-        uint32 RefSym = Symbols.Old2NewIndex(RefPoint);
+        uint32_t RefSym = Symbols.Old2NewIndex(RefPoint);
         TargetAbsAddr = InlineA + Symbols[RefSym].Offset + Sections[Symbols[RefSym].Section].SectionAddress;
     }
     else {
@@ -2239,7 +2239,7 @@ uint32 CDisassembler::MakeMissingRelocation(int32 Section, uint32 Offset, uint32
     else {
         // Object file
         Sym.Section = Section;
-        Sym.Offset  = (uint32)TargetAbsAddr - SectionAddress;
+        Sym.Offset  = (uint32_t)TargetAbsAddr - SectionAddress;
 
         // Make a symbol for this address if none exists
         Sym.Scope = TargetScope;
@@ -2254,7 +2254,7 @@ uint32 CDisassembler::MakeMissingRelocation(int32 Section, uint32 Offset, uint32
 
     if (isym) {
         // Relocation addend
-        int32 Addend = -(int32)InlineA;
+        int32_t Addend = -(int32_t)InlineA;
         if (RelType & 2) {
             // Correct self-relative record for bias
             if (s.MFlags & 0x100) {
@@ -2282,19 +2282,19 @@ uint32 CDisassembler::MakeMissingRelocation(int32 Section, uint32 Offset, uint32
 }
 
 
-void CDisassembler::CheckImportSymbol(uint32 symi) {
+void CDisassembler::CheckImportSymbol(uint32_t symi) {
     // Check for indirect jump to import table entry
 
     if (Symbols[symi].DLLName) {
         // Instruction is an indirect jump to symbol table entry
         // Find label at current instruction
-        uint32 sym2 = Symbols.FindByAddress(Section, IBegin);
+        uint32_t sym2 = Symbols.FindByAddress(Section, IBegin);
         if (sym2 && Symbols[sym2].Name == 0) {
             // Label at current instruction has no name
             // Give current instruction the import name without "_imp" prefix
             const char * ImpName = Symbols.GetName(symi);
-            if (strncmp(ImpName, Symbols.ImportTablePrefix, (uint32)strlen(Symbols.ImportTablePrefix)) == 0) {
-                Symbols.AssignName(sym2, ImpName + (uint32)strlen(Symbols.ImportTablePrefix));
+            if (strncmp(ImpName, Symbols.ImportTablePrefix, (uint32_t)strlen(Symbols.ImportTablePrefix)) == 0) {
+                Symbols.AssignName(sym2, ImpName + (uint32_t)strlen(Symbols.ImportTablePrefix));
             }
         }
     }
@@ -2302,7 +2302,7 @@ void CDisassembler::CheckImportSymbol(uint32 symi) {
 
 void CDisassembler::MarkCodeAsDubious() {
     // Remember that this may be data in a code segment
-    uint32 sym1, sym2 = 0, sym3 = 0;              // Preceding and succeding symbols
+    uint32_t sym1, sym2 = 0, sym3 = 0;              // Preceding and succeding symbols
 
     // Check likelihood that this is data rather than code
     if (((s.Errors & 0x4000) && ((s.Warnings1 & 0x10000000) || CountErrors > 1))
@@ -2433,8 +2433,8 @@ void CDisassembler::ParseInstruction() {
 
 void CDisassembler::ScanPrefixes() {
     // Scan prefixes
-    uint32 i;                                            // Index to current byte
-    uint8  Byte;                                         // Current byte of code
+    uint32_t i;                                            // Index to current byte
+    uint8_t  Byte;                                         // Current byte of code
     for (i = IBegin; i < SectionEnd; i++) {
 
         // Read code byte
@@ -2459,12 +2459,12 @@ void CDisassembler::ScanPrefixes() {
                 if (s.Prefixes[5] | s.Prefixes[7]) s.Warnings1 |= 0x800;
 
                 // Get equivalent prefixes
-                uint8 prefix3 = Byte;                    // Repeat prefix (F2, F3) or VEX prefix (C4, C5, 62)
-                uint8 prefix4;                           // 66, 48 Operand size prefix
-                uint8 prefix5;                           // 66, F2, F3 operand type prefixes
-                uint8 prefix6;                           // VEX.mmmmm and VEX.L
-                uint8 prefix7;                           // equivalent to REX prefix
-                uint8 vvvv;                              // vvvv register operand
+                uint8_t prefix3 = Byte;                    // Repeat prefix (F2, F3) or VEX prefix (C4, C5, 62)
+                uint8_t prefix4;                           // 66, 48 Operand size prefix
+                uint8_t prefix5;                           // 66, F2, F3 operand type prefixes
+                uint8_t prefix6;                           // VEX.mmmmm and VEX.L
+                uint8_t prefix7;                           // equivalent to REX prefix
+                uint8_t vvvv;                              // vvvv register operand
                 if (Byte == 0xC5) {
                     // 2-bytes VEX prefix
                     if (i+2 >= SectionEnd) {
@@ -2509,7 +2509,7 @@ void CDisassembler::ScanPrefixes() {
                 if (prefix7 & 8) prefix4 = 0x48;
                 StorePrefix(4, prefix4);                // Operand size prefix
                 // Translate operand type prefix values
-                static const uint8 PrefixValues[4] = {0, 0x66, 0xF3, 0xF2};
+                static const uint8_t PrefixValues[4] = {0, 0x66, 0xF3, 0xF2};
                 prefix5 = PrefixValues[prefix5];
                 StorePrefix(5, prefix5);                // Operand type prefix
                 StorePrefix(6, prefix6);                // VEX mmmmm,L
@@ -2564,7 +2564,7 @@ void CDisassembler::ScanPrefixes() {
 }
 
 
-void CDisassembler::StorePrefix(uint32 Category, uint8 Byte) {
+void CDisassembler::StorePrefix(uint32_t Category, uint8_t Byte) {
     // Store prefix according to category
     if (Category > 7) {err.submit(9000); return;} // Out of range
 
@@ -2590,12 +2590,12 @@ void CDisassembler::StorePrefix(uint32 Category, uint8 Byte) {
 
 void CDisassembler::FindMapEntry() {
     // Find entry in opcode maps
-    uint32 i = s.OpcodeStart1;                    // Index to current byte
-    uint16 Link;                                  // Link to another map
-    uint8  Byte = Buffer[i];                      // Current byte of code or index into map
-    uint32 MapNumber = 0;                         // Map number in opcodes.cpp
-    uint32 StartPage;                             // Index to start page in opcode map
-    uint32 MapNumber0 = 0;                        // Fallback start page if no map entry found in StartPage
+    uint32_t i = s.OpcodeStart1;                    // Index to current byte
+    uint16_t Link;                                  // Link to another map
+    uint8_t  Byte = Buffer[i];                      // Current byte of code or index into map
+    uint32_t MapNumber = 0;                         // Map number in opcodes.cpp
+    uint32_t StartPage;                             // Index to start page in opcode map
+    uint32_t MapNumber0 = 0;                        // Fallback start page if no map entry found in StartPage
     SOpcodeDef const * MapEntry;                  // Point to current opcode map entry
 
     // Get start page from VEX.mmmm or XOP.mmmm bits if any
@@ -2611,11 +2611,26 @@ void CDisassembler::FindMapEntry() {
         }
         MapNumber = OpcodeStartPageVEX[StartPage];
         if (StartPage == 1) MapNumber0 = 1;
-        if (StartPage == 2 && s.Prefixes[3] == 0x62) {
-            if ((s.Prefixes[5] & 0xFE) == 0xF2) {   // shortcut for EVEX F2 0F 38 and EVEX F3 0F 38
-                StartPage = 8 + (s.Prefixes[5] & 1);
-                MapNumber0 = MapNumber;
-                MapNumber = OpcodeStartPageVEX[StartPage];
+        else if (StartPage == 2 && s.Prefixes[3] == 0x62 && (s.Prefixes[5] & 0xFE) == 0xF2) {
+            // shortcut for EVEX F2 0F 38 and EVEX F3 0F 38
+            StartPage = 8 + (s.Prefixes[5] & 1);
+            MapNumber0 = MapNumber;
+            MapNumber = OpcodeStartPageVEX[StartPage];
+        }
+        else if (StartPage > 4 && s.Prefixes[3] == 0x62) {
+            // mmm >= 5: index by equivalent prefix 0/66/F2/F3
+            switch (s.Prefixes[5]) {
+            case 0: default:
+                Byte = 0;  break;
+            case 0x66:
+                Byte = 1;
+                if (s.Prefixes[3] == 0xF2) Byte = 2;      // F2/F3 take precedence over 66 in (tzcnt instruction)
+                else if (s.Prefixes[3] == 0xF3) Byte = 3;
+                break;
+            case 0xF2:
+                Byte = 2;  break;
+            case 0xF3:
+                Byte = 3;  break;
             }
         }
 
@@ -2643,8 +2658,8 @@ void CDisassembler::FindMapEntry() {
     }
 
     // Save previous opcode and options
-    *(uint32*)&PreviousOpcodei = *(uint32*)&Opcodei;
-    *(uint32*)&Opcodei = 0;
+    *(uint32_t*)&PreviousOpcodei = *(uint32_t*)&Opcodei;
+    *(uint32_t*)&Opcodei = 0;
 
     // Loop through map tree (exit loop when Link == 0)
     while (1) {
@@ -2809,6 +2824,10 @@ void CDisassembler::FindMapEntry() {
             else Byte = 0;                                // no VEX
             break;
 
+        case 0x12:   // Use code byte after any prefixes as index into next table
+             Byte = Buffer[i];
+             break;
+
         default:     // Internal error in map tree
             err.submit(9007, MapNumber);
             s.OpcodeStart2 = i;
@@ -2844,8 +2863,8 @@ void CDisassembler::FindOperands() {
     // 4 = has SIB byte,
     // 8 = has DREX byte (AMD SSE5 instructions never implemented),
     // 0x10 = is rip-relative
-    uint8 ModRegRM;                               // mod/reg/rm byte
-    uint8 SIB;                                    // SIB byte
+    uint8_t ModRegRM;                               // mod/reg/rm byte
+    uint8_t SIB;                                    // SIB byte
 
     // Get address size
     if (WordSize == 64) s.AddressSize = (s.Prefixes[1] == 0x67) ? 32 : 64;
@@ -2924,8 +2943,8 @@ void CDisassembler::FindOperands() {
                     // Indirect memory operand
                     // Get base and index registers
                     // [bx+si], [bx+di], [bp+si], [bp+di], [si], [di], [bp], [bx]
-                    static const uint8 BaseRegister [8] = {3+1, 3+1, 5+1, 5+1, 0, 0, 5+1, 3+1};
-                    static const uint8 IndexRegister[8] = {6+1, 7+1, 6+1, 7+1, 6+1, 7+1, 0, 0};
+                    static const uint8_t BaseRegister [8] = {3+1, 3+1, 5+1, 5+1, 0, 0, 5+1, 3+1};
+                    static const uint8_t IndexRegister[8] = {6+1, 7+1, 6+1, 7+1, 6+1, 7+1, 0, 0};
                     // Save register number + 1, because 0 means none.
                     s.BaseReg  = BaseRegister [s.RM]; // Base register = BX or BP or none
                     s.IndexReg = IndexRegister[s.RM]; // Index register = SI or DI or none
@@ -3007,7 +3026,7 @@ void CDisassembler::FindOperands() {
     }
 
     // Get operand size
-    uint32 OpSizePrefix = 0;
+    uint32_t OpSizePrefix = 0;
     if (s.Prefixes[4] == 0x66 && (s.OpcodeDef->AllowedPrefixes & 0x100))  OpSizePrefix = 1; // Operand size prefix
     if (s.Prefixes[4] == 0x48 && (s.OpcodeDef->AllowedPrefixes & 0x1000)) OpSizePrefix = 2; // Rex.W prefix
     s.OperandSize = (WordSize == 16) ^ (OpSizePrefix & 1) ? 16 : 32;
@@ -3077,17 +3096,17 @@ void CDisassembler::FindBroadcast() {
     // Find broadcast and offset multiplier for EVEX code
     if (s.Mod != 3) {
         // has memory operand
-        uint32 m;       // find memory operand
+        uint32_t m;       // find memory operand
         for (m = 0; m < s.MaxNumOperands; m++) {
             if (s.Operands[m] & 0x2000) break;
         }
         if (m == s.MaxNumOperands) return;   // no memory operand found. should not occur
-        uint32 r;       // find largest vector operand
-        uint32 vectortype = 0;
+        uint32_t r;       // find largest vector operand
+        uint32_t vectortype = 0;
         for (r = 0; r < s.MaxNumOperands; r++) {
             if ((s.Operands[r] & 0xF00) > vectortype) vectortype = s.Operands[r] & 0xF00;
         }
-        uint32 vectorsize = GetDataItemSize(vectortype);
+        uint32_t vectorsize = GetDataItemSize(vectortype);
         if (m < s.MaxNumOperands) {
             if ((s.OpcodeDef->EVEX & 1) && (s.Esss & 1)) {
                 // broadcasting. multiplier = element size
@@ -3143,7 +3162,7 @@ void CDisassembler::SwizTableLookup() {
         s.OffsetMultiplier = s.SwizRecord->memopsize;
         if (s.OffsetMultiplier == 0) {
             // no swizzle, use vector size
-            uint16 source = s.OpcodeDef->Source2;                 // last source operand
+            uint16_t source = s.OpcodeDef->Source2;                 // last source operand
             if (!(source & 0xF00)) source = s.OpcodeDef->Source1; // if source2 is not a vector, use source1
             switch ((source >> 8) & 0xF) {
             case 2:
@@ -3162,10 +3181,10 @@ void CDisassembler::SwizTableLookup() {
 
 void CDisassembler::FindOperandTypes() {
     // Determine the type of each operand
-    uint32 i, j, k;                               // Operands index
+    uint32_t i, j, k;                               // Operands index
     int nimm = 0;                                 // Number of immediate operands
-    uint32 AllowedPref = s.OpcodeDef->AllowedPrefixes;
-    uint32 oper;                                  // current operand definition
+    uint32_t AllowedPref = s.OpcodeDef->AllowedPrefixes;
+    uint32_t oper;                                  // current operand definition
 
     s.MaxNumOperands = 4;  // may be 5 in the future in cases where EVEX field is used as an extra operand
 
@@ -3231,7 +3250,7 @@ void CDisassembler::FindOperandTypes() {
 
     case 0x14: case 0x15: { // There is a DREX byte and three or four operands
         // Combine OC0 from DREX byte and OC1 from opcode byte into Operand configuration
-        int OperandConfiguration = ((s.Vreg >> 3) & 1) | ((Get<uint8>(s.OpcodeStart2) >> 1) & 2);
+        int OperandConfiguration = ((s.Vreg >> 3) & 1) | ((Get<uint8_t>(s.OpcodeStart2) >> 1) & 2);
         // Determine operands
         s.Operands[0] |= 0x50000;                  // Destination determined by dest field of DREX byte
         if (s.OpcodeDef->InstructionFormat & 1) {
@@ -3604,23 +3623,23 @@ void CDisassembler::FindOperandTypes() {
 
 void CDisassembler::FindWarnings() {
     // Find any reasons for warnings in code
-    uint32 i;                                     // Operand index
-    uint32 OperandSize;                           // Operand size
-    uint8 RexBits = 0;                            // Bits in REX prefix
+    uint32_t i;                                     // Operand index
+    uint32_t OperandSize;                           // Operand size
+    uint8_t RexBits = 0;                            // Bits in REX prefix
 
     if ((s.OpcodeDef->Options & 0x80) && s.ImmediateFieldSize > 1 && s.ImmediateRelocation == 0) {
         // Check if sign-extended operand can be used
-        if ((s.ImmediateFieldSize == 2 && Get<int16>(s.ImmediateField) == Get<int8>(s.ImmediateField))
-            ||  (s.ImmediateFieldSize == 4 && Get<int32>(s.ImmediateField) == Get<int8>(s.ImmediateField))) {
+        if ((s.ImmediateFieldSize == 2 && Get<int16_t>(s.ImmediateField) == Get<int8_t>(s.ImmediateField))
+            ||  (s.ImmediateFieldSize == 4 && Get<int32_t>(s.ImmediateField) == Get<int8_t>(s.ImmediateField))) {
                 s.Warnings1 |= 1; // Sign-extended operand could be used
         }
     }
     if (WordSize == 64 && s.ImmediateFieldSize == 8 && s.ImmediateRelocation == 0) {
         // We have a 64 bit immediate operand. Could it be made shorter?
-        if (Get<uint32>(s.ImmediateField+4) == 0) {
+        if (Get<uint32_t>(s.ImmediateField+4) == 0) {
             s.Warnings1 |= 2;                        // Upper half is zero. Could use zero-extension
         }
-        else if (Get<int64>(s.ImmediateField) == Get<int32>(s.ImmediateField)) {
+        else if (Get<int64_t>(s.ImmediateField) == Get<int32_t>(s.ImmediateField)) {
             s.Warnings1 |= 1;                        // Could use sign-extension
         }
     }
@@ -3631,22 +3650,22 @@ void CDisassembler::FindWarnings() {
             // There is a displacement which might be unnecessary
             switch (s.AddressFieldSize) {
             case 1:  // 1 byte displacement
-                if (Get<uint8>(s.AddressField) == 0
+                if (Get<uint8_t>(s.AddressField) == 0
                     && (((s.BaseReg-1) & 7) != 5 || (s.AddressSize == 16 && s.IndexReg)))
                     s.Warnings1 |= 4; // Displacement is 0 and an addressing mode without displacement exists
                 break;
             case 2:  // 2 bytes displacement
-                if (Get<int16>(s.AddressField) == 0) s.Warnings1 |= 4; // Displacement is 0
-                else if (Get<int16>(s.AddressField) == Get<int8>(s.AddressField)) s.Warnings1 |= 8; // Could use sign extension
+                if (Get<int16_t>(s.AddressField) == 0) s.Warnings1 |= 4; // Displacement is 0
+                else if (Get<int16_t>(s.AddressField) == Get<int8_t>(s.AddressField)) s.Warnings1 |= 8; // Could use sign extension
                 break;
             case 4:  // 4 bytes displacement
                 if (s.OpcodeDef->InstructionFormat != 0x1E) {
-                    if (Get<int32>(s.AddressField) == 0) s.Warnings1 |= 4; // Displacement is 0
-                    else if (Get<int32>(s.AddressField) == Get<int8>(s.AddressField)) s.Warnings1 |= 8; // Could use sign extension
+                    if (Get<int32_t>(s.AddressField) == 0) s.Warnings1 |= 4; // Displacement is 0
+                    else if (Get<int32_t>(s.AddressField) == Get<int8_t>(s.AddressField)) s.Warnings1 |= 8; // Could use sign extension
                 }
                 break;
             case 8:  // 8 bytes displacement
-                if (Get<int32>(s.AddressField) == Get<int64>(s.AddressField))
+                if (Get<int32_t>(s.AddressField) == Get<int64_t>(s.AddressField))
                     // Has 8 bytes displacement. Could use sign-extended or rip-relative
                     s.Warnings1 |= 8;
                 break;
@@ -3661,7 +3680,7 @@ void CDisassembler::FindWarnings() {
     }
     // Check if shorter instruction exists for register operands
     if ((s.OpcodeDef->Options & 0x80) && !(s.OpcodeDef->InstructionFormat & 0xFE0) && s.Mod == 3
-        && !(WordSize == 64 && Get<uint8>(s.OpcodeStart1) == 0xFF)) {
+        && !(WordSize == 64 && Get<uint8_t>(s.OpcodeStart1) == 0xFF)) {
             s.Warnings1 |= 0x20;   // No memory operand. A shorter version exists for register operand
     }
     // Check for length-changing prefix
@@ -3672,7 +3691,7 @@ void CDisassembler::FindWarnings() {
     }
     // Check for bogus length-changing prefix causing stall on Intel Core2.
     // Will occur if 66 prefix and first opcode byte is F7 and there is a 16 bytes boundary between opcode byte and mod/reg/rm byte
-    if (Get<uint8>(s.OpcodeStart1) == 0xF7 && s.Prefixes[4] == 0x66 && ((s.OpcodeStart1+1) & 0xF) == 0 && !s.ImmediateFieldSize) {
+    if (Get<uint8_t>(s.OpcodeStart1) == 0xF7 && s.Prefixes[4] == 0x66 && ((s.OpcodeStart1+1) & 0xF) == 0 && !s.ImmediateFieldSize) {
         s.Warnings1 |= 0x2000000;
     }
     // Warn for address size prefix if mod/reg/rm byte
@@ -3776,7 +3795,7 @@ void CDisassembler::FindWarnings() {
             // VEX present, check vvvv register operand
             if (s.Vreg & 8) s.Errors |= 0x200;  // Register 8-15 not allowed in this mode
             // Check imm[7:4] register operand
-            if ((s.OpcodeDef->InstructionFormat & 0x1E) == 0x1C && (Get<uint8>(s.ImmediateField) & 8)) {
+            if ((s.OpcodeDef->InstructionFormat & 0x1E) == 0x1C && (Get<uint8_t>(s.ImmediateField) & 8)) {
                 s.Errors |= 0x200;  // Register 8-15 not allowed in this mode
             }
         }
@@ -3854,7 +3873,7 @@ void CDisassembler::FindWarnings() {
     // Check for conflicting prefixes
     if (s.OpcodeDef->AllowedPrefixes & 0x140)  s.Conflicts[5] = 0; // 66 + F2/F3 allowed for string instructions
     if ((s.OpcodeDef->AllowedPrefixes & 0x1200) == 0x1200) s.Conflicts[4] = 0; // 66 + REX.W allowed for e.g. movd/movq instruction
-    if (*(int64*)&s.Conflicts) s.Warnings1 |= 0x800;  // Conflicting prefixes. Check all categories at once
+    if (*(int64_t*)&s.Conflicts) s.Warnings1 |= 0x800;  // Conflicting prefixes. Check all categories at once
 
     // Check for missing prefixes
     if ((s.OpcodeDef->AllowedPrefixes & 0x8000) && s.Prefixes[5] == 0)
@@ -3917,43 +3936,43 @@ void CDisassembler::FindWarnings() {
         // Loop through destination and source operands
         for (i = 0; i < s.MaxNumOperands; i++) {
             // Operand type
-            uint32 OperandType = s.Operands[i];
+            uint32_t OperandType = s.Operands[i];
             if ((OperandType & 0x2000) && Opcodei != 0x8D) {
                 // This is a memory operand (except LEA). Get target offset
-                int64 TargetOffset = 0;
+                int64_t TargetOffset = 0;
                 switch (s.AddressFieldSize) {
                 case 1:
-                    TargetOffset = Get<int8>(s.AddressField);  break;
+                    TargetOffset = Get<int8_t>(s.AddressField);  break;
                 case 2:
-                    TargetOffset = Get<int16>(s.AddressField);  break;
+                    TargetOffset = Get<int16_t>(s.AddressField);  break;
                 case 4:
-                    TargetOffset = Get<int32>(s.AddressField);
+                    TargetOffset = Get<int32_t>(s.AddressField);
                     if (s.MFlags & 0x100) {
                         // Compute rip-relative address
                         TargetOffset += IEnd - s.AddressField;
                     }
                     break;
                 case 8:
-                    TargetOffset = Get<int64>(s.AddressField);  break;
+                    TargetOffset = Get<int64_t>(s.AddressField);  break;
                 }
                 // Add relocation offset
                 TargetOffset += Relocations[s.AddressRelocation].Addend;
 
                 // Find relocation target
-                uint32 SymbolOldIndex = Relocations[s.AddressRelocation].TargetOldIndex;
-                uint32 SymbolNewIndex = Symbols.Old2NewIndex(SymbolOldIndex);
+                uint32_t SymbolOldIndex = Relocations[s.AddressRelocation].TargetOldIndex;
+                uint32_t SymbolNewIndex = Symbols.Old2NewIndex(SymbolOldIndex);
                 if (SymbolNewIndex) {
                     // Add relocation target offset
                     TargetOffset += Symbols[SymbolNewIndex].Offset;
                     // Target section
-                    int32 TargetSection = Symbols[SymbolNewIndex].Section;
-                    if (TargetSection && (uint32)TargetSection < Sections.GetNumEntries()) {
+                    int32_t TargetSection = Symbols[SymbolNewIndex].Section;
+                    if (TargetSection && (uint32_t)TargetSection < Sections.GetNumEntries()) {
                         // Add relocation section address
                         TargetOffset += Sections[TargetSection].SectionAddress;
                     }
                     if ((Relocations[s.AddressRelocation].Type & 0x10) && Relocations[s.AddressRelocation].RefOldIndex) {
                         // Add offset of reference point
-                        uint32 RefIndex = Symbols.Old2NewIndex(Relocations[s.AddressRelocation].RefOldIndex);
+                        uint32_t RefIndex = Symbols.Old2NewIndex(Relocations[s.AddressRelocation].RefOldIndex);
                         TargetOffset += Symbols[RefIndex].Offset;
                     }
                     if (Relocations[s.AddressRelocation].Type & 0x3000) {
@@ -4032,7 +4051,7 @@ void CDisassembler::FindWarnings() {
 
     // Check operand size for stack operations
     if ((s.OpcodeDef->AllowedPrefixes & 0x102) == 0x102) {
-        if (s.Prefixes[4] == 0x66 || (Get<uint8>(s.OpcodeStart1) == 0xCF && s.OperandSize != WordSize)) {
+        if (s.Prefixes[4] == 0x66 || (Get<uint8_t>(s.OpcodeStart1) == 0xCF && s.OperandSize != WordSize)) {
             s.Warnings1 |= 0x4000000; // Non-default size for stack operation
         }
     }
@@ -4074,7 +4093,7 @@ void CDisassembler::FindErrors() {
     if (IEnd > LabelEnd && IBegin < LabelEnd) {
         // Instruction crosses a label
         // Check if label is public
-        uint32 sym1 = Symbols.FindByAddress(Section, LabelEnd, 0, 0);
+        uint32_t sym1 = Symbols.FindByAddress(Section, LabelEnd, 0, 0);
         if (sym1 && (Symbols[sym1].Scope & 0x1C)) {
             // Label is public. Code interpretation may be out of phase
             s.Errors |= 0x80;
@@ -4109,9 +4128,9 @@ void CDisassembler::FindErrors() {
         if (s.IndexReg == 0) s.Errors |= 8;  // Illegal operand: no index register
     }
     if (LabelEnd >= s.OpcodeStart2+2 && (
-        Get<uint16>(s.OpcodeStart2) == 0
-        || Get<uint16>(s.OpcodeStart2) == 0xFFFF
-        // || Get<uint16>(s.OpcodeStart2) == 0xCCCC
+        Get<uint16_t>(s.OpcodeStart2) == 0
+        || Get<uint16_t>(s.OpcodeStart2) == 0xFFFF
+        // || Get<uint16_t>(s.OpcodeStart2) == 0xCCCC
         )) {
             // Two consecutive bytes of zero gives the instruction: add byte ptr [eax],al
             // This instruction is very unlikely to occur in normal code but occurs
@@ -4137,7 +4156,7 @@ void CDisassembler::FindRelocations() {
     rel2.Offset  = IEnd;                          // rel2 marks end of this instruction
 
     // Search for relocations in this instruction
-    uint32 irel = Relocations.FindFirst(rel1);    // Finds first relocation source >= IBegin
+    uint32_t irel = Relocations.FindFirst(rel1);    // Finds first relocation source >= IBegin
 
     if (irel == 0 || irel >= Relocations.GetNumEntries()) {
         // No relocations found
@@ -4202,7 +4221,7 @@ void CDisassembler::FindRelocations() {
 
 void CDisassembler::FindInstructionSet() {
     // Update instruction set
-    uint16 InstSet = s.OpcodeDef->InstructionSet;
+    uint16_t InstSet = s.OpcodeDef->InstructionSet;
     if (InstSet == 7 && s.Prefixes[5] == 0x66) {
         // Change MMX to SSE2 if 66 prefix
         InstSet = 0x12;
@@ -4250,7 +4269,7 @@ void CDisassembler::CheckLabel() {
     // Write begin and end of function
 
     // Search in symbol table
-    uint32 Sym1, Sym2;                            // First and last symbol
+    uint32_t Sym1, Sym2;                            // First and last symbol
 
     // Find all symbol table entries at this address
     Sym1 = Symbols.FindByAddress(Section, IBegin, &Sym2);
@@ -4258,7 +4277,7 @@ void CDisassembler::CheckLabel() {
     if (Sym1) {
         // Found at least one symbol
         // Loop for all symbols with same address
-        for (uint32 s = Sym1; s <= Sym2; s++) {
+        for (uint32_t s = Sym1; s <= Sym2; s++) {
 
             // Check if label has already been written as a function label
             if (!(Symbols[s].Scope & 0x100) && !(Symbols[s].Type & 0x80000000)) {
@@ -4295,13 +4314,13 @@ void CDisassembler::CheckForNops() {
     case 0:
         break;
     case 1:
-        if (Get<int8>(s.AddressField) != 0) return;
+        if (Get<int8_t>(s.AddressField) != 0) return;
         break;
     case 2:
-        if (Get<int16>(s.AddressField) != 0) return;
+        if (Get<int16_t>(s.AddressField) != 0) return;
         break;
     case 4:
-        if (Get<int32>(s.AddressField) != 0) return;
+        if (Get<int32_t>(s.AddressField) != 0) return;
         break;
     default:
         return;
@@ -4336,7 +4355,7 @@ void CDisassembler::CheckForNops() {
 
 void CDisassembler::InitialErrorCheck() {
     // Check for illegal relocations table entries
-    uint32 i;                                     // Loop counter
+    uint32_t i;                                     // Loop counter
 
     // Loop through relocations table
     for (i = 1; i < Relocations.GetNumEntries(); i++) {
@@ -4361,7 +4380,7 @@ void CDisassembler::InitialErrorCheck() {
 
 void CDisassembler::FinalErrorCheck() {
     // Check for illegal entries in symbol table and relocations table
-    uint32 i;                                     // Loop counter
+    uint32_t i;                                     // Loop counter
     int SpaceWritten = 0;                         // Blank line written
 
     // Loop through symbol table
@@ -4370,7 +4389,7 @@ void CDisassembler::FinalErrorCheck() {
             // Constant or external symbol or section
             continue;
         }
-        if ((uint32)Symbols[i].Section >= Sections.GetNumEntries()
+        if ((uint32_t)Symbols[i].Section >= Sections.GetNumEntries()
             || Symbols[i].Offset > Sections[Symbols[i].Section].TotalSize) {
                 // Symbol has illegal address
                 // Blank line
@@ -4397,7 +4416,7 @@ void CDisassembler::FinalErrorCheck() {
     for (i = 1; i < Relocations.GetNumEntries(); i++) {
         // Check source address
         if (Relocations[i].Section == 0
-            || (uint32)Relocations[i].Section >= Sections.GetNumEntries()
+            || (uint32_t)Relocations[i].Section >= Sections.GetNumEntries()
             || (Sections[Relocations[i].Section].Type & 0xFF) == 3
             || Relocations[i].Offset >= Sections[Relocations[i].Section].InitSize) {
                 // Relocation has illegal source address
@@ -4447,16 +4466,16 @@ void CDisassembler::FinalErrorCheck() {
 
 void CDisassembler::CheckNamesValid() {
     // Fix invalid symbol and section names
-    uint32 i, j;                                  // Loop counter
-    uint32 Len;                                   // Length of name
-    uint32 Changed;                               // Symbol is changed
+    uint32_t i, j;                                  // Loop counter
+    uint32_t Len;                                   // Length of name
+    uint32_t Changed;                               // Symbol is changed
     char c;                                       // Character in symbol
-    const char * ValidCharacters;                 // List of valid characters in symbol names
+    const char * ValidCharacters = "";            // List of valid characters in symbol names
     // Make list of characters valid in symbol names other than alphanumeric characters
     switch (Syntax) {
     case SUBTYPE_MASM:
         ValidCharacters = "_$@?";  break;
-    case SUBTYPE_YASM:
+    case SUBTYPE_NASM:
         ValidCharacters = "_$@?.~#";  break;
     case SUBTYPE_GASM:
         ValidCharacters = "_$.";  break;
@@ -4466,7 +4485,7 @@ void CDisassembler::CheckNamesValid() {
 
     // Loop through sections
     for (i = 1; i < Sections.GetNumEntries(); i++) {
-        char * SecName = NameBuffer.Buf() + Sections[i].Name;
+        char * SecName = (char*)NameBuffer.Buf() + Sections[i].Name;
         if (Syntax == SUBTYPE_MASM && SecName[0] == '.') {
             // Name begins with dot
             // Check for reserved names
@@ -4489,7 +4508,7 @@ void CDisassembler::CheckNamesValid() {
         if (Symbols[i].Name) {
             // Warning: violating const specifier in GetName():
             char * SymName = (char *)Symbols.GetName(i);
-            Len = strlen(SymName);  Changed = 0;
+            Len = (uint32_t)strlen(SymName);  Changed = 0;
             // Loop through characters in symbol
             for (j = 0; j < Len; j++) {
                 c = SymName[j];
@@ -4525,7 +4544,7 @@ void CDisassembler::CheckNamesValid() {
                     else {
                         // Illegal character in GAS or YASM syntax
 #if ReplaceIllegalChars
-                        SymName[j] = (Syntax == SUBTYPE_YASM) ? '?' : '$';
+                        SymName[j] = (Syntax == SUBTYPE_NASM) ? '?' : '$';
 #endif
                         Changed++;
                     }
@@ -4541,9 +4560,9 @@ void CDisassembler::CheckNamesValid() {
 void CDisassembler::FixRelocationTargetAddresses() {
     // Fix missing relocation target addresses
     // to section:offset addresses
-    uint32 r;                                     // Relocation index
-    uint32 s;                                     // Symbol index
-    int32 sect;
+    uint32_t r;                                     // Relocation index
+    uint32_t s;                                     // Symbol index
+    int32_t sect;
 
     // Loop through relocations
     for (r = 1; r < Relocations.GetNumEntries(); r++) {
@@ -4555,15 +4574,15 @@ void CDisassembler::FixRelocationTargetAddresses() {
 
             // Find target address from relocation source
             sect = Relocations[r].Section;
-            if ((uint32)sect >= Sections.GetNumEntries()) continue;
-            uint8 * pSectionData = Sections[sect].Start;
+            if ((uint32_t)sect >= Sections.GetNumEntries()) continue;
+            uint8_t * pSectionData = Sections[sect].Start;
             if (!pSectionData) continue;
-            int64 TargetOffset = 0;
+            int64_t TargetOffset = 0;
             if (Relocations[r].Size == 4) {
-                TargetOffset = *(int32*)(pSectionData + Relocations[r].Offset);
+                TargetOffset = *(int32_t*)(pSectionData + Relocations[r].Offset);
             }
             else if (Relocations[r].Size == 8) {
-                TargetOffset = *(int64*)(pSectionData + Relocations[r].Offset);
+                TargetOffset = *(int64_t*)(pSectionData + Relocations[r].Offset);
             }
             else {
                 // Error: wrong size
@@ -4593,10 +4612,10 @@ void CDisassembler::FixRelocationTargetAddresses() {
 }
 
 
-int CDisassembler::TranslateAbsAddress(int64 Addr, int32 &Sect, uint32 &Offset) {
+int CDisassembler::TranslateAbsAddress(int64_t Addr, int32_t &Sect, uint32_t &Offset) {
     // Translate absolute virtual address to section and offset
     // Returns 1 if valid address found.
-    int32 Section;
+    int32_t Section;
 
     // Get image-relative address
     Addr -= ImageBase;
@@ -4604,13 +4623,13 @@ int CDisassembler::TranslateAbsAddress(int64 Addr, int32 &Sect, uint32 &Offset) 
     if (HighDWord(Addr)) return 0;
 
     // Search through sections
-    for (Section = 1; (uint32)Section < Sections.GetNumEntries(); Section++) {
-        uint32 SectionAddress = Sections[Section].SectionAddress;
-        if ((uint32)Addr >= SectionAddress && (uint32)Addr < SectionAddress + Sections[Section].TotalSize) {
+    for (Section = 1; (uint32_t)Section < Sections.GetNumEntries(); Section++) {
+        uint32_t SectionAddress = Sections[Section].SectionAddress;
+        if ((uint32_t)Addr >= SectionAddress && (uint32_t)Addr < SectionAddress + Sections[Section].TotalSize) {
             // Address is within this section
             // Return section and offset
             Sect = Section;
-            Offset = (uint32)Addr - SectionAddress;
+            Offset = (uint32_t)Addr - SectionAddress;
             // Return 1 to indicate success
             return 1;
         }
@@ -4620,9 +4639,9 @@ int CDisassembler::TranslateAbsAddress(int64 Addr, int32 &Sect, uint32 &Offset) 
 }
 
 
-uint32 CDisassembler::GetDataItemSize(uint32 Type) {
+uint32_t CDisassembler::GetDataItemSize(uint32_t Type) {
     // Get size in bytes of data item with specified type
-    uint32 Size = 1;
+    uint32_t Size = 1;
 
     switch (Type & 0xFF) {
         // Scalar types
@@ -4664,7 +4683,7 @@ uint32 CDisassembler::GetDataItemSize(uint32 Type) {
 }
 
 
-uint32 CDisassembler::GetDataElementSize(uint32 Type) {
+uint32_t CDisassembler::GetDataElementSize(uint32_t Type) {
     // Get size of vector element in data item with specified type
     if ((Type & 0xF0) == 0x50) {
         // Vector of unknown elements
@@ -4677,7 +4696,7 @@ uint32 CDisassembler::GetDataElementSize(uint32 Type) {
 }
 
 
-int32 CDisassembler::GetSegmentRegisterFromPrefix() {
+int32_t CDisassembler::GetSegmentRegisterFromPrefix() {
     // Translate segment prefix to segment register
     switch (s.Prefixes[0]) {
     case 0x26:  // ES:

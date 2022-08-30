@@ -33,23 +33,23 @@ void CCOF2ASM::Convert() {
 
 void CCOF2ASM::MakeSectionList() {
    // Make Sections list and Relocations list in Disasm
-   uint32 isec;                                  // Section index
-   uint32 irel;                                  // Relocation index
+   uint32_t isec;                                  // Section index
+   uint32_t irel;                                  // Relocation index
 
    // Loop through sections
-   for (isec = 0; isec < (uint32)NSections; isec++) {
+   for (isec = 0; isec < (uint32_t)NSections; isec++) {
 
       // Get section header
       SCOFF_SectionHeader * SectionHeader = &SectionHeaders[isec];
 
       // Section properties
-      const char * Name  = GetSectionName(SectionHeader->Name);
-      uint8 * Buffer = (uint8*)Buf() + SectionHeader->PRawData;
-      uint32 InitSize = SectionHeader->SizeOfRawData;
-      uint32 TotalSize = SectionHeader->VirtualSize;
+      const char * Name  = (char*)GetSectionName(SectionHeader->Name);
+      uint8_t * Buffer = (uint8_t*)Buf() + SectionHeader->PRawData;
+      uint32_t InitSize = SectionHeader->SizeOfRawData;
+      uint32_t TotalSize = SectionHeader->VirtualSize;
 
-      uint32 SectionAddress = SectionHeader->VirtualAddress;
-      uint32 Type  = (SectionHeader->Flags & PE_SCN_CNT_CODE) ? 1 : 2;
+      uint32_t SectionAddress = SectionHeader->VirtualAddress;
+      uint32_t Type  = (SectionHeader->Flags & PE_SCN_CNT_CODE) ? 1 : 2;
       if (SectionHeader->Flags & PE_SCN_CNT_UNINIT_DATA) {
          // BSS segment. No data in file
          Buffer = 0;
@@ -72,7 +72,7 @@ void CCOF2ASM::MakeSectionList() {
          Type = 0x11;
       }
 
-      uint32 Align = (SectionHeader->Flags & PE_SCN_ALIGN_MASK) / PE_SCN_ALIGN_1;
+      uint32_t Align = (SectionHeader->Flags & PE_SCN_ALIGN_MASK) / PE_SCN_ALIGN_1;
       if (Align) Align--;
 
       // Save section record
@@ -82,20 +82,20 @@ void CCOF2ASM::MakeSectionList() {
       // Pointer to relocation entry
       union {
          SCOFF_Relocation * p;  // pointer to record
-         int8 * b;              // used for address calculation and incrementing
+         int8_t * b;              // used for address calculation and incrementing
       } Reloc;
       Reloc.b = Buf() + SectionHeader->PRelocations;
 
       for (irel = 0; irel < SectionHeader->NRelocations; irel++, Reloc.b += SIZE_SCOFF_Relocation) {
 
          // Relocation properties
-         int32 Section = isec + 1;
-         uint32 Offset = Reloc.p->VirtualAddress;
-         int32 Addend  = 0;
-         uint32 TargetIndex = Reloc.p->SymbolTableIndex;
+         int32_t Section = isec + 1;
+         uint32_t Offset = Reloc.p->VirtualAddress;
+         int32_t Addend  = 0;
+         uint32_t TargetIndex = Reloc.p->SymbolTableIndex;
 
          // Translate relocation type
-         uint32 Type = 0, Size = 0;
+         uint32_t Type = 0, Size = 0;
          if (WordSize == 32) {
             // 32 bit relocation types
             // 0 = unknown, 1 = direct, 2 = self-relative, 3 = image-relative, 4 = segment relative
@@ -171,19 +171,19 @@ void CCOF2ASM::MakeSectionList() {
 
 void CCOF2ASM::MakeSymbolList() {
    // Make Symbols list in Disasm
-   uint32 isym;                                  // Symbol index
-   uint32 naux = 0;                              // Number of auxiliary entries in old symbol table
+   uint32_t isym;                                  // Symbol index
+   uint32_t naux = 0;                              // Number of auxiliary entries in old symbol table
 
    union {                                       // Pointer to old symbol table entries
       SCOFF_SymTableEntry * p;                   // Normal pointer
-      int8 * b;                                  // Used for address calculation
+      int8_t * b;                                  // Used for address calculation
    } Sym, SymAux;
 
    // Set pointer to old SymbolTable
    Sym.p = SymbolTable;
 
    // Loop through old symbol table
-   for (isym = 0; isym < (uint32)NumberOfSymbols; isym += 1+naux, Sym.b += (1+naux) * SIZE_SCOFF_SymTableEntry) {
+   for (isym = 0; isym < (uint32_t)NumberOfSymbols; isym += 1+naux, Sym.b += (1+naux) * SIZE_SCOFF_SymTableEntry) {
 
       // Number of auxiliary entries
       naux = Sym.p->s.NumAuxSymbols;
@@ -196,11 +196,11 @@ void CCOF2ASM::MakeSymbolList() {
       }
 
       // Symbol properties
-      uint32 Index   = isym;
-      int32  Section = Sym.p->s.SectionNumber;
-      uint32 Offset  = Sym.p->s.Value;
-      uint32 Size    = 0;
-      uint32 Type    = (Sym.p->s.Type == COFF_TYPE_FUNCTION) ? 0x83 : 0;
+      uint32_t Index   = isym;
+      int32_t  Section = Sym.p->s.SectionNumber;
+      uint32_t Offset  = Sym.p->s.Value;
+      uint32_t Size    = 0;
+      uint32_t Type    = (Sym.p->s.Type == COFF_TYPE_FUNCTION) ? 0x83 : 0;
 
       // Identify segment entries in symbol table
       if (Sym.p->s.Value == 0 && Sym.p->s.StorageClass == COFF_CLASS_STATIC
@@ -212,10 +212,10 @@ void CCOF2ASM::MakeSymbolList() {
          Type = 0x80000082;
       }
 
-      const char * Name = GetSymbolName(Sym.p->s.Name);
+      const char * Name = (char*)GetSymbolName(Sym.p->s.Name);
 
       // Get scope. Note that these values are different from the constants defined in maindef.h
-      uint32 Scope = 0;
+      uint32_t Scope = 0;
       if (Sym.p->s.StorageClass == COFF_CLASS_STATIC || Sym.p->s.StorageClass == COFF_CLASS_LABEL) {
          Scope = 2;             // Local
       }
@@ -264,15 +264,15 @@ void CCOF2ASM::MakeDynamicRelocations() {
    // Beginning of .reloc section is first base relocation block
    pBaseRelocation = &Get<SCOFF_BaseRelocationBlock>(reldir.FileOffset);
 
-   uint32 ROffset = 0;                        // Offset into .reloc section
-   uint32 BlockEnd;                           // Offset of end of current block
-   uint32 PageOffset;                         // Image-relative address of begin of page
+   uint32_t ROffset = 0;                        // Offset into .reloc section
+   uint32_t BlockEnd;                           // Offset of end of current block
+   uint32_t PageOffset;                         // Image-relative address of begin of page
 
    // Make pointer to header or entry in .reloc section
    union {
       SCOFF_BaseRelocationBlock * header;
       SCOFF_BaseRelocation * entry;
-      int8 * b;
+      int8_t * b;
    } Pointer;
 
    // Loop throung .reloc section
@@ -311,7 +311,7 @@ void CCOF2ASM::MakeDynamicRelocations() {
          if (Pointer.entry->Type == COFF_REL_BASED_HIGHADJ) ROffset += sizeof(SCOFF_BaseRelocation);
       }
       // Finished block. Align by 4
-      ROffset = (ROffset + 3) & uint32(-4);
+      ROffset = (ROffset + 3) & uint32_t(-4);
    }
 }
 
@@ -330,21 +330,21 @@ void CCOF2ASM::MakeImportList() {
 
    // Check if 64 bit
    int Is64bit = OptionalHeader->h64.Magic == COFF_Magic_PE64; // 1 if 64 bit
-   uint32 EntrySize = Is64bit ? 8 : 4;           // Size of address table entries
+   uint32_t EntrySize = Is64bit ? 8 : 4;           // Size of address table entries
 
-   uint32 NameOffset;                            // Offset to name
+   uint32_t NameOffset;                            // Offset to name
    const char * SymbolName;                      // Name of symbol
    const char * DLLName;                         // Name of DLL containing symbol
    char NameBuffer[64];                          // Buffer for creating name of ordinal symbols
-   uint32 SectionOffset;                         // Section-relative address of current entry
-   uint32 HintNameOffset;                        // Section-relative address of hint/name table
-   uint32 FirstHintNameOffset = 0;               // First HintNameOffset = start of hint/name table
-   uint32 AddressTableOffset;                    // Offset of import address table relative to import lookup table
+   uint32_t SectionOffset;                         // Section-relative address of current entry
+   uint32_t HintNameOffset;                        // Section-relative address of hint/name table
+   uint32_t FirstHintNameOffset = 0;               // First HintNameOffset = start of hint/name table
+   uint32_t AddressTableOffset;                    // Offset of import address table relative to import lookup table
 
    // Pointer to current import directory entry
    SCOFF_ImportDirectory * ImportEntry = pImportDirectory;
    // Pointer to current import lookup table entry
-   int32 * LookupEntry = 0;
+   int32_t * LookupEntry = 0;
    // Pointer to current hint/name table entry
    SCOFF_ImportHintName * HintNameEntry;
 
@@ -372,7 +372,7 @@ void CCOF2ASM::MakeImportList() {
       // Loop through lookup table
       while (1) {
          // Pointer to lookup table entry
-         LookupEntry = &Get<int32>(impdir.FileOffset + SectionOffset);
+         LookupEntry = &Get<int32_t>(impdir.FileOffset + SectionOffset);
 
          // End when entry is empty
          if (!LookupEntry[0]) break;
@@ -384,7 +384,7 @@ void CCOF2ASM::MakeImportList() {
             char * dot = strchr(NameBuffer,'.');
             if (dot) *dot = 0;
             // Add ordinal number to name
-            sprintf(NameBuffer+strlen(NameBuffer), "_Ordinal_%i", uint16(LookupEntry[0]));
+            sprintf(NameBuffer+strlen(NameBuffer), "_Ordinal_%i", uint16_t(LookupEntry[0]));
             SymbolName = NameBuffer;
          }
          else {
@@ -436,42 +436,42 @@ void CCOF2ASM::MakeExportList() {
    SCOFF_ExportDirectory * pExportDirectory = &Get<SCOFF_ExportDirectory>(expdir.FileOffset);
 
    // Find ExportAddressTable
-   uint32 ExportAddressTableOffset = pExportDirectory->ExportAddressTableRVA - expdir.VirtualAddress;
+   uint32_t ExportAddressTableOffset = pExportDirectory->ExportAddressTableRVA - expdir.VirtualAddress;
    if (ExportAddressTableOffset == 0 || ExportAddressTableOffset >= expdir.MaxOffset) {
       // Points outside section
       err.submit(2035);  return;
    }
-   uint32 * pExportAddressTable = &Get<uint32>(expdir.FileOffset + ExportAddressTableOffset);
+   uint32_t * pExportAddressTable = &Get<uint32_t>(expdir.FileOffset + ExportAddressTableOffset);
 
    // Find ExportNameTable
    if (pExportDirectory->NamePointerTableRVA == 0) {
        return;  // I don't know why this happens
    }
-   uint32 ExportNameTableOffset = pExportDirectory->NamePointerTableRVA - expdir.VirtualAddress;
+   uint32_t ExportNameTableOffset = pExportDirectory->NamePointerTableRVA - expdir.VirtualAddress;
    if (ExportNameTableOffset == 0 || ExportNameTableOffset >= expdir.MaxOffset) {
       // Points outside section
       err.submit(2035);  return;
    }
-   uint32 * pExportNameTable = &Get<uint32>(expdir.FileOffset + ExportNameTableOffset);
+   uint32_t * pExportNameTable = &Get<uint32_t>(expdir.FileOffset + ExportNameTableOffset);
 
    // Find ExportOrdinalTable
-   uint32 ExportOrdinalTableOffset = pExportDirectory->OrdinalTableRVA - expdir.VirtualAddress;
+   uint32_t ExportOrdinalTableOffset = pExportDirectory->OrdinalTableRVA - expdir.VirtualAddress;
    if (ExportOrdinalTableOffset == 0 || ExportOrdinalTableOffset >= expdir.MaxOffset) {
       // Points outside section
       err.submit(2035);  return;
    }
-   uint16 * pExportOrdinalTable = &Get<uint16>(expdir.FileOffset + ExportOrdinalTableOffset);
+   uint16_t * pExportOrdinalTable = &Get<uint16_t>(expdir.FileOffset + ExportOrdinalTableOffset);
 
    // Get further properties
-   uint32 NumExports = pExportDirectory->AddressTableEntries;
-   uint32 NumExportNames = pExportDirectory->NamePointerEntries;
-   uint32 OrdinalBase = pExportDirectory->OrdinalBase;
+   uint32_t NumExports = pExportDirectory->AddressTableEntries;
+   uint32_t NumExportNames = pExportDirectory->NamePointerEntries;
+   uint32_t OrdinalBase = pExportDirectory->OrdinalBase;
 
-   uint32 i;                                     // Index into pExportOrdinalTable and pExportNameTable
-   uint32 Ordinal;                               // Index into pExportAddressTable
-   uint32 Address;                               // Image-relative address of symbol
-   uint32 NameOffset;                            // Section-relative address of name
-   uint32 FirstName = 0;                         // Image-relative address of first name table entry
+   uint32_t i;                                     // Index into pExportOrdinalTable and pExportNameTable
+   uint32_t Ordinal;                               // Index into pExportAddressTable
+   uint32_t Address;                               // Image-relative address of symbol
+   uint32_t NameOffset;                            // Section-relative address of name
+   uint32_t FirstName = 0;                         // Image-relative address of first name table entry
    const char * Name = 0;                        // Name of symbol
    char NameBuffer[64];                          // Buffer for making name
 
@@ -518,7 +518,7 @@ void CCOF2ASM::MakeExportList() {
 void CCOF2ASM::MakeListLabels() {
    // Attach names to all image directories
    SCOFF_ImageDirAddress dir;
-   uint32 i;
+   uint32_t i;
 
    for (i = 0; i < NumImageDirs; i++) {
       if (GetImageDir(i, &dir)) {

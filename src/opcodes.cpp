@@ -1,13 +1,13 @@
 /****************************    opcodes.cpp    *******************************
 * Author:        Agner Fog
 * Date created:  2007-02-21
-* Last modified: 2017-04-14
+* Last modified: 2022-05-07
 * Project:       objconv
 * Module:        opcodes.cpp
 * Description:
 * Definition of opcode maps used by disassembler
 *
-* Copyright 2007-2017 GNU General Public License http://www.gnu.org/licenses
+* Copyright 2007-2022 GNU General Public License http://www.gnu.org/licenses
 *****************************************************************************/
 
 
@@ -363,11 +363,11 @@ SOpcodeDef OpcodeMap1[256] = {
    {"unpckh",    0x11  ,0x8D2200, 0x19  , 0x124F, 0x124F, 0x24F , 0     , 0x31  , 0     , 0     , 0x3   },    // 0F 15 unpckhps/pd
    {0,           0x44  , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0x9   , 0     },    // 0F 16 Link to tertiary map: movhps, etc.
    {"movh",      0x11  ,0x812200, 0x13  , 0x234F, 0x144F, 0     , 0     , 0x1000, 0     , 0     , 0x3   },    // 0F 17 movhps/pd
-   {0,           0x35  , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0x2   , 0     },    // 0F 18 Link to tertiary map: group 16
+   {0,           0x35  , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 2     , 0     },    // 0F 18 Link to tertiary map: group 16
    {"hint",      0x6   , 0      , 0x2012, 0     , 0x6   , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 19. Hint instructions reserved for future use
-   {0,           0x110 , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0x9   , 0     },    // 0F 1A. Link to BNDMK etc
-   {0,           0x111 , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0x9   , 0     },    // 0F 1B. Link to BNDCL etc
-   {"hint",      0x6   , 0      , 0x2012, 0     , 0x6   , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 1C. Hint instructions reserved for future use
+   {0,           0x110 , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 9     , 0     },    // 0F 1A. Link to BNDMK etc
+   {0,           0x111 , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 9     , 0     },    // 0F 1B. Link to BNDCL etc
+   {"hint",      0x13A , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 2     , 0     },    // 0F 1C. Link to CLDEMOTE etc
    {"hint",      0x6   , 0      , 0x2012, 0     , 0x6   , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 1D. Hint instructions reserved for future use
    {"hint",      0x135 , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 9     , 0     },    // 0F 1E. link to endbr64 etc.
    {"nop",       0x6   , 0      , 0x10  , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0x40  },    // 0F 1F. Multi-byte nop
@@ -553,7 +553,7 @@ SOpcodeDef OpcodeMap1[256] = {
    {0,           0xF5  , 0      , 0x52  , 0     , 0     , 0     , 0     , 0     , 0     , 0x11  , 0     },    // 0F C2. Link to cmpps etc.
    {"movnti",    0x11  , 0x1000 , 0x13  , 0x2009, 0x1009, 0     , 0     , 0     , 0     , 0     , 0     },    // 0F C3
    {0,           0x29  , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0x3   , 0     },    // 0F C4. Link to pinsrw
-   {"pextrw",    0x7   ,0x812200, 0x52  , 0x1002, 0x1102, 0x11  , 0     , 0x1000, 0     , 0     , 0x2   },    // 0F C5
+   {"pextrw",    0x7   ,0x812200, 0x52  , 0x1009, 0x1102, 0x11  , 0     , 0x1000, 0     , 0     , 0x2   },    // 0F C5
    {"shuf",      0x11  ,0x8D2200, 0x59  , 0x124F, 0x124F, 0x24F , 0x11  , 0x31  , 0     , 0     , 0x3   },    // 0F C6
    {0,           0x50  , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0x2   , 0     },    // 0F C7. Link to tertiary map for group 9
    {"bswap",     0x3   , 0x1000 , 0x3   , 0x1009, 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F C8. bswap eax
@@ -709,12 +709,17 @@ SOpcodeDef OpcodeMap2[] = {
    {"vrsqrt14p", 0x20  ,0x8D9200, 0x12  , 0x124F, 0x024F, 0     , 0     , 0x31  , 0     , 0     , 0x1   },    // 0F 38 4E
    {"vrsqrt14s", 0x20  ,0x8D9200, 0x19  , 0x144F, 0x144F, 0x004F, 0     , 0x30  , 0     , 0     , 0x1   },    // 0F 38 4F
 //  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
-   {"vaddnp",    0x80  ,0x4A9200, 0x19,   0x164F, 0x164F, 0x64F , 0     , 0     , 0x1304, 0     , 0x101 },    // 0F 38 50
-   {"vgmaxabsps",0x80  ,0x428200, 0x12  , 0x164F, 0x64F , 0     , 0     , 0     , 0x1204, 0     , 0x100 },    // 0F 38 51
-   {"vgminp",    0x80  ,0x429200, 0x12  , 0x164F, 0x64F , 0     , 0     , 0     , 0x1204, 0     , 0x101 },    // 0F 38 52
-   {"vgmaxp",    0x80  ,0x429200, 0x12  , 0x164F, 0x64F , 0     , 0     , 0     , 0x1204, 0     , 0x101 },    // 0F 38 53
-   {"(reserved)",0x00  ,0x4D2E00, 0x4012, 0x609 , 0x609 , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 54
-   {"vfixupnanp",0x80  ,0x4A9200, 0x19,   0x164F, 0x164F, 0x603 , 0     , 0     , 0x1206, 0     , 0x101 },    // 0F 38 55
+//   {"vaddnp",    0x80  ,0x4A9200, 0x19,   0x164F, 0x164F, 0x64F , 0     , 0     , 0x1304, 0     , 0x101 },    // 0F 38 50. Knight's corner
+   {"vpdpbusd",  0x24  ,0x8E8200, 0x19  , 0x203 , 0x1203, 0x1203, 0     , 0x1020, 0     , 0     , 0     },    // 66 0F 38 50
+//   {"vgmaxabsps",0x80  ,0x428200, 0x12  , 0x164F, 0x64F , 0     , 0     , 0     , 0x1204, 0     , 0x100 },    // 0F 38 51. Knight's corner
+   {"vpdpbusds", 0x24  ,0x8E8200, 0x19  , 0x203 , 0x1203, 0x1203, 0     , 0x1020, 0     , 0     , 0     },    // 66 0F 38 51
+//   {"vgminp",    0x80  ,0x429200, 0x12  , 0x164F, 0x64F , 0     , 0     , 0     , 0x1204, 0     , 0x101 },    // 0F 38 52. Knight's corner
+   {"vpdpwssd", 0x24  ,0x8E8200, 0x19  , 0x203 , 0x1203, 0x1203, 0     , 0x1020, 0     , 0     , 0     },    // 66 0F 38 52
+//   {"vgmaxp",    0x80  ,0x429200, 0x12  , 0x164F, 0x64F , 0     , 0     , 0     , 0x1204, 0     , 0x101 },    // 0F 38 53. Knight's corner
+   {"vpdpwssds", 0x24  ,0x8E8200, 0x19  , 0x203 , 0x1203, 0x1203, 0     , 0x1020, 0     , 0     , 0     },    // 66 0F 38 53
+   {"vpopcnt",   0x24  ,0x8EC200, 0x18,   0x209 , 0x1209, 0     , 0     , 0     , 0     , 0     , 1     },    // 0F 38 54
+   {"vpopcnt",   0x24  ,0x8EB200, 0x18,   0x209 , 0x1209, 0     , 0     , 0     , 0     , 0     , 1     },    // 0F 38 55
+//   {"vfixupnanp",0x80  ,0x4A9200, 0x19,   0x164F, 0x164F, 0x603 , 0     , 0     , 0x1206, 0     , 0x101 },    // 0F 38 55. Knight's corner
    {"(reserved)",0x00  ,0x4D2E00, 0x4012, 0x609 , 0x609 , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 56
    {"(reserved)",0x00  ,0x4D2E00, 0x4012, 0x609 , 0x609 , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 57
    {"vpbroadcastd",0xA0, 0      , 0   ,   0     , 0     , 0     , 0     , 0     , 0     , 0x3   , 0     },    // 0F 38 58. Link to vpbroadcastd
@@ -728,8 +733,8 @@ SOpcodeDef OpcodeMap2[] = {
 //  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
    {0,           0     , 0      , 0x2012, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 60
    {0,           0     , 0      , 0x2012, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 61
-   {0,           0     , 0      , 0x2012, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 62
-   {0,           0     , 0      , 0x2012, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 63
+   {"vpexpand",  0x23  ,0x80C200, 0x13,   0x0209, 0x1209, 0     , 0     , 0x1020, 0     , 0     , 1     },    // 0F 38 62
+   {"vpcompress",0x23  ,0x80C200, 0x13,   0x0209, 0x1209, 0     , 0     , 0x1020, 0     , 0     , 1     },    // 0F 38 63
    {"vpblendm",  0x20  ,0xCAB200, 0x19,   0x1209, 0x1209, 0x209 , 0     , 0x21  , 0x1406, 0     , 0x001 },    // 0F 38 64 (alignment required only in Knights Corner)
    {"vblendmp",  0x80  ,0xCA9200, 0x19,   0x124F, 0x124F, 0x24F , 0     , 0x21  , 0x1404, 0     , 0x101 },    // 0F 38 65
    {"vpblendm",  0x20  ,0x8AC200, 0x19,   0x1209, 0x1209, 0x209 , 0     , 0x21  , 0x1406, 0     , 0x001 },    // 0F 38 66
@@ -743,10 +748,10 @@ SOpcodeDef OpcodeMap2[] = {
    {"vpsbbrd",   0x80  , 0x4A8200,0x19  , 0x1603, 0x95  , 0x603 , 0     , 0     , 0x1406, 0     , 0x100 },    // 0F 38 6E
    {"vpsubrsetbd",0x80 , 0x4A8200,0x19  , 0x1603, 0x95  , 0x603 , 0     , 0     , 0x1406, 0     , 0x100 },    // 0F 38 6F
 //  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
-   {"(reserved)",0x00  ,0x4D2E00, 0x4012, 0x609 , 0x609 , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 70
-   {"(reserved)",0x00  ,0x4D2E00, 0x4012, 0x609 , 0x609 , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 71
-   {"(reserved)",0x00  ,0x4D2E00, 0x4012, 0x609 , 0x609 , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 72
-   {"(reserved)",0x00  ,0x4D2E00, 0x4012, 0x609 , 0x609 , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 73
+   {"vpshldv",   0x23  ,0x8CC200, 0x19,   0x0209, 0x1209, 0x1209, 0     , 0x1020, 0     , 0     , 1     },    // 0F 38 70
+   {"vpshldv",   0x23  ,0x8CB200, 0x19,   0x0209, 0x1209, 0x1209, 0     , 0x1020, 0     , 0     , 1     },    // 0F 38 71
+   {"vpshrdv",   0x23  ,0x8CC200, 0x19,   0x0209, 0x1209, 0x1209, 0     , 0x1020, 0     , 0     , 1     },    // 0F 38 72
+   {"vpshrdv",   0x23  ,0x8CB200, 0x19,   0x0209, 0x1209, 0x1209, 0     , 0x1020, 0     , 0     , 1     },    // 0F 38 73
    {"vpcmpltd",  0x80  ,0x4B8200, 0x19  , 0x95  , 0x1603, 0x603 , 0     , 0     , 0x1406, 0     , 0x100 },    // 0F 38 74
    {"vpermi2" ,  0x23  ,0x8EC200, 0x19,   0x1209, 0x1209, 0x209 , 0     , 0x20  , 0     , 0     , 1     },    // 0F 38 75 (instruction set avx512vbmi for byte version)
    {"vpermi2",   0x20  ,0x8AB200, 0x19,   0x1609, 0x1609, 0x0609, 0     , 0x31  , 0     , 0     , 0x1   },    // 0F 38 76
@@ -775,13 +780,13 @@ SOpcodeDef OpcodeMap2[] = {
    {"vpmaskmov", 0x1C  , 0xFB200, 0x19,   0x1209, 0x1209, 0x2209, 0     , 0     , 0     , 0     , 1     },    // 0F 38 8C
    {"vperm" ,    0x23  ,0x8EC200, 0x19,   0x1209, 0x1209, 0x209 , 0     , 0x20  , 0     , 0     , 1     },    // 0F 38 8D
    {"vpmaskmov", 0x1C  , 0xFB200, 0x1A,   0x2209, 0x1209, 0x1209, 0     , 0     , 0     , 0     , 1     },    // 0F 38 8E
-   {0,           0     , 0      , 0x2012, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 8F
+   {"vpshufbitqmb",0x24,0x8E8200, 0x19,   0x95,   0x1201, 0x1201, 0     , 0x90  , 0     , 0     , 0     },    // 0F 38 8F
 //  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
    {0,           0x102 , 0      , 0   ,   0     , 0     , 0     , 0     , 0     , 0     , 0xE   , 0     },    // 0F 38 90. link to vpgatherd/q
    {0,           0x94  , 0      , 0   ,   0     , 0     , 0     , 0     , 0     , 0     , 0xE   , 0     },    // 0F 38 91. Link to vpgatherqd/q
    {0,           0xB6  , 0      , 0   ,   0     , 0     , 0     , 0     , 0     , 0     , 0xE   , 0     },    // 0F 38 92. Link to vpgatherdps/pd
    {0,           0xE0  , 0      , 0   ,   0     , 0     , 0     , 0     , 0     , 0     , 0xE   , 0     },    // 0F 38 93. Link to vpgatherqps/pd
-   {"(reserved)",0x00  ,0x4D2E00, 0x4012, 0x609 , 0x609 , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 94
+   {0,           0x00  ,0x4D2E00, 0x4012, 0x609 , 0x609 , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 94
    {0,           0     , 0      , 0x2012, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 95
    {"vfmaddsub132p",0x1A,0x8F9200,0x19  , 0x124F, 0x124F, 0x24F , 0     , 0x37  , 0     , 0     , 0x1   },    // 0F 38 96
    {"vfmsubadd132p",0x1A,0x8F9200,0x19  , 0x124F, 0x124F, 0x24F , 0     , 0x37  , 0     , 0     , 0x1   },    // 0F 38 97
@@ -843,8 +848,9 @@ SOpcodeDef OpcodeMap2[] = {
    {0,           0x10A , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0x11  , 0     },    // 0F 38 CB
    {0,           0x10B , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0x11  , 0     },    // 0F 38 CC
    {0,           0x10C , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0x11  , 0     },    // 0F 38 CD
-   {"(reserved)",0x00  ,0x4D2E00, 0x4012, 0x609 , 0x609 , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 CE
-   {"(reserved)",0x00  ,0x4D2E00, 0x4012, 0x609 , 0x609 , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 CF
+   {0,           0x00  ,0x4D2E00, 0x4012, 0x609 , 0x609 , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 CE
+   {"gf2p8mulb" ,0x24  ,0x8CB200,0x19   ,0x201  , 0x1201, 0x1201, 0     , 0x20  , 0     , 0     , 2     },    // 0F 38 CF
+
 //  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
    {0,           0xBE  , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0x9   , 0     },    // 0F 38 D0. Link to vloadunpackld
    {0,           0xBF  , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0x9   , 0     },    // 0F 38 D1. Link to vloadunpacklps
@@ -888,8 +894,8 @@ SOpcodeDef OpcodeMap2[] = {
    {"bzhi",      0xA3  , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0x9   , 0     },    // 0F 38 F5. Link to bzhi, pdep, pext
    {"mulx",      0xD0  , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0x9   , 0     },    // 0F 38 F6. Link to mulx, adcx, adox
    {"bextr",     0xAD  , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0x9   , 0     },    // 0F 38 F7. Link to bextr etc.
-   {0,           0     , 0      , 0x2012, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 F8
-   {0,           0     , 0      , 0x2012, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 F9
+   {"movdir64b", 0x24  , 0x0200 , 0x12  , 4     , 0x650 , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 F8
+   {"movdiri",   0x24  , 0x3000 , 0x12  , 0x1009, 9     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 F9
    {0,           0     , 0      , 0x2012, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 FA
    {0,           0     , 0      , 0x2012, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 FB
    {0,           0     , 0      , 0x2012, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 38 FC
@@ -949,8 +955,8 @@ SOpcodeDef OpcodeMap4[] = {
    {0,           0x8F  , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0xC   , 0     },    // 0F 3A 23. Link to vshuff32x4
    {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A 24
    {"vpternlog", 0x20  ,0x88B200, 0x59  , 0x1209, 0x1209, 0x0209, 0x31  , 0x31  , 0     , 0     , 0x1   },    // 0F 3A 25
-   {"vgetmantp", 0x20  , 0xC29200,0x52  , 0x124F, 0x24F , 0x31  , 0     , 0x33  , 0x1204, 0     , 0x001 },    // 0F 3A 26
-   {"vgetmants", 0x20  , 0xCA9200,0x59  , 0x144F, 0x24F , 0x04F , 0x31  , 0x32  , 0x1204, 0     , 0x001 },    // 0F 3A 27
+   {0,           0x13E , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 9     , 0     },    // 0F 3A 26 link by prefix. vgetmantp
+   {0,           0x13F , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 9     , 0     },    // 0F 3A 27 link by prefix. vgetmants
    {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A 28
    {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A 29
    {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A 2A
@@ -1000,8 +1006,8 @@ SOpcodeDef OpcodeMap4[] = {
    {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A 53
    {"vfixupimmp",0x20  ,0x881200, 0x59  , 0x124F, 0x124F, 0x024F, 0x31  , 0x33  , 0     , 0     , 1     },    // 0F 3A 54
    {"vfixupimms",0x20  ,0x8C1200, 0x59  , 0x104F, 0x104F, 0x004F, 0x31  , 0x32  , 0     , 0     , 1     },    // 0F 3A 55
-   {"vreducep",  0x20  ,0x86B200, 0x52  , 0x124F, 0x24f , 0     , 0x31  , 0x23  , 0     , 0     , 1     },    // 0F 3A 56
-   {"vreduces",  0x20  ,0x8EB200, 0x52  , 0x144F, 0x44f , 0     , 0x31  , 0x22  , 0     , 0     , 1     },    // 0F 3A 57
+   {0,           0x14E , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 9     , 0     },    // 0F 3A 56. link by prefix. vreducep
+   {0,           0x14F , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 9     ,       },    // 0F 3A 57. link by prefix. vreduces
    {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A 58
    {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A 59
    {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A 5A
@@ -1017,8 +1023,8 @@ SOpcodeDef OpcodeMap4[] = {
    {"pcmpistri", 0x16  , 0x18200, 0x52  , 0x1401, 0x451 , 0x31  , 0     , 0     , 0     , 0     , 0x202 },    // 0F 3A 63
    {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A 64
    {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A 65
-   {"vfpclassp", 0x20  ,0x82B200, 0x52  , 0x95  , 0x24F , 0x31  , 0     , 0x10  , 0     , 0     , 1     },    // 0F 3A 66
-   {"vfpclasss", 0x20  ,0x82B200, 0x52  , 0x95  , 0x44F , 0x31  , 0     , 0x10  , 0     , 0     , 1     },    // 0F 3A 67
+   {0,           0x13C , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 9     , 0     },    // 0F 3A 66 link by prefix. vfpclassp
+   {0,           0x13D , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 9     , 0     },    // 0F 3A 67 link by prefix. vfpclasss
 // 4-operand FMA instructions. First specified by Intel, then Intel changed their plans, now supported by AMD
    {"vfmaddps",  0x1006,0xFF200 , 0x5C  , 0x24B , 0x24B , 0x24B , 0x24B , 0     , 0     , 0     , 0     },    // 0F 3A 68
    {"vfmaddpd",  0x1006,0xFF200 , 0x5C  , 0x24C , 0x24C , 0x24C , 0x24C , 0     , 0     , 0     , 0     },    // 0F 3A 69
@@ -1029,10 +1035,10 @@ SOpcodeDef OpcodeMap4[] = {
    {"vfmsubss",  0x1006,0xBF200 , 0x5C  , 0x44B , 0x44B , 0x44B , 0x44B , 0     , 0     , 0     , 0     },    // 0F 3A 6E
    {"vfmsubsd",  0x1006,0xBF200 , 0x5C  , 0x44C , 0x44C , 0x44C , 0x44C , 0     , 0     , 0     , 0     },    // 0F 3A 6F
 //  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
-   {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A 70
-   {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A 71
-   {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A 72
-   {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A 73
+   {"vpshld",    0x23  ,0x8CC200, 0x59,   0x0209, 0x1209, 0x1209,0x31   , 0x1020, 0     , 0     , 1     },    // 0F 3A 70
+   {"vpshld",    0x23  ,0x8CB200, 0x59,   0x0209, 0x1209, 0x1209,0x31   , 0x1020, 0     , 0     , 1     },    // 0F 3A 71
+   {"vpshrd",    0x23  ,0x8CC200, 0x59,   0x0209, 0x1209, 0x1209,0x31   , 0x1020, 0     , 0     , 1     },    // 0F 3A 72
+   {"vpshrd",    0x23  ,0x8CB200, 0x59,   0x0209, 0x1209, 0x1209,0x31   , 0x1020, 0     , 0     , 1     },    // 0F 3A 73
    {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A 74
    {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A 75
    {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A 76
@@ -1116,7 +1122,7 @@ SOpcodeDef OpcodeMap4[] = {
 //  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
    {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A C0
    {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A C1
-   {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A C2
+   {0,           0x152 , 0      , 0   ,   0   ,   0     , 0     , 0     , 0     , 0     , 9     , 0     },    // 0F 3A C2
    {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A C3
    {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A C4
    {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A C5
@@ -1128,8 +1134,8 @@ SOpcodeDef OpcodeMap4[] = {
    {0,           0xB5  , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0x9   , 0     },    // 0F 3A CB. Link to vcvtfxpntdq2ps etc
    {"sha1rnds4", 0x22  , 0      , 0x52  , 0x1403, 0x0403, 0x31  , 0     , 0     , 0     , 0     , 0     },    // 0F 3A CC
    {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A CD
-   {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A CE
-   {0,           0     , 0      , 0x2052, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 3A CF
+   {"gf2p8affineqb",   0x24,0x88B200,0x59,0x201 , 0x1201, 0x1201, 0x31  , 0x20  , 0     , 0     , 2     },    // 0F 3A CE
+   {"gf2p8affineinvqb",0x24,0x88B200,0x59,0x201 , 0x1201, 0x1201, 0x31  , 0x20  , 0     , 0     , 2     },    // 0F 3A CF
 //  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
    {"(reserved)",0x00  ,0x4D2E00, 0x4052, 0x609 , 0x609 , 0x31  , 0     , 0     , 0     , 0     , 0     },    // 0F 38 D0
    {"(reserved)",0x00  ,0x4D2E00, 0x4052, 0x609 , 0x609 , 0x31  , 0     , 0     , 0     , 0     , 0     },    // 0F 38 D1
@@ -2024,14 +2030,14 @@ SOpcodeDef OpcodeMap34[16] = {
    {0,           0x134 , 0      , 0x11  , 0     , 0     , 0     , 0     , 0     , 0     , 9     , 0     },     // 0F AE /5. Link setssbsy
    {0,           0xF3  , 0      , 0x11  , 0     , 0     , 0     , 0     , 0     , 0     , 9     , 0     },     // 0F AE /6. Link xsaveopt
    {0,           0xF2  , 0      , 0x11  , 0     , 0     , 0     , 0     , 0     , 0     , 9     , 0     },     // 0F AE /7. Link clflush
-   {"rdfsbase",  0x10000,0x1400 , 0x11  , 0x1009, 0     , 0     , 0     , 0     , 0     , 0     , 0     },     // F3 0F AE m-0
-   {"rdgsbase",  0x10000,0x1400 , 0x11  , 0x1009, 0     , 0     , 0     , 0     , 0     , 0     , 0     },     // F3 0F AE m-1
-   {"wrfsbase",  0x10000,0x1400 , 0x11  , 0     , 0x1009, 0     , 0     , 0     , 0     , 0     , 0     },     // F3 0F AE m-2
-   {"wrgsbase",  0x10000,0x1400 , 0x11  , 0     , 0x1009, 0     , 0     , 0     , 0     , 0     , 0     },     // F3 0F AE m-3
+   {"rdfsbase",  0x10000,0x1400 , 0x11  , 0x1009, 0     , 0     , 0     , 0     , 0     , 0     , 0     },     // F3 0F AE 0
+   {"rdgsbase",  0x10000,0x1400 , 0x11  , 0x1009, 0     , 0     , 0     , 0     , 0     , 0     , 0     },     // F3 0F AE 1
+   {"wrfsbase",  0x10000,0x1400 , 0x11  , 0     , 0x1009, 0     , 0     , 0     , 0     , 0     , 0     },     // F3 0F AE 2
+   {"wrgsbase",  0x10000,0x1400 , 0x11  , 0     , 0x1009, 0     , 0     , 0     , 0     , 0     , 0     },     // F3 0F AE 3
    {0,           0     , 0      , 0x10  , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },     // Illegal
-   {"lfence",    0x12  , 0      , 0x10  , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },     // m-5
-   {"mfence",    0x12  , 0      , 0x10  , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },     // m-6
-   {0,           0xF4  , 0      , 0x10  , 0     , 0     , 0     , 0     , 0     , 0     , 9     , 0     }};    // m-7. Link sfence, pcommit
+   {"lfence",    0x12  , 0      , 0x10  , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },     // 5
+   {0,           0x139 , 0      , 0x11  , 0     , 0     , 0     , 0     , 0     , 0     , 9     , 0     },     // 0F AE /6 reg. Link
+   {0,           0xF4  , 0      , 0x10  , 0     , 0     , 0     , 0     , 0     , 0     , 9     , 0     }};    // 7. Link sfence, pcommit
 
 // Secondary opcode map for group 16. Opcode byte = 0F 18
 // Indexed by reg bits = 0 - 7.
@@ -2048,13 +2054,15 @@ SOpcodeDef OpcodeMap35[8] = {
 
 // Quarternary opcode map for group 7. 0F 01 reg = 0
 // Indexed by rm bits of mod/reg/rm byte
-SOpcodeDef OpcodeMap36[6] = {
+SOpcodeDef OpcodeMap36[] = {
 //  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
    {0,           0     , 0      , 0x4010, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // illegal
    {"vmcall",    0x813 , 0      , 0x10  , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0x8   },    // Intel processor only?
    {"vmlaunch",  0x813 , 0      , 0x10  , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0x8   },    // Intel processor only?
    {"vmresume",  0x813 , 0      , 0x10  , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // Intel processor only?
    {"vmxoff",    0x813 , 0      , 0x10  , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // Intel processor only?
+   {"pconfig",   0x824 , 0      , 0x10  , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },
+   {0,           0     , 0      , 0x4010, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },
    {0,           0     , 0      , 0x4010, 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};   // illegal
 
 // Quarternary opcode map for group 7. 0F 01 reg = 1
@@ -2351,7 +2359,7 @@ SOpcodeDef OpcodeMap58[3] = {
 //  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
    {"movd",      0x7   , 0x11200, 0x12  , 0x1103, 0x3   , 0     , 0     , 0x00  , 0     , 0     , 0x2   },    // 0F 6E
    {"movd",      0x7   , 0x11200, 0x12  , 0x1103, 0x3   , 0     , 0     , 0x00  , 0     , 0     , 0x2   },    // 0F 6E
-   {"movq",      0x4000, 0x11200, 0x12  , 0x1404, 0x4   , 0     , 0     , 0x00  , 0     , 0     , 0x2   }};   // 0F 6E. Name varies: movd or movq, though the operand is 64 bits
+   {"movq",      0x4000, 0x11200, 0x12  , 0x1104, 0x4   , 0     , 0     , 0x00  , 0     , 0     , 0x2   }};   // 0F 6E. Name varies: movd or movq, though the operand is 64 bits
 
 // Tertiary opcode map for movd/movq. Opcode byte = 0F 7E
 // Indexed by prefix: none/66/F2/F3
@@ -2432,7 +2440,7 @@ SOpcodeDef OpcodeMap61[2] = {
 SOpcodeDef OpcodeMap62[2] = {
 //  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
    {"pextrw",    0x15  ,0x81A200, 0x53  , 0x2002, 0x1402, 0x31  , 0     , 0x1000, 0     , 0     , 0x2   },    // 0F 3A 15 memory
-   {"pextrw",    0x15  ,0x81A200, 0x53  , 0x1002, 0x1402, 0x31  , 0     , 0     , 0     , 0     , 0x2   }};   // 0F 3A 15 register
+   {"pextrw",    0x15  ,0x81A200, 0x53  , 0x1009, 0x1402, 0x31  , 0     , 0     , 0     , 0     , 0x2   }};   // 0F 3A 15 register
 
 // Quarternary opcode map for pextrd/q. Opcode byte = 0F 3A 16
 // Indexed by operand size (16, 32, 64)
@@ -2990,7 +2998,7 @@ SOpcodeDef OpcodeMap66[] = {
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};   // XOP(0xA) 11
 
 
-// Opcode map for AMD instructions with XOP prefix and mmmmm = 01011 or whatever (vacant)
+// Opcode map for AMD instructions with XOP prefix and mmmmm = 01011 or whatever (unused, obsolete)
 // Indexed by first opcode byte after XOP prefix.
 SOpcodeDef OpcodeMap67[] = {
 //  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
@@ -3913,7 +3921,7 @@ SOpcodeDef OpcodeMapA4[4] = {
    {0       ,    0      , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },   // 0F 3A F0
    {0       ,    0      , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },   // 66 0F 3A F0
    {"rorx"  ,    0x1D   , 0x31000, 0x52  , 0x1009, 0x9   , 0x31  , 0     , 0     , 0     , 0     , 0     },   // F2 0F 3A F0
-   {0       ,    0      , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};  // F3 0F 3A F0
+   {0       ,    0x13b  , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 4     , 0     }};  // F3 0F 3A F0. link by reg/rm
 
 // Quarternary opcode map for pinsrb. Opcode byte = 0F 3A 20
 // Indexed by memory vs. register operand
@@ -4454,7 +4462,6 @@ SOpcodeDef OpcodeMapB2[] = {
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F2 0F 38 4D
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F2 0F 38 4E
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F2 0F 38 4F
-
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F2 0F 38 50
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F2 0F 38 51
    {"vp4dpwssd" ,0x24  ,0x8F9800, 0x19  , 0x164B, 0x164B, 0x244B, 0     , 0x20  , 0     , 0     , 0     },    // EVEX F2 0F 38 52
@@ -4481,7 +4488,7 @@ SOpcodeDef OpcodeMapB2[] = {
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F2 0F 38 65
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F2 0F 38 66
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F2 0F 38 67
-   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F2 0F 38 68
+   {"vp2intersectd",0x24,0x8E3800,0x19  , 0x95  , 0x251 , 0x1251, 0     , 0     , 0     , 0     , 1     },    // EVEX F2 0F 38 68
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F2 0F 38 69
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F2 0F 38 6A
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F2 0F 38 6B
@@ -4492,7 +4499,7 @@ SOpcodeDef OpcodeMapB2[] = {
 
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F2 0F 38 70
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F2 0F 38 71
-   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F2 0F 38 72
+   {"vcvtne2ps2bf16",0x24,0x8E0800,0x19 , 0x203 , 0x203 , 0x203 , 0     , 0x1020, 0     , 0     , 0     },    // EVEX F2 0F 38 72
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F2 0F 38 73
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F2 0F 38 74
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F2 0F 38 75
@@ -4654,7 +4661,7 @@ SOpcodeDef OpcodeMapB3[] = {
 
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F3 0F 38 50
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F3 0F 38 51
-   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F3 0F 38 52
+   {"vdpbf16ps", 0x24  ,0x8E0400, 0x19  , 0x203 , 0x203 , 0x1203, 0     , 0x1020, 0     , 0     , 0     },    // EVEX F3 0F 38 52
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F3 0F 38 53
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F3 0F 38 54
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F3 0F 38 55
@@ -4689,7 +4696,7 @@ SOpcodeDef OpcodeMapB3[] = {
 
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F3 0F 38 70
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F3 0F 38 71
-   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F3 0F 38 72
+   {"vcvtneps2bf16",0x24,0x8E0400,0x19  , 0x203 , 0x203 , 0x203 , 0     , 0x1020, 0     , 0     , 0     },    // EVEX F3 0F 38 72
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F3 0F 38 73
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F3 0F 38 74
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // EVEX F3 0F 38 75
@@ -5059,8 +5066,8 @@ SOpcodeDef OpcodeMapDC[] = {
 SOpcodeDef OpcodeMapDD[] = {
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    //    EVEX 0F 7B
    {0,           0x11A , 0      , 0x12  , 0     , 0     , 0     , 0     , 0     , 0     , 0xC   , 0     },    // 66 EVEX 0F 7B. Link to vcvtps/pd2qq
-   {"vcvtusi2sd",0x20  ,0x8C3800, 0x19  , 0x104C, 0x104C, 9     , 0     , 0x06  , 0     , 0     , 0     },    // F2 EVEX 0F 7B
-   {"vcvtusi2ss",0x20  ,0x8C3400, 0x19  , 0x104B, 0x104B, 9     , 0     , 0x06  , 0     , 0     , 0     }};   // F3 EVEX 0F 7B
+   {"vcvtusi2sd",0x20  ,0x8C3800, 0x19  , 0x104C, 0x04C , 9     , 0     , 0x06  , 0     , 0     , 0     },    // F2 EVEX 0F 7B
+   {"vcvtusi2ss",0x20  ,0x8C3400, 0x19  , 0x104B, 0x04B , 9     , 0     , 0x06  , 0     , 0     , 0     }};   // F3 EVEX 0F 7B
 
 // Opcode map for 0F 3A 1B. Indexed by W bit
 SOpcodeDef OpcodeMapDE[] = {
@@ -5180,7 +5187,7 @@ SOpcodeDef OpcodeMapF2[] = {
    {"clflush",   0x12  , 0      , 0x11  , 0x2006, 0     , 0     , 0     , 0     , 0     , 0     , 0     },     // 0F AE /7
    {"clflushopt",0x22  , 0x200  , 0x11  , 0x2006, 0     , 0     , 0     , 0     , 0     , 0     , 0     }};    // 66 0F AE /7
 
-// Map for 0F AE /6. Indexed by 66 prefix
+// Map for 0F AE /6 mem. Indexed by 66 prefix
 SOpcodeDef OpcodeMapF3[] = {
    {"xsaveopt",  0x19  , 0x2000 , 0x11  , 0x2006, 0     , 0     , 0     , 0     , 0     , 0     , 0     },     // 0F AE /6
    {"clwb    ",  0x22  , 0x200  , 0x11  , 0x2006, 0     , 0     , 0     , 0     , 0     , 0     , 0     },     // 66 0F AE /6
@@ -5287,7 +5294,7 @@ SOpcodeDef OpcodeMapF8[] = {
 // Map for 0F 3A 08. Indexed by EVEX present
 SOpcodeDef OpcodeMapF9[] = {
    {"roundps",   0x15  , 0x58200, 0x52  , 0x124B, 0x24B , 0x31  , 0     , 0     , 0     , 0     , 0x2   },    // 0F 3A 08. Also in AMD instruction set
-   {"vrndscaleps",0x20 ,0x858200, 0x52  , 0x124B, 0x24B , 0x31  , 0     , 0x33  , 0     , 0     , 0     }};   // EVEX 0F 3A 08
+   {0,           0x150 , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 9     , 0     }};   // EVEX 0F 3A 08. link by prefix
 
 // Map for 0F 3A 09. Indexed by EVEX present
 SOpcodeDef OpcodeMapFA[] = {
@@ -5297,7 +5304,7 @@ SOpcodeDef OpcodeMapFA[] = {
 // Map for 0F 3A 0A. Indexed by EVEX present
 SOpcodeDef OpcodeMapFB[] = {
    {"roundss",   0x15  , 0x98200, 0x59  , 0x104B, 0x104B, 0x4B  , 0x31  , 0     , 0     , 0     , 0x2   },    // 0F 3A 0A. Also in AMD instruction set
-   {"vrndscaless",0x20 ,0x8DB200, 0x59  , 0x104B, 0x004B, 0x4B  , 0x31  , 0x32  , 0     , 0     , 0     }};   // EVEX 0F 3A 08
+   {0,           0x151 , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 9     , 0     }};   // EVEX 0F 3A 0A. link by prefix
 
 // Map for 0F 3A 0B. Indexed by EVEX present
 SOpcodeDef OpcodeMapFC[] = {
@@ -5655,7 +5662,7 @@ SOpcodeDef OpcodeMap12F[] = {
 // Opcode map for 0F 01, mod = 11b, reg = 5
 // Indexed by rm bits
 SOpcodeDef OpcodeMap130[] = {
-   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // rm = 0
+   {"serialize", 0x24  , 0      , 0x10  , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // rm = 0
    {0,           0x131 , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 9     , 0     },    // rm = 1. link to incssp
    {0,           0x132 , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 9     , 0     },    // rm = 2. link to savessp
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // rm = 3
@@ -5738,27 +5745,1695 @@ SOpcodeDef OpcodeMap138[] = {
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // F2 0F C7 reg /7
    {"rdpid",     0x1D  , 0x1500 , 0x11  , 0x1009, 0     , 0     , 0     , 0     , 0     , 0     , 0     }};   // F3 0F C7 reg /7
 
-
+// Submap for 0F AE reg /6, Indexed by prefixes
 SOpcodeDef OpcodeMap139[] = {
-   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};
+    {"mfence",    0x12  , 0      , 0x10  , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },     // 6
+    {"tpause",    0x24  , 0x200  , 0x11  , 0x1003, 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 66 0F AE reg /6
+    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // F2 0F AE reg /6
+    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};   // F3 0F AE reg /6
 
+// Submap for 0F 1C
+// Indexed by reg bits = 0 - 7.
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
 SOpcodeDef OpcodeMap13A[] = {
-   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};
+    {"cldemote",  0x24  , 0      , 0x11  , 0     , 0x2001, 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 1C /0
+    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 1C /1
+    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 1C /2
+    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 1C /3
+    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 1C /4
+    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 1C /5
+    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 0F 1C /6
+    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};   // 0F 1C /7
 
+// Submap for F3 0F 3A F0 by reg/rm
 SOpcodeDef OpcodeMap13B[] = {
-   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};
+    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // F3 0F 3A F0 /0
+    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // F3 0F 3A F0 /1  mem
+    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // F3 0F 3A F0 /2
+    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // F3 0F 3A F0 /3
+    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // F3 0F 3A F0 /4
+    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // F3 0F 3A F0 /5
+    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // F3 0F 3A F0 /6
+    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // F3 0F 3A F0 /7
+    {"hreset",    0x824 , 0x400  , 0x50  , 0     , 0x31  , 0     , 0     , 0     , 0     , 0     , 0     },    // F3 0F 3A F0 /0  reg
+    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // F3 0F 3A F0 /1
+    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // F3 0F 3A F0 /2
+    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};
 
+// submap for 0F 3A 66 by prefix
 SOpcodeDef OpcodeMap13C[] = {
-   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {"vfpclassph",0x25  ,0x820000, 0x52  , 0x95  , 0x24A , 0x31  , 0     , 0x0010, 0     , 0     , 0     },    // NP 0F 3A 66
+   {"vfpclassp", 0x20  ,0x82B200, 0x52  , 0x95  , 0x24F , 0x31  , 0     , 0x0010, 0     , 0     , 1     },    // 66 0F 3A 66
+   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};   // F2 0F 3A 66
 
+// submap for 0F 3A 67 by prefix
 SOpcodeDef OpcodeMap13D[] = {
-   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};
+   {"vfpclassh", 0x25  ,0x820000, 0x52  , 0x95  , 0x44A , 0x31  , 0     , 0x10  , 0     , 0     , 1     },    // NP 0F 3A 67
+   {"vfpclasss", 0x20  ,0x82B200, 0x52  , 0x95  , 0x44F , 0x31  , 0     , 0x10  , 0     , 0     , 1     },    // 66 0F 3A 67
+   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};   // F2 0F 3A 67
 
+// submap for 0F 3A 26 by prefix
 SOpcodeDef OpcodeMap13E[] = {
+   {"vgetmantph",0x25  , 0x860000,0x52  , 0x124F, 0x24A , 0x31  , 0     , 0x0023, 0     , 0     , 0     },   // NP 0F 3A 26
+   {"vgetmantp", 0x20  , 0xC29200,0x52  , 0x124F, 0x24F , 0x31  , 0     , 0x33  , 0x1204, 0     , 1     },   // 66 0F 3A 26
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};
 
+// submap for 0F 3A 27 by prefix
 SOpcodeDef OpcodeMap13F[] = {
+   {"vgetmants", 0x25  , 0x860000,0x59  , 0x144F, 0x24A , 0x04A , 0x31  , 0x23  , 0     , 0     , 0x001 },    // NP 0F 3A 27
+   {"vgetmants", 0x20  , 0xCA9200,0x59  , 0x144F, 0x24F , 0x04F , 0x31  , 0x32  , 0x1204, 0     , 0x001 },    // 66 0F 3A 27
    {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};
+
+// Start map for mmm=5, indexed by 'prefix' n/66/F2/F3
+SOpcodeDef OpcodeMap140[] = {
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0x142 , 0      , 0x19  , 0     , 0     , 0     , 0     , 0     , 0     , 0x12  , 0     },    // mmm=5, no prefix
+   {0,           0x143 , 0      , 0x19  , 0     , 0     , 0     , 0     , 0     , 0     , 0x12  , 0     },    // mmm=5, 66
+   {0,           0x144 , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0x12  , 0     },    // mmm=5, F2
+   {0,           0x145 , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0x12  , 0     }};   // mmm=5, F3
+
+// Start map for mmm=6, indexed by 'prefix' n/66/F2/F3
+SOpcodeDef OpcodeMap141[] = {
+   {0,           0x146 , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0x12  , 0     },    // mmm=6, no prefix
+   {0,           0x147 , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0x12  , 0     },    // mmm=6, 66
+   {0,           0x148 , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0x12  , 0     },    // mmm=6, F2
+   {0,           0x149 , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0x12  , 0     }};   // mmm=6, F3
+
+// submap for mmm=5, no prefix
+SOpcodeDef OpcodeMap142[] = {
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 00
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 01
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 02
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 03
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 04
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 05
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 06
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 07
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 08
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 09
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 0A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 0B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 0C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 0D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 0E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 0F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 10
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 11
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 12
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 13
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 14
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 15
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 16
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 17
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 18
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 19
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 1A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 1B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 1C
+   {"vcvtss2sh", 0x25  ,0x840000, 0x19,   0x144A, 0x144A, 0x44A , 0     , 0x26  , 0     , 0     , 0     },    // mmm=5 NP 1D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 1E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 1F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 20
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 21
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 22
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 23
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 24
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 25
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 26
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 27
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 28
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 29
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 2A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 2B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 2C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 2D
+   {"vucomish",  0x25  ,0x8E0000, 0x12,   0x144A, 0x044A, 0     , 0     , 0x02  , 0     , 0     , 0     },    // mmm=5 NP 2E
+   {"vcomish",   0x25  ,0x8E0000, 0x12,   0x144A, 0x044A, 0     , 0     , 0x02  , 0     , 0     , 0     },    // mmm=5 NP 2F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 30
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 31
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 32
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 33
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 34
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 35
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 36
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 37
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 38
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 39
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 3A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 3B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 3C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 3D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 3E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 3F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 40
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 41
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 42
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 43
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 44
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 45
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 46
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 47
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 48
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 49
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 4A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 4B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 4C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 4D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 4E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 4F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 50
+   {"vsqrtph",   0x25  ,0x860000, 0x12,   0x124A, 0x24A , 0     , 0     , 0x0026, 0     , 0     , 0     },    // mmm=5 NP 51
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 52
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 53
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 54
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 55
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 56
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 57
+   {"vaddph",    0x25  ,0x8E0000, 0x19,   0x124A, 0x124A, 0x24A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=5 NP 58
+   {"vmulph",    0x25  ,0x8E0000, 0x19,   0x124A, 0x124A, 0x24A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=5 NP 59
+   {"vcvtph2pd", 0x25  ,0x8E2000, 0x12,   0x124A, 0x44A , 0     , 0     , 0x0006, 0     , 0     , 0     },    // mmm=5 NP 5A
+   {0,           0x14A , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0xC   , 0     },    // mmm=5 NP 5B. link by W bit
+   {"vsubph",    0x25  ,0x8E0000, 0x19,   0x124A, 0x124A, 0x24A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=5 NP 5C
+   {"vminph",    0x25  ,0x8E0000, 0x19,   0x124A, 0x124A, 0x24A , 0     , 0x0022, 0     , 0     , 0     },    // mmm=5 NP 5D
+   {"vdivph",    0x25  ,0x8E0000, 0x19,   0x124A, 0x124A, 0x24A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=5 NP 5E
+   {"vmaxph",    0x25  ,0x8E0000, 0x19,   0x124A, 0x124A, 0x24A , 0     , 0x0022, 0     , 0     , 0     },    // mmm=5 NP 5F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 60
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 61
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 62
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 63
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 64
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 65
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 66
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 67
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 68
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 69
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 6A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 6B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 6C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 6D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 6E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 6F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 70
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 71
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 72
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 73
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 74
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 75
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 76
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 77
+   {"vcvttph2udq",0x25 ,0x8E0000, 0x12,   0x124C, 0xF4A , 0     , 0     , 0x1026, 0     , 0     , 0     },    // mmm=5 NP 78
+   {"vcvtph2udq",0x25  ,0x8E0000, 0x12,   0x124C, 0xF4A , 0     , 0     , 0x1026, 0     , 0     , 0     },    // mmm=5 NP 79
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 7A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 7B
+   {"vcvttph2uw", 0x25 ,0x8E0000, 0x12,   0x124A, 0x24A , 0     , 0     , 0x1026, 0     , 0     , 0     },    // mmm=5 NP 7C
+   {"vcvtph2uw", 0x25  ,0x8E0000, 0x12,   0x124A, 0x24A , 0     , 0     , 0x1026, 0     , 0     , 0     },    // mmm=5 NP 7D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 7E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 NP 7F
+
+   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};
+
+// submap for mmm=5, 66 prefix
+SOpcodeDef OpcodeMap143[] = {
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 00
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 01
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 02
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 03
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 04
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 05
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 06
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 07
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 08
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 09
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 0A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 0B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 0C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 0D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 0E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 0F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 10
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 11
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 12
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 13
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 14
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 15
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 16
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 17
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 18
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 19
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 1A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 1B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 1C
+   {"vcvtps2phx",0x25  ,0x8E1200, 0x12,   0x1F4B, 0x24B , 0     , 0     , 0x1026, 0     , 0     , 0     },    // mmm=5 66 1D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 1E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 1F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 20
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 21
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 22
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 23
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 24
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 25
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 26
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 27
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 28
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 29
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 2A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 2B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 2C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 2D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 2E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 2F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 30
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 31
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 32
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 33
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 34
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 35
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 36
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 37
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 38
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 39
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 3A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 3B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 3C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 3D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 3E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 3F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 40
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 41
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 42
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 43
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 44
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 45
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 46
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 47
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 48
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 49
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 4A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 4B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 4C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 4D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 4E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 4F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 50
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 51
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 52
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 53
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 54
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 55
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 56
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 57
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 58
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 59
+   {"vcvtpd2ph", 0x25  ,0x8E1200, 0x12,   0x144C, 0x24C , 0     , 0     , 0x0026, 0     , 0     , 0     },    // mmm=5 66 5A
+   {"vcvtph2dq", 0x25  ,0x8E0200, 0x12,   0x124C, 0xF4C , 0     , 0     , 0x0026, 0     , 0     , 0     },    // mmm=5 66 5B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 5C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 5D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 5E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 5F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 60
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 61
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 62
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 63
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 64
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 65
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 66
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 67
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 68
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 69
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 6A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 6B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 6C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 6D
+   {"vmovw",     0x25  ,0x822200, 0x12,   0x144A, 0x2   , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 6E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 6F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 70
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 71
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 72
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 73
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 74
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 75
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 76
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 77
+   {"vcvttph2uqq",0x25 ,0x8E0200, 0x12,   0x124C, 0x44A , 0     , 0     , 0x1026, 0     , 0     , 0     },    // mmm=5 66 78
+   {"vcvtph2uqq",0x25  ,0x8E0200, 0x12,   0x124C, 0x44A , 0     , 0     , 0x1026, 0     , 0     , 0     },    // mmm=5 66 79
+   {"vcvttph2qq",0x25  ,0x8E0200, 0x12,   0x124C, 0x44A , 0     , 0     , 0x1026, 0     , 0     , 0     },    // mmm=5 66 7A
+   {"vcvtph2qq", 0x25  ,0x8E0200, 0x12,   0x124C, 0x44A , 0     , 0     , 0x1026, 0     , 0     , 0     },    // mmm=5 66 7B
+   {"vcvttph2w", 0x25  ,0x8E0200, 0x12,   0x124A, 0x24A , 0     , 0     , 0x1026, 0     , 0     , 0     },    // mmm=5 66 7C
+   {"vcvtph2w",  0x25  ,0x8E0200, 0x12,   0x124A, 0x24A , 0     , 0     , 0x1026, 0     , 0     , 0     },    // mmm=5 66 7D
+   {"vmovw",     0x25  ,0x822200, 0x13,   2     , 0x44A , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 66 7F
+
+   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};
+
+// submap for mmm=5, F2 prefix
+SOpcodeDef OpcodeMap144[] = {
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 00
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 01
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 02
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 03
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 04
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 05
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 06
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 07
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 08
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 09
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 0A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 0B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 0C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 0D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 0E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 0F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 10
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 11
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 12
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 13
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 14
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 15
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 16
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 17
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 18
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 19
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 1A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 1B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 1C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 1D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 1E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 1F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 20
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 21
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 22
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 23
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 24
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 25
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 26
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 27
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 28
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 29
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 2A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 2B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 2C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 2D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 2E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 2F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 30
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 31
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 32
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 33
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 34
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 35
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 36
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 37
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 38
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 39
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 3A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 3B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 3C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 3D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 3E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 3F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 40
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 41
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 42
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 43
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 44
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 45
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 46
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 47
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 48
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 49
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 4A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 4B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 4C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 4D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 4E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 4F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 50
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 51
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 52
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 53
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 54
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 55
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 56
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 57
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 58
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 59
+   {"vcvtsd2sh", 0x25  ,0x8E2800, 0x12,   0x144C, 0x44C , 0     , 0     , 0x0026, 0     , 0     , 0     },    // mmm=5 F2 5A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 5B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 5C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 5D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 5E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 5F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 60
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 61
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 62
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 63
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 64
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 65
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 66
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 67
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 68
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 69
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 6A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 6B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 6C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 6D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 6E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 6F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 70
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 71
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 72
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 73
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 74
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 75
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 76
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 77
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 78
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 79
+   {0,           0x14B , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0xC   , 0     },    // mmm=5 F2 7A. llink by W bit
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 7B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 7C
+   {"vcvtuw2ph" ,0x25  ,0x8E0800, 0x12,   0x124A, 0x24A , 0     , 0     , 0x0026, 0     , 0     , 0     },    // mmm=5 F2 7D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 7E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F2 7F
+   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};
+
+// submap for mmm=5, F3 prefix
+SOpcodeDef OpcodeMap145[] = {
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 00
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 01
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 02
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 03
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 04
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 05
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 06
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 07
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 08
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 09
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 0A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 0B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 0C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 0D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 0E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 0F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0x14C , 0      , 0   ,   0     , 0     , 0     , 0     , 0     , 0     , 3     , 0     },    // mmm=5 F3 10. link by mem/reg
+   {0,           0x14D , 0      , 0   ,   0     , 0     , 0     , 0     , 0     , 0     , 3     , 0     },    // mmm=5 F3 11. link by mem/reg
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 12
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 13
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 14
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 15
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 16
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 17
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 18
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 19
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 1A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 1B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 1C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 1D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 1E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 1F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 20
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 21
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 22
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 23
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 24
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 25
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 26
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 27
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 28
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 29
+   {"vcvtsi2sh", 0x25  ,0x8E1400, 0x12,   0x144A, 0x0009, 0     , 0     , 0x0006, 0     , 0     , 0     },    // mmm=5 F3 2A
+   {"vcvtusi2sh",0x25  ,0x8E1400, 0x12,   0x144A, 0x0009, 0     , 0     , 0x0006, 0     , 0     , 0     },    // mmm=5 F3 2B
+   {"vcvttsh2si",0x25  ,0x8E1400, 0x12,   0x1009, 0x44A , 0     , 0     , 0x0006, 0     , 0     , 0     },    // mmm=5 F3 2C
+   {"vcvtsh2si", 0x25  ,0x8E1400, 0x12,   0x1009, 0x44A , 0     , 0     , 0x0006, 0     , 0     , 0     },    // mmm=5 F3 2D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 2E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 2F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 30
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 31
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 32
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 33
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 34
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 35
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 36
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 37
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 38
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 39
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 3A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 3B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 3C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 3D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 3E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 3F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 40
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 41
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 42
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 43
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 44
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 45
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 46
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 47
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 48
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 49
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 4A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 4B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 4C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 4D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 4E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 4F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 50
+   {"vsqrtsh",   0x25  ,0x8E0400, 0x12,   0x144A, 0x44A , 0     , 0     , 0x26  , 0     , 0     , 0     },    // mmm=5 F3 51
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 52
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 53
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 54
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 55
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 56
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 57
+   {"vaddsh",    0x25  ,0x8E0400, 0x19,   0x144A, 0x144A, 0x44A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=5 F3 58
+   {"vmulsh",    0x25  ,0x8E0400, 0x19,   0x144A, 0x144A, 0x44A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=5 F3 59
+   {"vcvtsh2sd", 0x25  ,0x8E2400, 0x12,   0x144C, 0x44A , 0     , 0     , 0x0026, 0     , 0     , 0     },    // mmm=5 F3 5A
+   {"vcvttph2dq",0x25  ,0x8E0400, 0x12,   0x124C, 0xF4A , 0     , 0     , 0x1026, 0     , 0     , 0     },    // mmm=5 F3 5B
+   {"vsubsh",    0x25  ,0x8E0000, 0x19,   0x144A, 0x144A, 0x44A , 0     , 0x26,   0     , 0     , 0     },    // mmm=5 F3 5C
+   {"vminsh",    0x25  ,0x8E0400, 0x19,   0x144A, 0x144A, 0x44A , 0     , 0x22  , 0     , 0     , 0     },    // mmm=5 F3 5F
+   {"vdivsh",    0x25  ,0x8E0400, 0x19,   0x144A, 0x144A, 0x44A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=5 F3 5E
+   {"vmaxsh",    0x25  ,0x8E0400, 0x19,   0x144A, 0x144A, 0x44A , 0     , 0x22  , 0     , 0     , 0     },    // mmm=5 F3 5F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 60
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 61
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 62
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 63
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 64
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 65
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 66
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 67
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 68
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 69
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 6A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 6B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 6C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 6D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 6E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 6F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 70
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 71
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 72
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 73
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 74
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 75
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 76
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 77
+   {"vcvttsh2usi",0x25 ,0x8E1400, 0x12,   0x1009, 0x44A , 0     , 0     , 0x0006, 0     , 0     , 0     },    // mmm=5 F3 78
+   {"vcvtsh2usi",0x25  ,0x8E1400, 0x12,   0x1009, 0x44A , 0     , 0     , 0x0006, 0     , 0     , 0     },    // mmm=5 F3 79
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 7A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 7B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 7C
+   {"vcvtw2ph"  ,0x25  ,0x8E0800, 0x12,   0x144A, 0x44A , 0     , 0     , 0x0026, 0     , 0     , 0     },    // mmm=5 F3 7D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 7E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=5 F3 7F
+
+   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};
+
+// submap for mmm=6, no prefix
+SOpcodeDef OpcodeMap146[] = {
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 00
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 01
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 02
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 03
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 04
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 05
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 06
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 07
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 08
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 09
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 0A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 0B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 0C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 0D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 0E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 0F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 10
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 11
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 12
+   {"vcvtsh2ss", 0x25  ,0x8E1200, 0x19,   0x124B, 0x124A, 0x24A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=6 NP 13
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 14
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 15
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 16
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 17
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 18
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 19
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 1A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 1B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 1C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 1D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 1E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 1F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 20
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 21
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 22
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 23
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 24
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 25
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 26
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 27
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 28
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 29
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 2A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 2B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 2C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 2D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 2E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 2F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 30
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 31
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 32
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 33
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 34
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 35
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 36
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 37
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 38
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 39
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 3A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 3B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 3C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 3D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 3E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 3F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 40
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 41
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 42
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 43
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 44
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 45
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 46
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 47
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 48
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 49
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 4A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 4B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 4C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 4D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 4E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 4F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 50
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 51
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 52
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 53
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 54
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 55
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 56
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 57
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 58
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 59
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 5A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 5B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 5C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 5D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 5E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 5F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 60
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 61
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 62
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 63
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 64
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 65
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 66
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 67
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 68
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 69
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 6A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 6B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 6C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 6D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 6E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 6F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 70
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 71
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 72
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 73
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 74
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 75
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 76
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 77
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 78
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 79
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 7A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 7B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 7C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 7D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 7E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 NP 7F
+
+   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};
+
+// submap for mmm=6, 66 prefix
+SOpcodeDef OpcodeMap147[] = {
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 00
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 01
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 02
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 03
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 04
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 05
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 06
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 07
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 08
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 09
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 0A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 0B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 0C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 0D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 0E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 0F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 10
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 11
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 12
+   {"vcvtph2psx",0x25  ,0x8E1200, 0x12,   0x124A, 0xF4A , 0     , 0     , 0x1026, 0     , 0     , 0     },    // mmm=6 66 13
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 14
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 15
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 16
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 17
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 18
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 19
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 1A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 1B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 1C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 1D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 1E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 1F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 20
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 21
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 22
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 23
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 24
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 25
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 26
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 27
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 28
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 29
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 2A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 2B
+   {"vscalefph", 0x25  ,0x8E0200, 0x19,   0x124A, 0x124A, 0x24A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=6 66 2C
+   {"vscalefsh", 0x25  ,0x8E0200, 0x19,   0x144A, 0x144A, 0x44A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=6 66 2D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 2E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 2F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 30
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 31
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 32
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 33
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 34
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 35
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 36
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 37
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 38
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 39
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 3A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 3B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 3C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 3D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 3E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 3F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 40
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 41
+   {"vgetexpph", 0x25  ,0x8E0200, 0x12,   0x124A, 0x24A , 0     , 0     , 0x0022, 0     , 0     , 0     },    // mmm=6 66 42
+   {"vgetexpsh", 0x25  ,0x8E0200, 0x12,   0x144A, 0x44A , 0     , 0     , 0x0022, 0     , 0     , 0     },    // mmm=6 66 43
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 44
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 45
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 46
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 47
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 48
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 49
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 4A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 4B
+   {"vrcpph",    0x25  ,0x8E0200, 0x12,   0x124A, 0x24A , 0     , 0     , 0x0020, 0     , 0     , 0     },    // mmm=6 66 4C
+   {"vrcpsh",    0x25  ,0x8E0200, 0x19,   0x144A, 0x44A , 0x44A , 0     , 0x0020, 0     , 0     , 0     },    // mmm=6 66 4D
+   {"vrsqrtph",  0x25  ,0x860200, 0x12,   0x124A, 0x24A , 0     , 0     , 0x0020, 0     , 0     , 0     },    // mmm=6 66 4E
+   {"vrsqrtsh",  0x25  ,0x8E0200, 0x19,   0x144A, 0x44A , 0x44A , 0     , 0x0020, 0     , 0     , 0     },    // mmm=6 66 4F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 50
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 51
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 52
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 53
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 54
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 55
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 56
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 57
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 58
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 59
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 5A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 5B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 5C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 5D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 5E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 5F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 60
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 61
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 62
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 63
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 64
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 65
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 66
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 67
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 68
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 69
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 6A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 6B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 6C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 6D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 6E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 6F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 70
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 71
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 72
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 73
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 74
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 75
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 76
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 77
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 78
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 79
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 7A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 7B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 7C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 7D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 7E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 7F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 80
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 81
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 82
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 83
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 84
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 85
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 86
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 87
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 88
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 89
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 8A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 8B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 8C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 8D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 8E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 8F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 90
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 91
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 92
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 93
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 94
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 95
+   {"vfmaddsub132ph",0x25,0x8E0200,0x19,  0x124A, 0x124A, 0x24A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=6 66 96
+   {"vfmsubadd132ph",0x25,0x8E0200,0x19,  0x124A, 0x124A, 0x24A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=6 66 97
+   {"vfmadd132ph",0x25,0x8E0200,  0x19,   0x124A, 0x124A, 0x24A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=6 66 98
+   {"vfmadd132sh",0x25,0x8E0200,  0x19,   0x144A, 0x144A, 0x44A , 0     , 0x26,   0     , 0     , 0     },    // mmm=6 66 99
+   {"vfmsub132ph",0x25,0x8E0200,  0x19,   0x124A, 0x124A, 0x24A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=6 66 9A
+   {"vfmsub132sh",0x25,0x8E0200,  0x19,   0x144A, 0x144A, 0x44A , 0     , 0x26,   0     , 0     , 0     },    // mmm=6 66 9B
+   {"vfnmadd132ph",0x25,0x8E0200, 0x19,   0x124A, 0x124A, 0x24A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=6 66 9C
+   {"vfnmadd132sh",0x25,0x8E0200, 0x19,   0x144A, 0x144A, 0x44A , 0     , 0x26,   0     , 0     , 0     },    // mmm=6 66 9D
+   {"vfnmsub132ph",0x25,0x8E0200, 0x19,   0x124A, 0x124A, 0x24A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=6 66 9E
+   {"vfnmsub132sh",0x25,0x8E0200, 0x19,   0x144A, 0x144A, 0x44A , 0     , 0x26,   0     , 0     , 0     },    // mmm=6 66 9F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 A0
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 A1
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 A2
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 A3
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 A4
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 A5
+   {"vfmaddsub213ph",0x25,0x8E0200,0x19,  0x124A, 0x124A, 0x24A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=6 66 A6
+   {"vfmsubadd213ph",0x25,0x8E0200,0x19,  0x124A, 0x124A, 0x24A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=6 66 A7
+   {"vfmadd213ph",0x25,0x8E0200,  0x19,   0x124A, 0x124A, 0x24A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=6 66 A8
+   {"vfmadd213sh",0x25,0x8E0200,  0x19,   0x144A, 0x144A, 0x44A , 0     , 0x26,   0     , 0     , 0     },    // mmm=6 66 A9
+   {"vfmsub213ph",0x25,0x8E0200,  0x19,   0x124A, 0x124A, 0x24A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=6 66 AA
+   {"vfmsub213sh",0x25,0x8E0200,  0x19,   0x144A, 0x144A, 0x44A , 0     , 0x26,   0     , 0     , 0     },    // mmm=6 66 AB
+   {"vfnmadd213ph",0x25,0x8E0200, 0x19,   0x124A, 0x124A, 0x24A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=6 66 AC
+   {"vfnmadd213sh",0x25,0x8E0200, 0x19,   0x144A, 0x144A, 0x44A , 0     , 0x26,   0     , 0     , 0     },    // mmm=6 66 AD
+   {"vfnmsub213ph",0x25,0x8E0200, 0x19,   0x124A, 0x124A, 0x24A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=6 66 AE
+   {"vfnmsub213sh",0x25,0x8E0200, 0x19,   0x144A, 0x144A, 0x44A , 0     , 0x26,   0     , 0     , 0     },    // mmm=6 66 AF
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 B0
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 B1
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 B2
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 B3
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 B4
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 B5
+   {"vfmaddsub231ph",0x25,0x8E0200,0x19,  0x124A, 0x124A, 0x24A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=6 66 B6
+   {"vfmsubadd231ph",0x25,0x8E0200,0x19,  0x124A, 0x124A, 0x24A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=6 66 B7
+   {"vfmadd231ph",0x25,0x8E0200,  0x19,   0x124A, 0x124A, 0x24A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=6 66 B8
+   {"vfmadd231sh",0x25,0x8E0200,  0x19,   0x144A, 0x144A, 0x44A , 0     , 0x26,   0     , 0     , 0     },    // mmm=6 66 B9
+   {"vfmsub231ph",0x25,0x8E0200,  0x19,   0x124A, 0x124A, 0x24A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=6 66 BA
+   {"vfmsub231sh",0x25,0x8E0200,  0x19,   0x144A, 0x144A, 0x44A , 0     , 0x26,   0     , 0     , 0     },    // mmm=6 66 BB
+   {"vfnmadd231ph",0x25,0x8E0200, 0x19,   0x124A, 0x124A, 0x24A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=6 66 BC
+   {"vfnmsub231ph",0x25,0x8E0200, 0x19,   0x144A, 0x144A, 0x44A , 0     , 0x26,   0     , 0     , 0     },    // mmm=6 66 BD
+   {"vfnmsub213ph",0x25,0x8E0200, 0x19,   0x124A, 0x124A, 0x24A , 0     , 0x0026, 0     , 0     , 0     },    // mmm=6 66 BE
+   {"vfnmsub231sh",0x25,0x8E0200, 0x19,   0x144A, 0x144A, 0x44A , 0     , 0x26,   0     , 0     , 0     },    // mmm=6 66 BF
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 C0
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 C1
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 C2
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 C3
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 C4
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 C5
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 C6
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 C7
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 C8
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 C9
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 CA
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 CB
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 CC
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 CD
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 CE
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 CF
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 D0
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 D1
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 D2
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 D3
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 D4
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 D5
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 D6
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 D7
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 D8
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 D9
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 DA
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 DB
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 DC
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 DD
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 DE
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 DF
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 E0
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 E1
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 E2
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 E3
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 E4
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 E5
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 E6
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 E7
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 E8
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 E9
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 EA
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 EB
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 EC
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 ED
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 EE
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 EF
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 F0
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 F1
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 F2
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 F3
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 F4
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 F5
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 F6
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 F7
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 F8
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 F9
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 FA
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 FB
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 FC
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 FD
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 66 FE
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};   // mmm=6 66 FF
+
+// submap for mmm=6, F2 prefix
+SOpcodeDef OpcodeMap148[] = {
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 00
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 01
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 02
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 03
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 04
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 05
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 06
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 07
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 08
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 09
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 0A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 0B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 0C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 0D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 0E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 0F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 10
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 11
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 12
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 13
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 14
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 15
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 16
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 17
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 18
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 19
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 1A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 1B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 1C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 1D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 1E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 1F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 20
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 21
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 22
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 23
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 24
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 25
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 26
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 27
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 28
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 29
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 2A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 2B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 2C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 2D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 2E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 2F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 30
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 31
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 32
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 33
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 34
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 35
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 36
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 37
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 38
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 39
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 3A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 3B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 3C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 3D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 3E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 3F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 40
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 41
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 42
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 43
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 44
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 45
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 46
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 47
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 48
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 49
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 4A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 4B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 4C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 4D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 4E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 4F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 50
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 51
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 52
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 53
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 54
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 55
+   {"vfcmaddcph",0x25  ,0x8E0800, 0x19,   0x124B, 0x124B, 0x24B , 0     , 0x26  , 0     , 0     , 0     },    // mmm=6 F2 56
+   {"vfcmaddcsh",0x25  ,0x8E0800, 0x19,   0x144B, 0x144B, 0x44B , 0     , 0x26  , 0     , 0     , 0     },    // mmm=6 F2 57
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 58
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 59
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 5A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 5B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 5C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 5D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 5E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 5F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 60
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 61
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 62
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 63
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 64
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 65
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 66
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 67
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 68
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 69
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 6A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 6B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 6C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 6D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 6E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 6F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 70
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 71
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 72
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 73
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 74
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 75
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 76
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 77
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 78
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 79
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 7A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 7B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 7C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 7D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 7E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 7F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 80
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 81
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 82
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 83
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 84
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 85
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 86
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 87
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 88
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 89
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 8A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 8B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 8C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 8D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 8E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 8F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 90
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 91
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 92
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 93
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 94
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 95
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 96
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 97
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 98
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 99
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 9A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 9B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 9C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 9D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 9E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 9F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 A0
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 A1
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 A2
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 A3
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 A4
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 A5
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 A6
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 A7
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 A8
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 A9
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 AA
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 AB
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 AC
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 AD
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 AE
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 AF
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 B0
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 B1
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 B2
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 B3
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 B4
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 B5
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 B6
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 B7
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 B8
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 B9
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 BA
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 BB
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 BC
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 BD
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 BE
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 BF
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 C0
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 C1
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 C2
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 C3
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 C4
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 C5
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 C6
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 C7
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 C8
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 C9
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 CA
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 CB
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 CC
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 CD
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 CE
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 CF
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 D0
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 D1
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 D2
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 D3
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 D4
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 D5
+   {"vfcmulcph", 0x25  ,0x8E0800, 0x19,   0x124B, 0x124B, 0x24B , 0     , 0x26  , 0     , 0     , 0     },    // mmm=6 F2 D6
+   {"vfcmulcsh", 0x25  ,0x8E0800, 0x19,   0x144B, 0x144B, 0x44B , 0     , 0x26  , 0     , 0     , 0     },    // mmm=6 F2 D7
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 D8
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 D9
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 DA
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 DB
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 DC
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 DD
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 DE
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F2 DF
+
+   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};
+
+// submap for mmm=6, F3 prefix
+SOpcodeDef OpcodeMap149[] = {
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 00
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 01
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 02
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 03
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 04
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 05
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 06
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 07
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 08
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 09
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 0A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 0B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 0C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 0D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 0E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 0F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 10
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 11
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 12
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 13
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 14
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 15
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 16
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 17
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 18
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 19
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 1A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 1B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 1C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 1D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 1E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 1F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 20
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 21
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 22
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 23
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 24
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 25
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 26
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 27
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 28
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 29
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 2A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 2B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 2C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 2D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 2E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 2F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 30
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 31
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 32
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 33
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 34
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 35
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 36
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 37
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 38
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 39
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 3A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 3B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 3C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 3D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 3E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 3F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 40
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 41
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 42
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 43
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 44
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 45
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 46
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 47
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 48
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 49
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 4A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 4B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 4C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 4D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 4E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 4F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 50
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 51
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 52
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 53
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 54
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 55
+   {"vfmaddcph", 0x25  ,0x8E0400, 0x19,   0x124B, 0x124B, 0x24B , 0     , 0x26  , 0     , 0     , 0     },    // mmm=6 F3 56
+   {"vfcmaddcsh",0x25  ,0x8E0400, 0x19,   0x144B, 0x144B, 0x44B , 0     , 0x26  , 0     , 0     , 0     },    // mmm=6 F3 57
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 58
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 59
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 5A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 5B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 5C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 5D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 5E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 5F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 60
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 61
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 62
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 63
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 64
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 65
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 66
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 67
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 68
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 69
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 6A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 6B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 6C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 6D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 6E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 6F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 70
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 71
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 72
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 73
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 74
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 75
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 76
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 77
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 78
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 79
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 7A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 7B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 7C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 7D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 7E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 7F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 80
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 81
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 82
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 83
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 84
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 85
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 86
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 87
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 88
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 89
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 8A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 8B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 8C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 8D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 8E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 8F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 90
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 91
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 92
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 93
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 94
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 95
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 96
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 97
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 98
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 99
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 9A
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 9B
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 9C
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 9D
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 9E
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 9F
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 A0
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 A1
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 A2
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 A3
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 A4
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 A5
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 A6
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 A7
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 A8
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 A9
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 AA
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 AB
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 AC
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 AD
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 AE
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 AF
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 B0
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 B1
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 B2
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 B3
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 B4
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 B5
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 B6
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 B7
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 B8
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 B9
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 BA
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 BB
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 BC
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 BD
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 BE
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 BF
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 C0
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 C1
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 C2
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 C3
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 C4
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 C5
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 C6
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 C7
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 C8
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 C9
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 CA
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 CB
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 CC
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 CD
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 CE
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 CF
+
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 D0
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 D1
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 D2
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 D3
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 D4
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 D5
+   {"vfmulcph",  0x25  ,0x8E0400, 0x19,   0x124B, 0x124B, 0x24B , 0     , 0x26  , 0     , 0     , 0     },    // mmm=6 F3 D6
+   {"vfmulcsh",  0x25  ,0x8E0400, 0x19,   0x144B, 0x144B, 0x44B , 0     , 0x26  , 0     , 0     , 0     },    // mmm=6 F3 D7
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 D8
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 D9
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 DA
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 DB
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 DC
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 DD
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 DE
+   {0,           0     , 0      , 0x19,   0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // mmm=6 F3 DF
+
+   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};
+
+// submap for mmm=5 NP 5B, link by W bit
+SOpcodeDef OpcodeMap14A[] = {
+   {"vcvtdq2ph", 0x25  ,0x8E0000, 0x12,   0x1F4A, 0x24A , 0     , 0     , 0x0006, 0     , 0     , 0     },    // mmm=5 NP 5B W0
+   {"vcvtqq2ph", 0x25  ,0x8E2000, 0x12,   0x144C, 0x24C , 0     , 0     , 0x0006, 0     , 0     , 0     }};   // mmm=5 NP 5B W1
+
+// submap for mmm=5 F2 7A, link by W bit
+SOpcodeDef OpcodeMap14B[] = {
+   {"vcvtudq2ph",0x25  ,0x8E0800, 0x12,   0x1F4A, 0x44B , 0     , 0     , 0x0026, 0     , 0     , 0     },    // mmm=5 F2 7A W0
+   {"vcvtuqq2ph",0x25  ,0x8E2800, 0x12,   0x144A, 0x24C , 0     , 0     , 0x0026, 0     , 0     , 0     }};   // mmm=5 F2 7A W1
+
+// submap for mmm=5 F3 10. link by mem/reg
+SOpcodeDef OpcodeMap14C[] = {
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {"vmovsh",    0x25  ,0x8E0400, 0x12,   0x144A, 0x2002, 0     , 0     , 0x21  , 0     , 0     , 0     },  // mmm=5 F3 10 mem
+   {"vmovsh",    0x25  ,0x8E0400, 0x19,   0x144A, 0x144A, 0x44A , 0     , 0x22  , 0     , 0     , 0     }}; // mmm=5 F3 10 reg
+
+// submap for mmm=5 F3 11. link by mem/reg
+SOpcodeDef OpcodeMap14D[] = {
+   {"vmovsh",    0x25  ,0x8E0400, 0x13,   0x2002, 0x44A,  0     , 0     , 0x10  , 0     , 0     , 0     },  // mmm=5 F3 11 mem
+   {"vmovsh",    0x25  ,0x8E0400, 0x19,   0x144A, 0x144A, 0x44A , 0     , 0x22  , 0     , 0     , 0     }}; // mmm=5 F3 11 reg
+
+// submap for 0F 3A 56. link by prefix NP 66 F2 F3
+SOpcodeDef OpcodeMap14E[] = {
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {"vreduceph", 0x25  ,0x860000, 0x52  , 0x124A, 0x24A , 0     , 0x31  , 0x0022, 0     , 0     , 1     },    // NP 0F 3A 56
+   {"vreduces",  0x20  ,0x8EB200, 0x52  , 0x144F, 0x44F , 0     , 0x31  , 0x22  , 0     , 0     , 1     },    // 66 0F 3A 56
+   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};   // F2 0F 3A 56
+
+// submap for 0F 3A 57. link by prefix NP 66 F2 F3
+SOpcodeDef OpcodeMap14F[] = {
+   {"vreduces",  0x25  ,0x860000, 0x52  , 0x144A, 0x44A , 0     , 0x31  , 0x22  , 0     , 0     , 1     },    // NP 0F 3A 57
+   {"vreduces",  0x20  ,0x8EB200, 0x52  , 0x144F, 0x44F , 0     , 0x31  , 0x22  , 0     , 0     , 1     },    // 66 0F 3A 57
+   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};   // F2 0F 3A 57
+
+// submap for EVEX 0F 3A 08. link by prefix
+SOpcodeDef OpcodeMap150[] = {
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {"vrndscaleph",0x25 ,0x850000, 0x52  , 0x124A, 0x24A , 0x31  , 0     , 0x0023, 0     , 0     , 0     },    // EVEX NP 0F 3A 08
+   {"vrndscaleps",0x20 ,0x858200, 0x52  , 0x124B, 0x24B , 0x31  , 0     , 0x33  , 0     , 0     , 0     },    // EVEX 66 0F 3A 08
+   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};   // EVEX F2 0F 3A 08
+
+// submap for EVEX 0F 3A 0A. link by prefix
+SOpcodeDef OpcodeMap151[] = {
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {"vrndscalesh",0x25 ,0x860000, 0x52  , 0x144A, 0x44A , 0x31  , 0     , 0x22  , 0     , 0     , 0     },    // EVEX NP 0F 3A 0A
+   {"vrndscaless",0x20 ,0x8DB200, 0x59  , 0x104B, 0x004B, 0x4B  , 0x31  , 0x32  , 0     , 0     , 0     },    // EVEX 66 0F 3A 08
+   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};   // EVEX F2 0F 3A 0A
+
+// submap for 0F 3A C2. link by prefix
+SOpcodeDef OpcodeMap152[] = {
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {"vcmpph",    0x25  ,0x8E0000, 0x59,   0x95,   0x24A , 0x24A , 0x31  , 0x12  , 0     , 0     , 0     },    // 0F 3A C2
+   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // 66 0F 3A C2
+   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     },    // F2 0F 3A C2
+   {"vcmpsh",    0x25  ,0x8E0400, 0x59,   0x95,   0x44A , 0x44A , 0x31  , 0x12  , 0     , 0     , 0     }};   // F3 0F 3A C2
+
+SOpcodeDef OpcodeMap153[] = {
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};
+
+SOpcodeDef OpcodeMap154[] = {
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};
+
+SOpcodeDef OpcodeMap155[] = {
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};
+
+SOpcodeDef OpcodeMap156[] = {
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};
+
+SOpcodeDef OpcodeMap157[] = {
+//  name         instset prefix   format  dest.   source1 source2 source3 EVEX    MVEX    link    options
+   {0,           0     , 0      , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     , 0     }};
+
 
 
 /************** Make pointers to all opcode maps ***************************/
@@ -5843,10 +7518,16 @@ const SOpcodeDef * const OpcodeTables[] = {
    OpcodeMap134, OpcodeMap135, OpcodeMap136, OpcodeMap137,
    OpcodeMap138, OpcodeMap139, OpcodeMap13A, OpcodeMap13B,
    OpcodeMap13C, OpcodeMap13D, OpcodeMap13E, OpcodeMap13F,
+   OpcodeMap140, OpcodeMap141, OpcodeMap142, OpcodeMap143,
+   OpcodeMap144, OpcodeMap145, OpcodeMap146, OpcodeMap147,
+   OpcodeMap148, OpcodeMap149, OpcodeMap14A, OpcodeMap14B,
+   OpcodeMap14C, OpcodeMap14D, OpcodeMap14E, OpcodeMap14F,
+   OpcodeMap150, OpcodeMap151, OpcodeMap152, OpcodeMap153,
+   OpcodeMap154, OpcodeMap155, OpcodeMap156, OpcodeMap157,
 };
 
 // size of each table pointed to by OpcodeTables[]
-const uint32 OpcodeTableLength[] = {
+const uint32_t OpcodeTableLength[] = {
    TableSize(OpcodeMap0),  TableSize(OpcodeMap1),  TableSize(OpcodeMap2),  TableSize(OpcodeMap3),
    TableSize(OpcodeMap4),  TableSize(OpcodeMap5),  TableSize(OpcodeMap6),  TableSize(OpcodeMap7),
    TableSize(OpcodeMap8),  TableSize(OpcodeMap9),  TableSize(OpcodeMapA),  TableSize(OpcodeMapB),
@@ -5927,19 +7608,28 @@ const uint32 OpcodeTableLength[] = {
    TableSize(OpcodeMap134), TableSize(OpcodeMap135), TableSize(OpcodeMap136), TableSize(OpcodeMap137),
    TableSize(OpcodeMap138), TableSize(OpcodeMap139), TableSize(OpcodeMap13A), TableSize(OpcodeMap13B),
    TableSize(OpcodeMap13C), TableSize(OpcodeMap13D), TableSize(OpcodeMap13E), TableSize(OpcodeMap13F),
+   TableSize(OpcodeMap140), TableSize(OpcodeMap141), TableSize(OpcodeMap142), TableSize(OpcodeMap143),
+   TableSize(OpcodeMap144), TableSize(OpcodeMap145), TableSize(OpcodeMap146), TableSize(OpcodeMap147),
+   TableSize(OpcodeMap148), TableSize(OpcodeMap149), TableSize(OpcodeMap14A), TableSize(OpcodeMap14B),
+   TableSize(OpcodeMap14C), TableSize(OpcodeMap14D), TableSize(OpcodeMap14E), TableSize(OpcodeMap14F),
+   TableSize(OpcodeMap150), TableSize(OpcodeMap151), TableSize(OpcodeMap152), TableSize(OpcodeMap153),
+   TableSize(OpcodeMap154), TableSize(OpcodeMap155), TableSize(OpcodeMap156), TableSize(OpcodeMap157),
 };
 
 // number of entries in OpcodeTables
-const uint32 NumOpcodeTables1 = TableSize(OpcodeTables);
-const uint32 NumOpcodeTables2 = TableSize(OpcodeTableLength);
+const uint32_t NumOpcodeTables1 = TableSize(OpcodeTables);
+const uint32_t NumOpcodeTables2 = TableSize(OpcodeTableLength);
 
 // Index to start pages, depending on VEX.mmmm bits
-uint32 OpcodeStartPageVEX[] = {
+uint32_t OpcodeStartPageVEX[] = {
    0xB0,                        // no escape,      VEX.mmmm = 0
    0xB1,                        // 0F    escape or VEX.mmmm = 1
    0x2,                         // 0F 38 escape or VEX.mmmm = 2
    0x4,                         // 0f 3A escape or VEX.mmmm = 3
-   0, 0, 0, 0,                  // reserved for higher mmmm
+   0x0,                         // VEX.mmmm = 4  // currently unused
+   0x140,                       // VEX.mmmm = 5  // subdivide by prefix
+   0x141,                       // VEX.mmmm = 6  // subdivide by prefix
+   0x0,                         // VEX.mmmm = 7  // currently unused
    0xB2,                        // 0F 38 escape or EVEX.mmmm = 2 with F2 prefix (pp = 11)
    0xB3                         // 0F 38 escape or EVEX.mmmm = 2 with F3 prefix (pp = 10)
 };
@@ -5952,8 +7642,8 @@ SOpcodeDef const * OpcodeStartPageXOP[] = {
 };
 
 // Number of entries in OpcodeStartPages
-const uint32 NumOpcodeStartPageVEX = TableSize(OpcodeStartPageVEX);
-const uint32 NumOpcodeStartPageXOP = TableSize(OpcodeStartPageXOP);
+const uint32_t NumOpcodeStartPageVEX = TableSize(OpcodeStartPageVEX);
+const uint32_t NumOpcodeStartPageXOP = TableSize(OpcodeStartPageXOP);
 
 
 // Define register names
@@ -6019,9 +7709,9 @@ SwizSpec Sf32m[8] = {  // 32-bit float memory broadcast or conversion
     {0x04B, 4,4,"1to16"},
     {0x44B,16,4,"4to16"},
     {0x54A,32,2,"float16"},
-    {0x401,16,1,"uint8"},
+    {0x401,16,1,"uint8_t"},
     {0x401,16,1,"sint8 N/A!"},
-    {0x502,32,2,"uint16"},
+    {0x502,32,2,"uint16_t"},
     {0x502,32,2,"sint16"}};
 
 SwizSpec Sf64m[8] = {  // 64-bit float memory broadcast (no conversion)
@@ -6039,9 +7729,9 @@ SwizSpec Si32m[8] = {  // 32-bit integer memory broadcast or conversion
     {0x003, 4,4,"1to16"},
     {0x403,16,4,"4to16"},
     {0x54A,32,2,"N/A!"},
-    {0x401,16,1,"uint8"},
+    {0x401,16,1,"uint8_t"},
     {0x401,16,1,"sint8"},
-    {0x502,32,2,"uint16"},
+    {0x502,32,2,"uint16_t"},
     {0x502,32,2,"sint16"}};
 
 SwizSpec Si64m[8] = {  // 64-bit integer memory broadcast (no conversion)
@@ -6059,9 +7749,9 @@ SwizSpec Uf32m[8] = {  // 32-bit float memory up- or down-conversion
     {0x04B, 4,4,"N/A!"},
     {0x54B,16,4,"N/A!"},
     {0x54A,32,2,"float16"},
-    {0x401,16,1,"uint8"},
+    {0x401,16,1,"uint8_t"},
     {0x401,16,1,"sint8"},
-    {0x502,32,2,"uint16"},
+    {0x502,32,2,"uint16_t"},
     {0x502,32,2,"sint16"}};
 
 SwizSpec Uf64m[8] = {  // 64-bit float memory, no up- or down-conversion
@@ -6079,9 +7769,9 @@ SwizSpec Ui32m[8] = {  // 32-bit integer memory up- or down-conversion
     {0x003, 4,4,"N/A!"},
     {0x503,16,4,"N/A!"},
     {0x54A,32,2,"N/A!"},
-    {0x401,16,1,"uint8"},
+    {0x401,16,1,"uint8_t"},
     {0x401,16,1,"sint8"},
-    {0x502,32,2,"uint16"},
+    {0x502,32,2,"uint16_t"},
     {0x502,32,2,"sint16"}};
 
 SwizSpec Ui64m[8] = {  // 64-bit integer memory, no up- or down-conversion
@@ -6101,9 +7791,9 @@ SwizSpec Uf32mx4[8] = {  // 32-bit float memory up-conversion, broadcast * 4, vb
     {0x04B,16,4*4,"N/A!"},
     {0x54B,16,4*4,"N/A!"},
     {0x004, 8,2*4,"float16"},
-    {0x003, 4,1*4,"uint8"},
+    {0x003, 4,1*4,"uint8_t"},
     {0x003, 4,1*4,"sint8"},
-    {0x004, 8,2*4,"uint16"},
+    {0x004, 8,2*4,"uint16_t"},
     {0x004, 8,2*4,"sint16"}};
 
 SwizSpec Uf64mx4[8] = {  // 64-bit float memory, no up-conversion, broadcast * 4, vbroadcastf64x4
@@ -6121,9 +7811,9 @@ SwizSpec Ui32mx4[8] = {  // 32-bit integer memory up-conversion, broadcast * 4, 
     {0x003,16,4*4,"N/A!"},
     {0x503,16,4*4,"N/A!"},
     {0x54A, 8,2*4,"N/A!"},
-    {0x003, 4,1*4,"uint8"},
+    {0x003, 4,1*4,"uint8_t"},
     {0x003, 4,1*4,"sint8"},
-    {0x004, 8,2*4,"uint16"},
+    {0x004, 8,2*4,"uint16_t"},
     {0x004, 8,2*4,"sint16"}};
 
 SwizSpec Ui64mx4[8] = {  // 64-bit integer memory, no up-conversion, broadcast * 4, vbroadcasti64x4
@@ -6263,4 +7953,3 @@ SwizSpec const * SwizRoundTables[1][2] = {
 const char * EVEXRoundingNames[5] = {
     "rn-sae", "rd-sae", "ru-sae", "rz-sae", "sae"
 };
-

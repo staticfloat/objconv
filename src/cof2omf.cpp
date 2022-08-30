@@ -49,10 +49,10 @@ void CCOF2OMF::Convert() {
 void CCOF2OMF::MakeSegmentList() {
    // Make temporary segment conversion list
    const char * oldname;                         // Old name of section
-   uint32 namei;                                 // Name index into NameBuffer
-   uint32 align;                                 // Segment alignment = 2^align
-   int32 align2;                                 // align2 = 2^align
-   uint32 flags;                                 // Old flags
+   uint32_t namei;                                 // Name index into NameBuffer
+   uint32_t align;                                 // Segment alignment = 2^align
+   int32_t align2;                                 // align2 = 2^align
+   uint32_t flags;                                 // Old flags
    int i, j;                                     // Loop counters
    int oldsec;                                   // Old section number
 
@@ -99,7 +99,7 @@ void CCOF2OMF::MakeSegmentList() {
 
       // Check for previous sections with same name
       for (i = 0; i < SectionBufferNum; i++) {
-         if (strcmp(oldname, NameBuffer.Buf() + SectionBuffer[i].OldName) == 0) break; // Found same name
+         if (strcmp(oldname, (char*)NameBuffer.Buf() + SectionBuffer[i].OldName) == 0) break; // Found same name
       }
       if (i < SectionBufferNum) {
          // Previous section with same name found.
@@ -195,7 +195,7 @@ void CCOF2OMF::MakeSymbolList() {
    //int jsym = 0;  // auxiliary entry number
    union {        // Pointer to symbol table
       SCOFF_SymTableEntry * p;  // Normal pointer
-      int8 * b;                 // Used for address calculation
+      int8_t * b;                 // Used for address calculation
    } Symtab;
 
    Symtab.p = SymbolTable;      // Set pointer to begin of SymbolTable
@@ -215,7 +215,7 @@ void CCOF2OMF::MakeSymbolList() {
             SymbolBuffer[isym].Name = NameBuffer.PushString(GetSymbolName(Symtab.p->s.Name));
 
             // Find section in SectionBuffer
-            uint32 OldSection = Symtab.p->s.SectionNumber;
+            uint32_t OldSection = Symtab.p->s.SectionNumber;
             SymbolBuffer[isym].Segment = SectionBuffer[OldSection].NewNumber; // New segment number
 
             // Calculate offset = offset into old section + offset of old section to first section with same name
@@ -255,22 +255,22 @@ void CCOF2OMF::MakeSymbolList() {
 
 void CCOF2OMF::MakeRelocationsList() {
    // Make temporary list of relocations (fixups) and sort it
-   uint32 i;                                     // Relocation number in old file
+   uint32_t i;                                     // Relocation number in old file
    int j;                                        // Section number of relocation source in old file
    int isym;                                     // Symbol table index in old file
-   //int32 * paddend = 0;                          // Pointer to inline addend
-   uint32 TargetOldSection;                      // Section number of relocation target in old file
+   //int32_t * paddend = 0;                          // Pointer to inline addend
+   uint32_t TargetOldSection;                      // Section number of relocation target in old file
 
    SOMFRelocation NewRel;                        // Entry in RelocationBuffer
 
    union {                                       // Pointer to symbol table
       SCOFF_SymTableEntry * p;                   // Normal pointer
-      int8 * b;                                  // Used for address calculation
+      int8_t * b;                                  // Used for address calculation
    } Symtab;
 
    union {                                       // Pointer to relocation entry
       SCOFF_Relocation * p;                      // pointer to record
-      int8 * b;                                  // used for address calculation and incrementing
+      int8_t * b;                                  // used for address calculation and incrementing
    } Reloc;
 
    // Loop through section headers of old file
@@ -285,7 +285,7 @@ void CCOF2OMF::MakeRelocationsList() {
 
          // Find symbol table entry
          isym = Reloc.p->SymbolTableIndex;
-         if ((uint32)isym >= (uint32)NumberOfSymbols) {
+         if ((uint32_t)isym >= (uint32_t)NumberOfSymbols) {
             err.submit(2040);                    // SymbolTableIndex points outside Symbol Table
             isym = 0;
          }
@@ -294,7 +294,7 @@ void CCOF2OMF::MakeRelocationsList() {
 
          // Find inline addend
          if (Reloc.p->Type < COFF32_RELOC_SEG12) {
-            //paddend = (int32*)(Buf()+SectionHeaderp->PRawData+Reloc.p->VirtualAddress);
+            //paddend = (int32_t*)(Buf()+SectionHeaderp->PRawData+Reloc.p->VirtualAddress);
          }
          //else paddend = 0;
 
@@ -326,7 +326,7 @@ void CCOF2OMF::MakeRelocationsList() {
             // Local
             NewRel.Scope  = S_LOCAL;                   // 0 = local, 2 = external
             TargetOldSection = Symtab.p->s.SectionNumber;    // Target section
-            if (TargetOldSection > uint32(NSections)) {
+            if (TargetOldSection > uint32_t(NSections)) {
                // SectionNumber out of range
                err.submit(2035);  continue;
             }
@@ -359,7 +359,7 @@ void CCOF2OMF::MakeRelocationsList() {
    NumRelocations = RelocationBuffer.GetNumEntries();
 
    // Check for overlapping relocation sources
-   for (uint32 i = 1; i < RelocationBuffer.GetNumEntries(); i++) {
+   for (uint32_t i = 1; i < RelocationBuffer.GetNumEntries(); i++) {
       if (RelocationBuffer[i].Section == RelocationBuffer[i-1].Section
       && RelocationBuffer[i].SourceOffset >= RelocationBuffer[i-1].SourceOffset
       && RelocationBuffer[i].SourceOffset <  RelocationBuffer[i-1].SourceOffset + 4
@@ -373,7 +373,7 @@ void CCOF2OMF::MakeRelocationsList() {
 void CCOF2OMF::MakeLNAMES() {
    // Make THEADR and LNAMES records
    int Sec;                                      // Loop counter
-   uint32 NameI;                                 // Name index
+   uint32_t NameI;                                 // Name index
 
    // Make first record in output file = Translator header
    ToFile.StartRecord(OMF_THEADR);
@@ -404,7 +404,7 @@ void CCOF2OMF::MakeLNAMES() {
             ToFile.StartRecord(OMF_LNAMES);      // Start new LNAMES record
          }
          // Store name of this segment
-         ToFile.PutString(NameBuffer.Buf() + SectionBuffer[Sec].NewName);
+         ToFile.PutString((char*)NameBuffer.Buf() + SectionBuffer[Sec].NewName);
          NameI++;                                // Ready for next name
       }
    }
@@ -416,9 +416,9 @@ void CCOF2OMF::MakeLNAMES() {
 void CCOF2OMF::MakeSEGDEF() {
    // Make SEGDEF and GRPDEF records
    int Sec;                                      // Index into SectionBuffer
-   uint32 SegNum = 0;                            // Segment number in new file
+   uint32_t SegNum = 0;                            // Segment number in new file
    OMF_SAttrib Attr;                             // Segment attributes bitfield
-   uint32 align;                                 // Alignment in new file
+   uint32_t align;                                 // Alignment in new file
 
    // Loop through SectionBuffer
    for (Sec = 0; Sec < SectionBufferNum; Sec++) {
@@ -490,8 +490,8 @@ void CCOF2OMF::MakeSEGDEF() {
 
 void CCOF2OMF::MakeEXTDEF() {
    // Make EXTDEF records
-   uint32 j;                                     // SymbolBuffer entry index
-   uint32 ExtSymNum = 0;                         // External symbol number
+   uint32_t j;                                     // SymbolBuffer entry index
+   uint32_t ExtSymNum = 0;                         // External symbol number
 
    if (NumExternalSymbols > 0) {                 // Are there any external symbols?
 
@@ -510,7 +510,7 @@ void CCOF2OMF::MakeEXTDEF() {
                ToFile.StartRecord(OMF_EXTDEF);   // Start new EXTDEF record
             }
             // Put symbol name in record
-            ToFile.PutString(NameBuffer.Buf() + SymbolBuffer[j].Name);
+            ToFile.PutString((char*)NameBuffer.Buf() + SymbolBuffer[j].Name);
 
             // Type index
             ToFile.PutIndex(0);                  // Not used any more
@@ -523,8 +523,8 @@ void CCOF2OMF::MakeEXTDEF() {
 
 void CCOF2OMF::MakePUBDEF() {
    // Make PUBDEF records
-   uint32 j;                                     // SymbolBuffer entry index
-   uint32 PubSymNum = 0;                         // Public symbol number
+   uint32_t j;                                     // SymbolBuffer entry index
+   uint32_t PubSymNum = 0;                         // Public symbol number
 
    // Loop through SymbolBuffer
    for (j = 0; j < SymbolBuffer.GetNumEntries(); j++) {
@@ -536,7 +536,7 @@ void CCOF2OMF::MakePUBDEF() {
          ToFile.StartRecord(OMF_PUBDEF + 1);     // Start new PUBDEF record, 32 bit
 
          // Group index
-         uint32 Group = SymbolBuffer[j].Segment ? OMF_LNAME_FLAT : 0; // Group = FLAT, except for absolute symbols
+         uint32_t Group = SymbolBuffer[j].Segment ? OMF_LNAME_FLAT : 0; // Group = FLAT, except for absolute symbols
          ToFile.PutIndex(Group);                 // Group name index
 
          // Segment index
@@ -546,7 +546,7 @@ void CCOF2OMF::MakePUBDEF() {
          if (SymbolBuffer[j].Segment == 0) ToFile.PutWord(0);
 
          // Put symbol name in record
-         ToFile.PutString(NameBuffer.Buf() + SymbolBuffer[j].Name);
+         ToFile.PutString((char*)NameBuffer.Buf() + SymbolBuffer[j].Name);
 
          // Offset relative to segment
          ToFile.PutNumeric(SymbolBuffer[j].Offset);
@@ -595,16 +595,16 @@ relocations with a source address in the current LEDATA record.
 */
    int    Segment;                               // Segment index in new file
    int    OldSection;                            // Section index in old file
-   uint32 SegOffset;                             // Offset of section relative to segment
-   uint32 SectOffset;                            // Offset of LEDATA record relative to section
-   uint32 CutOff;                                // Size limit for splitting section into multiple LEDATA records
-   uint32 RelFirst;                              // Index into RelocationBuffer of first relocation for section/record
-   uint32 RelLast;                               // Index into RelocationBuffer of last relocation for record + 1
-   uint32 Rel;                                   // Current index into RelocationBuffer
-   uint32 FrameDatum;                            // Frame datum field in FIXUPP record
-   uint32 TargetDatum;                           // Target datum field in FIXUPP record
-   uint32 TargetDisplacement;                    // Target displacement field in FIXUPP record
-   uint32 AlignmentFiller;                       // Number of unused bytes from end of one section to begin of next section due to alignment
+   uint32_t SegOffset;                             // Offset of section relative to segment
+   uint32_t SectOffset;                            // Offset of LEDATA record relative to section
+   uint32_t CutOff;                                // Size limit for splitting section into multiple LEDATA records
+   uint32_t RelFirst;                              // Index into RelocationBuffer of first relocation for section/record
+   uint32_t RelLast;                               // Index into RelocationBuffer of last relocation for record + 1
+   uint32_t Rel;                                   // Current index into RelocationBuffer
+   uint32_t FrameDatum;                            // Frame datum field in FIXUPP record
+   uint32_t TargetDatum;                           // Target datum field in FIXUPP record
+   uint32_t TargetDisplacement;                    // Target displacement field in FIXUPP record
+   uint32_t AlignmentFiller;                       // Number of unused bytes from end of one section to begin of next section due to alignment
 
    SOMFRelocation Reloc0;                        // Reference relocation record for compare and search
    OMF_SLocat Locat;                             // Locat bitfield for FIXUPP record
@@ -617,7 +617,7 @@ relocations with a source address in the current LEDATA record.
       // Search through SectionBuffer for old sections contributing to this segment
       for (OldSection = 0; OldSection < SectionBufferNum; OldSection++) {
 
-         if (SectionBuffer[OldSection].NewNumber == (uint32)Segment && SectionBuffer[OldSection].Size) {
+         if (SectionBuffer[OldSection].NewNumber == (uint32_t)Segment && SectionBuffer[OldSection].Size) {
             // This section contributes to Segment. Make LEDATA record(s)
 
             if (SectionBuffer[OldSection].Offset > SegOffset) {
@@ -663,7 +663,7 @@ relocations with a source address in the current LEDATA record.
 
                // Search for last relocation entry
                while (RelLast < NumRelocations) {
-                  if (RelocationBuffer[RelLast].Section != (uint32)OldSection) {
+                  if (RelocationBuffer[RelLast].Section != (uint32_t)OldSection) {
                      break; // Reached end of relocations for this section
                   }
                   if (RelocationBuffer[RelLast].SourceOffset >= CutOff + SectOffset) {
@@ -732,7 +732,7 @@ relocations with a source address in the current LEDATA record.
                         Locat.s.Location = 9;              // Indicates 32-bit offset
 
                         // Offset of source relative to section (10 bits)
-                        uint32 RelocOffset = RelocationBuffer[Rel].SourceOffset - SectOffset; // Offset of relocation source to begin of LEDATA record
+                        uint32_t RelocOffset = RelocationBuffer[Rel].SourceOffset - SectOffset; // Offset of relocation source to begin of LEDATA record
                         if (RelocOffset >= 1024) err.submit(9000); // Check that it fits into 10 bits
                         Locat.s.Offset = RelocOffset;
 

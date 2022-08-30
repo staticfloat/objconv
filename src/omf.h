@@ -113,9 +113,9 @@
 // Define bitfield structures used in OMF records
 
 union OMF_SAttrib { // Structure of attributes in SEGDEF record
-   uint8 b;                            // Byte
+   uint8_t b;                            // Byte
    struct {
-      uint8 P:1,                       // 0: 16 bit, 1: 32 bit
+      uint8_t P:1,                       // 0: 16 bit, 1: 32 bit
             B:1,                       // Big
             C:3,                       // Combination (private, public, stack, common)
             A:3;                       // Alignment
@@ -123,9 +123,9 @@ union OMF_SAttrib { // Structure of attributes in SEGDEF record
 };
 
 union OMF_SLocat { // Structure of first two bytes of FIXUP subrecord swapped = Locat field
-   uint8 bytes[2];                     // First two bytes swapped
+   uint8_t bytes[2];                     // First two bytes swapped
    struct {
-      uint16 Offset:10,                // Offset into LEDATA (or LIDATA)
+      uint16_t Offset:10,                // Offset into LEDATA (or LIDATA)
              Location:4,               // Relocation method
              M:1,                      // 0 = self-relative, 1 = direct
              one:1;                    // 1 = FIXUP subrecord, 0 = THREAD subrecord
@@ -133,9 +133,9 @@ union OMF_SLocat { // Structure of first two bytes of FIXUP subrecord swapped = 
 };
 
 union OMF_SFixData { // Structure of FixData field in FIXUP subrecord of FIXUPP record
-   uint8 b;                            // Byte
+   uint8_t b;                            // Byte
    struct {
-      uint8  Target:2,                 // Target method (T=0) or target thread number (T=1)
+      uint8_t  Target:2,                 // Target method (T=0) or target thread number (T=1)
              P:1,                      // 0 = target displacement field present, 1 = displacement is zero
              T:1,                      // 0 = target field present, 1 = target defined by thread
              Frame:3,                  // Frame method (F=0) or frame thread (F=1)
@@ -144,9 +144,9 @@ union OMF_SFixData { // Structure of FixData field in FIXUP subrecord of FIXUPP 
 };
 
 union OMF_STrdDat { // Structure of Thread Data field in THREAD subrecord of FIXUPP record
-   uint8 b;                            // Byte
+   uint8_t b;                            // Byte
    struct {
-      uint8  Thread:2,                 // Thread number
+      uint8_t  Thread:2,                 // Thread number
              Method:3,                 // Method (T0 - T3, F0 - F6)
              Unused:1,                 // 0
              D:1,                      // 0 = Target thread, 1 = Frame thread
@@ -158,25 +158,25 @@ union OMF_STrdDat { // Structure of Thread Data field in THREAD subrecord of FIX
 // Structure of OMF record pointer
 struct SOMFRecordPointer {
 public:
-   uint8  Type;            // Record type
-   uint8  Type2;           // Record type, made even
-   uint16 Unused;          // Align
-   uint32 FileOffset;      // Position in file
-   uint32 FileEnd;         // End of file = file size
-   uint32 Index;           // Offset to current byte while parsing from start of record
-   uint32 End;             // Offset to checksum byte from start of record
-   int8 * buffer;          // Pointer to file buffer
-   uint8  GetByte();       // Read next byte from buffer
-   uint16 GetWord();       // Read next 16 bit word from buffer
-   uint32 GetDword();      // Read next 32 bit dword from buffer
-   uint32 GetIndex();      // Read byte or word, depending on sign of first byte
-   uint32 GetNumeric();    // Read word or dword, depending on record type even or odd
-   uint32 GetLength();     // Read 1, 2, 3 or 4 bytes, depending on value of first byte
+   uint8_t  Type;            // Record type
+   uint8_t  Type2;           // Record type, made even
+   uint16_t Unused;          // Align
+   uint32_t FileOffset;      // Position in file
+   uint32_t FileEnd;         // End of file = file size
+   uint32_t Index;           // Offset to current byte while parsing from start of record
+   uint32_t End;             // Offset to checksum byte from start of record
+   int8_t * buffer;          // Pointer to file buffer
+   uint8_t  GetByte();       // Read next byte from buffer
+   uint16_t GetWord();       // Read next 16 bit word from buffer
+   uint32_t GetDword();      // Read next 32 bit dword from buffer
+   uint32_t GetIndex();      // Read byte or word, depending on sign of first byte
+   uint32_t GetNumeric();    // Read word or dword, depending on record type even or odd
+   uint32_t GetLength();     // Read 1, 2, 3 or 4 bytes, depending on value of first byte
    char * GetString();     // Read string and return as ASCIIZ string
-   void   Start(int8 * Buffer, uint32 FileOffset, uint32 FileEnd); // Start scanning through records
-   uint8  GetNext(uint32 align = 0);// Get next record
-   uint32 InterpretLIDATABlock(); // Interpret Data block in LIDATA record recursively
-   uint32 UnpackLIDATABlock(int8 * destination, uint32 MaxSize); // Unpack Data block in LIDATA record recursively and store data at destination
+   void   Start(int8_t * Buffer, uint32_t FileOffset, uint32_t FileEnd); // Start scanning through records
+   uint8_t  GetNext(uint32_t align = 0);// Get next record
+   uint32_t InterpretLIDATABlock(); // Interpret Data block in LIDATA record recursively
+   uint32_t UnpackLIDATABlock(int8_t * destination, uint32_t MaxSize); // Unpack Data block in LIDATA record recursively and store data at destination
 };
 
 
@@ -184,59 +184,59 @@ public:
 class COMFFileBuilder : public CFileBuffer {
 public:
    COMFFileBuilder();                  // Constructor
-   void StartRecord(uint8 type);       // Start building new record
+   void StartRecord(uint8_t type);       // Start building new record
    void EndRecord();                   // Finish building current record
-   void PutByte(uint8);                // Put byte into buffer
-   void PutWord(uint16);               // Put 16 bit word into buffer
-   void PutDword(uint32);              // Put 32 bit dword into buffer
-   void PutIndex(uint32);              // Put byte or word into buffer (word if > 127)
-   void PutNumeric(uint32);            // Put word or dword into buffer, depending on type being even or odd
+   void PutByte(uint8_t);                // Put byte into buffer
+   void PutWord(uint16_t);               // Put 16 bit word into buffer
+   void PutDword(uint32_t);              // Put 32 bit dword into buffer
+   void PutIndex(uint32_t);              // Put byte or word into buffer (word if > 127)
+   void PutNumeric(uint32_t);            // Put word or dword into buffer, depending on type being even or odd
    void PutString(const char *);       // Put ASCII string into buffer, preceded by size
-   void PutBinary(void *, uint32);     // Put binary data of any length
-   uint32 GetSize();                   // Get size of data added so far to current record
+   void PutBinary(void *, uint32_t);     // Put binary data of any length
+   uint32_t GetSize();                   // Get size of data added so far to current record
 protected:
-   uint8  Type;                        // Record type
-   uint32 Index;                       // Index to current offset
-   uint32 RecordStart;                 // Index to start of current record
+   uint8_t  Type;                        // Record type
+   uint32_t Index;                       // Index to current offset
+   uint32_t RecordStart;                 // Index to start of current record
 };
 
 
 // Structure for temporary segment list used while building OMF file
 struct SOMFSegmentList {
 public:
-   uint32 NewNumber;                   // Segment index in new file
-   uint32 OldName;                     // Segment name in old file as index into NameBuffer
-   uint32 NewName;                     // Segment name in new file as index into NameBuffer
-   uint32 NewNameI;                    // Segment name in new file as index into LNAMES record. Zero for subsequent entries with same segment name
+   uint32_t NewNumber;                   // Segment index in new file
+   uint32_t OldName;                     // Segment name in old file as index into NameBuffer
+   uint32_t NewName;                     // Segment name in new file as index into NameBuffer
+   uint32_t NewNameI;                    // Segment name in new file as index into LNAMES record. Zero for subsequent entries with same segment name
    SCOFF_SectionHeader * psechdr;      // Pointer to old section header
-   uint32 Align;                       // Alignment = 2^Align
-   uint32 Class;                       // Class in new file
-   uint32 Offset;                      // Offset of section in old file to first section with same name
-   uint32 Size;                        // Size of section. First record has combined size of all sections with same name
-   uint32 SegmentSize;                 // Size of segment = combined size of all sections with same name. Stored only in first section of segment
+   uint32_t Align;                       // Alignment = 2^Align
+   uint32_t Class;                       // Class in new file
+   uint32_t Offset;                      // Offset of section in old file to first section with same name
+   uint32_t Size;                        // Size of section. First record has combined size of all sections with same name
+   uint32_t SegmentSize;                 // Size of segment = combined size of all sections with same name. Stored only in first section of segment
 };
 
 
 // Structure for temporary symbol list used while building OMF file
 struct SOMFSymbolList {
 public:
-   uint32 Scope;                       // 0 = local, 1 = public, 2 = external
-   uint32 NewIndex;                    // PUBDEF index if Scope = 1, EXTDEF index if scope = 2
-   uint32 Segment;                     // New segment index
-   uint32 Offset;                      // Offset relative to segment = first section with same name
-   uint32 Name;                        // Symbol name in new file as index into NameBuffer
+   uint32_t Scope;                       // 0 = local, 1 = public, 2 = external
+   uint32_t NewIndex;                    // PUBDEF index if Scope = 1, EXTDEF index if scope = 2
+   uint32_t Segment;                     // New segment index
+   uint32_t Offset;                      // Offset relative to segment = first section with same name
+   uint32_t Name;                        // Symbol name in new file as index into NameBuffer
 };
 
 
 // Structure for temporary relocation (fixup) list used while building OMF file
 struct SOMFRelocation {
 public:
-   uint32 Section;                     // Section number in old file
-   uint32 SourceOffset;                // Offset of source relative to section
-   int32  Mode;                        // 0 = EIP-relative, 1 = direct, -1 = unsupported
-   uint32 Scope;                       // 0 = local, 2 = external
-   uint32 TargetSegment;               // Segment index or EXTDEF index of target in new file
-   uint32 TargetOffset;                // Offset relative to segment in new file of target
+   uint32_t Section;                     // Section number in old file
+   uint32_t SourceOffset;                // Offset of source relative to section
+   int32_t  Mode;                        // 0 = EIP-relative, 1 = direct, -1 = unsupported
+   uint32_t Scope;                       // 0 = local, 2 = external
+   uint32_t TargetSegment;               // Segment index or EXTDEF index of target in new file
+   uint32_t TargetOffset;                // Offset relative to segment in new file of target
    int operator < (SOMFRelocation const & x) const {// operator < for sorting by CSList::Sort()
       return Section < x.Section || (Section == x.Section && SourceOffset < x.SourceOffset);
    }
@@ -244,10 +244,10 @@ public:
 
 // Structure for assigning names to unnamed local symbols while converting OMF file
 struct SOMFLocalSymbol {
-   uint32 Offset;                      // Offset into segment
-   uint32 Segment;                     // Segment number in old file
-   uint32 Name;                        // Assigned name as index into new string table
-   uint32 NewSymtabIndex;              // Index into new symbol table
+   uint32_t Offset;                      // Offset into segment
+   uint32_t Segment;                     // Segment number in old file
+   uint32_t Name;                        // Assigned name as index into new string table
+   uint32_t NewSymtabIndex;              // Index into new symbol table
    // Operator < needed for sorting table of SOMFLocalSymbol:
    int operator < (const SOMFLocalSymbol & b) const {
       return Segment < b.Segment || (Segment == b.Segment && Offset < b.Offset);
@@ -256,14 +256,14 @@ struct SOMFLocalSymbol {
 
 // Structure for interpreted SEGDEF record used during disassembly
 struct SOMFSegment {
-   uint32 NameO;                       // Segment name, as offset into NameBuffer
-   uint32 Offset;                      // Segment address
-   uint32 Size;                        // Segment size
-   uint32 Align;                       // Alignment = 1 << Align
-   uint32 Type;                        // Segment type (as defined in disasm.h)
-   uint32 WordSize;                    // 16 or 32 bits
-   uint32 BufOffset;                   // Offset of raw data into SegmentData buffer
-   uint32 NameIndex;                   // Name index, used for COMDAT segment only
+   uint32_t NameO;                       // Segment name, as offset into NameBuffer
+   uint32_t Offset;                      // Segment address
+   uint32_t Size;                        // Segment size
+   uint32_t Align;                       // Alignment = 1 << Align
+   uint32_t Type;                        // Segment type (as defined in disasm.h)
+   uint32_t WordSize;                    // 16 or 32 bits
+   uint32_t BufOffset;                   // Offset of raw data into SegmentData buffer
+   uint32_t NameIndex;                   // Name index, used for COMDAT segment only
 };
 
 #endif // #ifndef OMF_H

@@ -16,7 +16,7 @@
 
 
 // Make big-endian numbers for library
-uint32 EndianChange(uint32);           // Convert little-endian to big-endian number, or vice versa
+uint32_t EndianChange(uint32_t);           // Convert little-endian to big-endian number, or vice versa
 
 
 // Define UNIX library member header
@@ -40,17 +40,17 @@ public:
     //static char *TruncateMemberName(char const*);// Remove path and truncate object file name to 15 characters
     static char * ShortenMemberName(char const *name); // Truncate library member name to 15 characters and make unique. The original long name is not overwritten
     static char * StripMemberName(char *);         // Remove path from library member name. Original long name is overwritten
-    const char  * GetModuleName(uint32 Index);     // Get name of module from index or page index
+    const char  * GetModuleName(uint32_t Index);     // Get name of module from index or page index
 protected:
     // Properties for UNIX input libraries only
-    uint32 LongNames;                   // Offset to long names member
-    uint32 LongNamesSize;               // Size of long names member
-    uint32 AlignBy;                     // Member alignment
+    uint32_t LongNames;                   // Offset to long names member
+    uint32_t LongNamesSize;               // Size of long names member
+    uint32_t AlignBy;                     // Member alignment
 
     // Properties for OMF input libraries only
-    uint32 PageSize;                    // Alignment of members
-    uint32 DictionaryOffset;            // Offset to hash table
-    uint32 DictionarySize;              // Dictionary size, in 512 bytes blocks
+    uint32_t PageSize;                    // Alignment of members
+    uint32_t DictionaryOffset;            // Offset to hash table
+    uint32_t DictionarySize;              // Dictionary size, in 512 bytes blocks
 
     // Methods and properties for reading library:
     void DumpUNIX();                    // Print contents of UNIX style library
@@ -60,10 +60,10 @@ protected:
     char * ExtractMember(CFileBuffer*); // Extract next library member from input library
     char * ExtractMemberUNIX(CFileBuffer*); // Extract member of UNIX style library
     char * ExtractMemberOMF(CFileBuffer*);  // Extract member of OMF style library
-    uint32 NextHeader(uint32 Offset);   // Loop through library headers
+    uint32_t NextHeader(uint32_t Offset);   // Loop through library headers
     CConverter MemberBuffer;            // Buffer containing single library member
-    uint32 CurrentOffset;               // Offset to current member
-    uint32 CurrentNumber;               // Number of current member
+    uint32_t CurrentOffset;               // Offset to current member
+    uint32_t CurrentNumber;               // Number of current member
     int  MemberFileType;                // File type of members
     // Methods and properties for modifying or writing library
     void FixNames();                    // Calls StripMemberNamesUNIX or RebuildOMF
@@ -82,7 +82,7 @@ protected:
     CMemoryBuffer LongNamesBuffer;      // Buffer for building the "//" longnames member
     CMemoryBuffer StringBuffer;         // Buffer containing strings
     CMemoryBuffer DataBuffer;           // Buffer containing raw members
-    CSList<uint32> Indexes;             // Buffer containing indexes into DataBuffer
+    CSList<uint32_t> Indexes;             // Buffer containing indexes into DataBuffer
     int RepressWarnings;                // Repress warnings when rebuilding library
 };
 
@@ -96,31 +96,31 @@ protected:
 // Structure of hash table block
 union SOMFHashBlock {
     struct {
-        uint8 Buckets[OMFNumBuckets];    // Indicators for each bucket
-        uint8 FreeSpace;                 // Pointer to free space
-        uint8 Data[OMFBlockSize-OMFNumBuckets-1]; // Contains strings and module indices
+        uint8_t Buckets[OMFNumBuckets];    // Indicators for each bucket
+        uint8_t FreeSpace;                 // Pointer to free space
+        uint8_t Data[OMFBlockSize-OMFNumBuckets-1]; // Contains strings and module indices
     } b;
-    uint8 Strings[OMFBlockSize];        // Start of each string = length
+    uint8_t Strings[OMFBlockSize];        // Start of each string = length
 };
 
 
 // Hash table handler
 class COMFHashTable {
 public:
-    void Init(SOMFHashBlock * blocks, uint32 NumBlocks); // Initialize
-    void MakeHash(int8 * name);         // Compute hash
-    int  FindString(uint32 & ModulePage, uint32 & Conflicts); // Search for string. Get number of occurrences, module, number of conflicting strings
-    int  InsertString(uint16 & ModulePage); // Insert string in hash table. Return 0 if success
+    void Init(SOMFHashBlock * blocks, uint32_t NumBlocks); // Initialize
+    void MakeHash(char * name);         // Compute hash
+    int  FindString(uint32_t & ModulePage, uint32_t & Conflicts); // Search for string. Get number of occurrences, module, number of conflicting strings
+    int  InsertString(uint16_t & ModulePage); // Insert string in hash table. Return 0 if success
     void MakeHashTable(CSList<SStringEntry> & StringEntries, CMemoryBuffer & StringBuffer, CMemoryBuffer & HashTable, CLibrary * Library); // Make hash table
 protected:
-    uint8 * String;                     // String to search for or insert
-    uint32 StringLength;                // Length of string
-    SOMFHashBlock * blocks;             // Pointer to blocks
-    uint32 NumBlocks;                   // Number of blocks
-    uint16 StartBlock;                  // Start block for search
-    uint16 StartBucket;                 // Start bucket for search
-    uint16 BlockD;                      // Block step size in search
-    uint16 BucketD;                     // Bucket step size in search
+    char * String;                        // String to search for or insert
+    uint32_t StringLength;                // Length of string
+    SOMFHashBlock * blocks;               // Pointer to blocks
+    uint32_t NumBlocks;                   // Number of blocks
+    uint16_t StartBlock;                  // Start block for search
+    uint16_t StartBucket;                 // Start bucket for search
+    uint16_t BlockD;                      // Block step size in search
+    uint16_t BucketD;                     // Bucket step size in search
 };
 
 #endif // #ifndef LIBRARY_H

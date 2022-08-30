@@ -38,13 +38,13 @@ void CMAC2MAC<MACSTRUCTURES>::MakeSymbolTable() {
    // Remake symbol tables and string table
    int OldScope = 0;                   // Old scope of symbol. 0=local, 1=public, 2=external
    int NewScope;                       // New scope of symbol. 0=local, 1=public, 2=external
-   uint32 symi;                        // Old index of symbol
+   uint32_t symi;                        // Old index of symbol
    const char * Name1;                 // Old symbol name
    const char * Name2;                 // New symbol name
    int action;                         // Action to take on symbol
    int SymType;                        // Symbol type
    int SymDesc;                        // Symbol descriptor
-   uint8 Section;                      // Symbol section
+   uint8_t Section;                      // Symbol section
 
    // pointer to symbol table
    TMAC_nlist * symp = (TMAC_nlist*)(this->Buf() + this->SymTabOffset);
@@ -156,7 +156,7 @@ void CMAC2MAC<MACSTRUCTURES>::MakeSymbolTable() {
 }
 
 template <class TMAC_header, class TMAC_segment_command, class TMAC_section, class TMAC_nlist, class MInt>
-int CMAC2MAC<MACSTRUCTURES>::NewSymbolIndex(int32 OldIndex) {
+int CMAC2MAC<MACSTRUCTURES>::NewSymbolIndex(int32_t OldIndex) {
    // Convert subfunction: Translate old to new symbol index
    int NewIndex;
    int Scope;
@@ -176,7 +176,7 @@ int CMAC2MAC<MACSTRUCTURES>::NewSymbolIndex(int32 OldIndex) {
 
 
 template <class TMAC_header, class TMAC_segment_command, class TMAC_section, class TMAC_nlist, class MInt>
-uint32 CMAC2MAC<MACSTRUCTURES>::NewFileOffset(uint32 OldOffset) {
+uint32_t CMAC2MAC<MACSTRUCTURES>::NewFileOffset(uint32_t OldOffset) {
    // Convert subfunction: Translate old to new file offset
    if (OldOffset <= NewSymtabOffset) {
       // Before symbol table. No change
@@ -196,8 +196,8 @@ uint32 CMAC2MAC<MACSTRUCTURES>::NewFileOffset(uint32 OldOffset) {
 // MakeBinaryFile()
 template <class TMAC_header, class TMAC_segment_command, class TMAC_section, class TMAC_nlist, class MInt>
 void CMAC2MAC<MACSTRUCTURES>::MakeBinaryFile() {
-   uint32 OldSymtabEnd;                // End of old symbol table
-   uint32 OldStringtabEnd;             // End of old string table
+   uint32_t OldSymtabEnd;                // End of old symbol table
+   uint32_t OldStringtabEnd;             // End of old string table
    const int WordSize = sizeof(MInt) * 8;  // Word size, 32 or 64 bits
 
    // Offset to symbol table and string table
@@ -242,10 +242,10 @@ template <class TMAC_header, class TMAC_segment_command, class TMAC_section, cla
 void CMAC2MAC<MACSTRUCTURES>::ChangeSegments() {
    // Convert subfunction: Change section names if needed and adjust all relocation tables
 
-   uint32 FileOffset;                  // Current offset into file
-   uint32 lcmd;                        // Load command
-   uint32 cmdsize = 0;                 // Command size
-   uint32 icmd;                        // Loop counter
+   uint32_t FileOffset;                  // Current offset into file
+   uint32_t lcmd;                        // Load command
+   uint32_t cmdsize = 0;                 // Command size
+   uint32_t icmd;                        // Loop counter
    int action;                         // Name change action
    char * Name1;                       // Old name
    const char * Name2;                 // New name
@@ -324,14 +324,14 @@ void CMAC2MAC<MACSTRUCTURES>::ChangeSegments() {
 
 
 template <class TMAC_header, class TMAC_segment_command, class TMAC_section, class TMAC_nlist, class MInt>
-void CMAC2MAC<MACSTRUCTURES>::ChangeSections(uint32 HeaderOffset, uint32 Num) {
+void CMAC2MAC<MACSTRUCTURES>::ChangeSections(uint32_t HeaderOffset, uint32_t Num) {
    // Convert subfunction: Change section names and relocation records if needed
    int action;                         // Name change action
    char * Name1;                       // Old name
    const char * Name2;                 // New name
-   uint32 isec1;                       // Section index
+   uint32_t isec1;                       // Section index
    TMAC_section * secp;                // Pointer to section header
-   uint32 irel;                        // Relocation index
+   uint32_t irel;                        // Relocation index
    MAC_relocation_info * relp;         // Pointer to relocation record
 
    // Loop through section headers
@@ -382,13 +382,13 @@ void CMAC2MAC<MACSTRUCTURES>::ChangeSections(uint32 HeaderOffset, uint32 Num) {
 
 
 template <class TMAC_header, class TMAC_segment_command, class TMAC_section, class TMAC_nlist, class MInt>
-void CMAC2MAC<MACSTRUCTURES>::ChangeImportTable(uint32 FileOffset, uint32 Num) {
+void CMAC2MAC<MACSTRUCTURES>::ChangeImportTable(uint32_t FileOffset, uint32_t Num) {
    // Convert subfunction: Change symbol indices in import table if needed
-   uint32 i;                           // Index
-   uint32 * p;                         // pointer to current entry
+   uint32_t i;                           // Index
+   uint32_t * p;                         // pointer to current entry
 
    // Find first entry
-   p = (uint32*)(ToFile.Buf() + FileOffset);
+   p = (uint32_t*)(ToFile.Buf() + FileOffset);
 
    // Loop through table
    for (i = 0;  i < Num; i++, p++) {

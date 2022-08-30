@@ -13,7 +13,7 @@
 
 #include "stdafx.h"
 
-void COMFHashTable::Init(SOMFHashBlock * blocks, uint32 NumBlocks) {
+void COMFHashTable::Init(SOMFHashBlock * blocks, uint32_t NumBlocks) {
    // Initialize
    this->blocks = blocks;                        // Pointer to blocks
    this->NumBlocks = NumBlocks;                  // Number of blocks
@@ -22,31 +22,31 @@ void COMFHashTable::Init(SOMFHashBlock * blocks, uint32 NumBlocks) {
 }
 
 // Rotate right 16-bit word
-uint16 RotR(uint16 x, uint16 bits) {
+uint16_t RotR(uint16_t x, uint16_t bits) {
    return (x >> bits) | (x << (16 - bits));
 }
 
 // Rotate left 16-bit word
-uint16 RotL(uint16 x, uint16 bits) {
+uint16_t RotL(uint16_t x, uint16_t bits) {
    return (x << bits) | (x >> (16 - bits));
 }
 
-void COMFHashTable::MakeHash(int8 * name) {
+void COMFHashTable::MakeHash(char * name) {
    // Compute hash according to the official algorithm
-   uint8 * pb;                                   // Pointer for forward scan through string
-   uint8 * pe;                                   // Pointer for backwards scan through string
-   uint16 c;                                     // Current character converted to lower case
-   uint16 BlockX;                                // Calculate block hash
-   uint16 BucketX;                               // Calculate block hash
-   String = (uint8*)name;                        // Type cast string to unsigned char *
-   StringLength = (uint32)strlen(name);
+   char * pb;                                    // Pointer for forward scan through string
+   char * pe;                                    // Pointer for backwards scan through string
+   uint16_t c;                                   // Current character converted to lower case
+   uint16_t BlockX;                              // Calculate block hash
+   uint16_t BucketX;                             // Calculate block hash
+   String = name;                                // Type cast string to unsigned char *
+   StringLength = (uint32_t)strlen(name);
    if (StringLength > 255 || StringLength == 0) {
       // String too long
       err.submit(1204, name);                    // Warning: truncating
       StringLength = 255;
       String[StringLength] = 0;                  // Truncation modifies string source!
    }
-   String = (uint8*)name;                        // Type cast to unsigned characters
+   String = name;                                // Type cast to unsigned characters
    pb = String;                                  // Initialize pointer for forward scan
    pe = String + StringLength;                   // Initialize pointer for backward scan
    BlockX = BucketD = StringLength | 0x20;       // Initialize left-to-right scan
@@ -74,15 +74,15 @@ void COMFHashTable::MakeHash(int8 * name) {
 }
 
 
-int  COMFHashTable::FindString(uint32 & ModulePage, uint32 & Conflicts) {
+int  COMFHashTable::FindString(uint32_t & ModulePage, uint32_t & Conflicts) {
    // Search for String.
    // Returns number of occurrences of String
    // Module receives the module page for the first occurrence
    // Conflicts receives the number of conflicting entries encountered before the match
-   uint32 Num = 0;                               // Number of occurrences of string found
-   uint16 Block;                                 // Block number
-   uint16 Bucket;                                // Bucket number
-   uint32 StringIndex;                           // Index to string
+   uint32_t Num = 0;                               // Number of occurrences of string found
+   uint16_t Block;                                 // Block number
+   uint16_t Bucket;                                // Bucket number
+   uint32_t StringIndex;                           // Index to string
    Conflicts = 0;                                // Start counting Conflicts
 
    Block = StartBlock;
@@ -115,12 +115,12 @@ int  COMFHashTable::FindString(uint32 & ModulePage, uint32 & Conflicts) {
          }
          // Bucket contains a string. Is it the same string?
          if (blocks[Block].Strings[StringIndex*2] == StringLength
-         && strncmp((int8*)&blocks[Block].Strings[StringIndex*2+1], (int8*)String, StringLength) == 0) {
+         && strncmp((char*)&blocks[Block].Strings[StringIndex*2+1], (char*)String, StringLength) == 0) {
             // Matching string found
             Num++;
             if (Num == 1) {
                // First occurrence. Save module number
-               ModulePage = *(uint16*)&blocks[Block].Strings[StringIndex*2+1+StringLength];
+               ModulePage = *(uint16_t*)&blocks[Block].Strings[StringIndex*2+1+StringLength];
             }
          }
          else {
@@ -138,7 +138,7 @@ int  COMFHashTable::FindString(uint32 & ModulePage, uint32 & Conflicts) {
    return Num;
 }
 
-int COMFHashTable::InsertString(uint16 & ModulePage) {
+int COMFHashTable::InsertString(uint16_t & ModulePage) {
    // Insert string in hash table.
    // Parameter:
    // ModulePage = module address / page size
@@ -147,14 +147,14 @@ int COMFHashTable::InsertString(uint16 & ModulePage) {
    // 1 if identical string allready exists in the table. New string will not be entered.
    //   ModulePage will receive the module page of the existing string in this case.
    // 2 if table is full,
-   uint16 Block;                                 // Block number
-   uint16 Bucket;                                // Bucket number
-   uint32 StringIndex;                           // Index to string space
-   uint32 StringOffset;                          // Offset to string from begin of block
-   uint32 SpaceRequired;                         // Space required to store string
+   uint16_t Block;                                 // Block number
+   uint16_t Bucket;                                // Bucket number
+   uint32_t StringIndex;                           // Index to string space
+   uint32_t StringOffset;                          // Offset to string from begin of block
+   uint32_t SpaceRequired;                         // Space required to store string
 
    SpaceRequired = StringLength + 3;             // Space for string + stringlength + module index
-   SpaceRequired = (SpaceRequired + 1) & uint32(-2);// Round up to nearest even
+   SpaceRequired = (SpaceRequired + 1) & uint32_t(-2);// Round up to nearest even
 
    Block = StartBlock;
    Bucket = StartBucket;
@@ -169,7 +169,7 @@ int COMFHashTable::InsertString(uint16 & ModulePage) {
          StringIndex = blocks[Block].b.Buckets[Bucket];
          if (StringIndex == 0) {
             // Found empty bucket. Check if block has enough free space
-            if (uint32(OMFBlockSize) - blocks[Block].b.FreeSpace * 2 < SpaceRequired) {
+            if (uint32_t(OMFBlockSize) - blocks[Block].b.FreeSpace * 2 < SpaceRequired) {
                // Not enough space in block.
                // Continue with same bucket in next block.
 
@@ -186,13 +186,13 @@ int COMFHashTable::InsertString(uint16 & ModulePage) {
             // Address to store string
             StringOffset = StringIndex * 2;
             // Store string length
-            blocks[Block].Strings[StringOffset] = (uint8)StringLength;
+            blocks[Block].Strings[StringOffset] = (uint8_t)StringLength;
             // Copy string
             memcpy(blocks[Block].Strings + StringOffset + 1, String, StringLength);
             // Insert module page number
-            *(uint16*)(blocks[Block].Strings + StringOffset + 1 + StringLength) = ModulePage;
+            *(uint16_t*)(blocks[Block].Strings + StringOffset + 1 + StringLength) = ModulePage;
             // Update free space
-            blocks[Block].b.FreeSpace += (uint8)(SpaceRequired / 2);
+            blocks[Block].b.FreeSpace += (uint8_t)(SpaceRequired / 2);
             // Check if overflow
             if (blocks[Block].b.FreeSpace == 0) blocks[Block].b.FreeSpace = 0xFF;
             // Indicate success
@@ -201,9 +201,9 @@ int COMFHashTable::InsertString(uint16 & ModulePage) {
          else {
             // Bucket contains a string. Check if it is the same string
             if (blocks[Block].Strings[StringIndex*2] == StringLength
-            && strncmp((int8*)(blocks[Block].Strings+StringIndex*2+1), (int8*)String, StringLength) == 0) {
+            && strncmp((char*)(blocks[Block].Strings+StringIndex*2+1), (char*)String, StringLength) == 0) {
                // Identical string found. Return module index for existing string entry
-               ModulePage = *(uint16*)(blocks[Block].Strings+StringIndex*2+1+StringLength);
+               ModulePage = *(uint16_t*)(blocks[Block].Strings+StringIndex*2+1+StringLength);
                // Indicate failure
                return 1;
             }
@@ -231,7 +231,7 @@ int COMFHashTable::InsertString(uint16 & ModulePage) {
 
 // Table of prime numbers
 // You may add more prime numbers if very big library files are needed
-static const uint32 PrimeNumbers[] = {
+static const uint32_t PrimeNumbers[] = {
    1, 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71,
    73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157,
    163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241,
@@ -284,7 +284,7 @@ static const uint32 PrimeNumbers[] = {
 };
 
 // Length of table
-static const uint32 PrimeNumbersLen = sizeof(PrimeNumbers)/sizeof(PrimeNumbers[0]);
+static const uint32_t PrimeNumbersLen = sizeof(PrimeNumbers)/sizeof(PrimeNumbers[0]);
 
 
 void COMFHashTable::MakeHashTable(CSList<SStringEntry> & StringEntries,
@@ -297,11 +297,11 @@ CMemoryBuffer & StringBuffer, CMemoryBuffer & OutFile, CLibrary * Library) {
 
    CSList<SOMFHashBlock> HashTable;              // Hash table
    COMFHashTable TableHandler;                   // Hash table handler
-   uint32 NumBlocksI;                            // Number of blocks as index into prime number table
-   uint32 BlockI;                                // Block index
-   uint32 SymI;                                  // Symbol index
-   int8 * String;                                // Symbol name
-   uint16 Module1, Module2;                      // Module page = offset / page size
+   uint32_t NumBlocksI;                          // Number of blocks as index into prime number table
+   uint32_t BlockI;                              // Block index
+   uint32_t SymI;                                // Symbol index
+   char * String;                                // Symbol name
+   uint16_t Module1, Module2;                    // Module page = offset / page size
    int    Result;                                // 0 = success
 
    // Estimate required number of blocks
@@ -341,7 +341,7 @@ CMemoryBuffer & StringBuffer, CMemoryBuffer & OutFile, CLibrary * Library) {
       for (SymI = 0; SymI < StringEntries.GetNumEntries(); SymI++) {
 
          // Symbol name
-         String = StringBuffer.Buf() + StringEntries[SymI].String;
+         String = (char*)StringBuffer.Buf() + StringEntries[SymI].String;
 
          // Module page
          Module1 = Module2 = StringEntries[SymI].Member;

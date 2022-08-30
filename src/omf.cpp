@@ -79,7 +79,7 @@ static SIntTxt OMFFixupLocationNames[] = {
 };
 
 // Alignment value translation table
-static const uint32 OMFAlignTranslate[8] = {0,1,2,16,256,4,0,0};
+static const uint32_t OMFAlignTranslate[8] = {0,1,2,16,256,4,0,0};
 
 
 // Class COMF members:
@@ -93,9 +93,9 @@ COMF::COMF() {
 
 void COMF::ParseFile() {
    // Parse file buffer
-   //uint8  RecordType;                            // Type of current record
-   uint32 Checksum;                              // Record checksum
-   uint32 ChecksumZero = 0;                      // Count number of records with zero checksum
+   //uint8_t  RecordType;                            // Type of current record
+   uint32_t Checksum;                              // Record checksum
+   uint32_t ChecksumZero = 0;                      // Count number of records with zero checksum
    SOMFRecordPointer rec;                        // Current record pointer
 
    // Make first entry zero in name lists
@@ -115,7 +115,7 @@ void COMF::ParseFile() {
       // Compute checksum
       Checksum = 0;  rec.Index = 0;
       while (rec.Index < rec.End) Checksum += rec.GetByte();
-      uint32 CheckByte = rec.GetByte();
+      uint32_t CheckByte = rec.GetByte();
       if ((Checksum + CheckByte) & 0xFF) {
          // Checksum failed
          if (CheckByte == 0) {
@@ -133,7 +133,7 @@ void COMF::ParseFile() {
          // Loop through strings in record
          while (rec.Index < rec.End) {
             char * LocalName = rec.GetString();
-            uint32 LocalNameIndex = NameBuffer.PushString(LocalName); // Store local name
+            uint32_t LocalNameIndex = NameBuffer.PushString(LocalName); // Store local name
             LocalNameOffset.Push(LocalNameIndex);// Store local name index
          }
          if (rec.Index != rec.End) err.submit(1203);  // Check for consistency
@@ -150,7 +150,7 @@ void COMF::ParseFile() {
             }
             rec.GetNumeric(); // Length
          }
-         uint32 NameIndex  = rec.GetIndex();
+         uint32_t NameIndex  = rec.GetIndex();
          if (NameIndex < LocalNameOffset.GetNumEntries()) {
             SegmentNameOffset.Push(LocalNameOffset[NameIndex]); // List by segment index
          }
@@ -158,7 +158,7 @@ void COMF::ParseFile() {
 
       if (rec.Type2 == OMF_GRPDEF) {
          // GRPDEF record. Store group name
-         uint32 NameIndex  = rec.GetIndex();
+         uint32_t NameIndex  = rec.GetIndex();
          if (NameIndex < LocalNameOffset.GetNumEntries()) {
             GroupNameOffset.Push(LocalNameOffset[NameIndex]); // List by group index
          }
@@ -170,7 +170,7 @@ void COMF::ParseFile() {
          while (rec.Index < rec.End) {
             char * symbolname = rec.GetString();
             rec.GetIndex();
-            uint32 SymbolNameIndex = NameBuffer.PushString(symbolname); // Store external name
+            uint32_t SymbolNameIndex = NameBuffer.PushString(symbolname); // Store external name
             SymbolNameOffset.Push(SymbolNameIndex);   // Save in name index table
          }
          if (rec.Index != rec.End) err.submit(1203);  // Check for consistency
@@ -179,9 +179,9 @@ void COMF::ParseFile() {
       if (rec.Type2 == OMF_CEXTDEF) {
          // CEXTDEF record. Store communal symbol names
          // Loop through entries in record
-         uint32 SymbolNameIndex;                 // Index into NameBuffer
+         uint32_t SymbolNameIndex;                 // Index into NameBuffer
          while (rec.Index < rec.End) {
-            uint32 LIndex = rec.GetIndex();      // Index into preceding LNAMES
+            uint32_t LIndex = rec.GetIndex();      // Index into preceding LNAMES
             rec.GetIndex();                      // Type index. Ignore
             // Get name from LocalNameOffset and put into SymbolNameOffset.
             if (LIndex < LocalNameOffset.GetNumEntries()) {
@@ -219,7 +219,7 @@ void COMF::Dump(int options) {
 void COMF::DumpRecordTypes() {
    // Dump summary of records
    printf("\nSummary of records:");
-   for (uint32 i = 0; i < NumRecords; i++) {
+   for (uint32_t i = 0; i < NumRecords; i++) {
       // Print record type
       printf("\n  Record %02X, %s%s, total length %i", Records[i].Type,
          Lookup(OMFRecordTypeNames, Records[i].Type2),
@@ -231,8 +231,8 @@ void COMF::DumpRecordTypes() {
 
 void COMF::DumpNames() {
    // Dump local names records
-   uint32 i;           // Record index
-   uint32 ln = 0;     // Local name index
+   uint32_t i;           // Record index
+   uint32_t ln = 0;     // Local name index
    printf("\n\nLocal names:");
    for (i = 0; i < NumRecords; i++) {
       if (Records[i].Type2 == OMF_LNAMES) {
@@ -254,7 +254,7 @@ void COMF::DumpNames() {
       }
       if (Records[i].Type2 == OMF_COMDEF) {
          // COMDEF record. Communal names
-         uint32 DType, DSize, DNum;
+         uint32_t DType, DSize, DNum;
          printf("\n\n Communal names:");
 
          // Loop through strings in record
@@ -289,14 +289,14 @@ void COMF::DumpNames() {
 
 void COMF::DumpSymbols() {
    // Dump public, external and communal names records
-   uint32 i;          // Record index
-   uint32 xn = 0;     // External name index
+   uint32_t i;          // Record index
+   uint32_t xn = 0;     // External name index
    char * string;
-   uint32 TypeIndex;
-   uint32 Group;
-   uint32 Segment;
-   uint32 BaseFrame;
-   uint32 Offset;
+   uint32_t TypeIndex;
+   uint32_t Group;
+   uint32_t Segment;
+   uint32_t BaseFrame;
+   uint32_t Offset;
 
    for (i = 0; i < NumRecords; i++) {
       if (Records[i].Type2 == OMF_EXTDEF) {
@@ -338,8 +338,8 @@ void COMF::DumpSymbols() {
          printf("\n\nCommunal names:");
          Records[i].Index = 3;
          while (Records[i].Index < Records[i].End) {
-            uint32 LIndex = Records[i].GetIndex();    // Index into preceding LNAMES
-            uint32 Type = Records[i].GetIndex();      // Type index. Ignored
+            uint32_t LIndex = Records[i].GetIndex();    // Index into preceding LNAMES
+            uint32_t Type = Records[i].GetIndex();      // Type index. Ignored
             printf("\n  %2i  %s, Type %i", ++xn, GetLocalName(LIndex), Type);
          }
          if (Records[i].Index != Records[i].End) err.submit(1203);   // Check for consistency
@@ -355,10 +355,10 @@ void COMF::DumpSegments() {
    OMF_SAttrib Attributes;
 
    // Record values
-   uint32 Frame, Offset, SegLength, NameIndex, ClassIndex, OverlayIndex;
+   uint32_t Frame, Offset, SegLength, NameIndex, ClassIndex, OverlayIndex;
 
-   uint32 i;                                     // Record number
-   uint32 SegNum = 0;                            // Segment number
+   uint32_t i;                                     // Record number
+   uint32_t SegNum = 0;                            // Segment number
 
    printf("\n\nSegment records:");
    for (i = 0; i < NumRecords; i++) {
@@ -401,7 +401,7 @@ void COMF::DumpSegments() {
 
          // Loop through remaining entries in record
          while (Records[i].Index < Records[i].End) {
-            uint8 Type = Records[i].GetByte();
+            uint8_t Type = Records[i].GetByte();
             if (Type != 0xFF) printf(" Type=%X:", Type);
             NameIndex =  Records[i].GetIndex();
             printf(" %s", GetSegmentName(NameIndex));
@@ -414,14 +414,14 @@ void COMF::DumpSegments() {
 
 void COMF::DumpRelocations() {
    // Dump all LEDATA, LIDATA, COMDAT and FIXUPP records
-   //uint32 LastDataRecord = 0;          // Index to the data record that relocations refer to
-   uint32 LastDataRecordSize = 0;      // Size of the data record that relocations refer to
-   int8 * LastDataRecordPointer = 0;   // Pointer to data in the data record that relocations refer to
-   uint32 i;                           // Loop counter
-   uint32 Segment, Offset, Size;       // Contents of LEDATA or LIDATA record
-   uint32 LastOffset = 0;              // Offset of last LEDATA or LIDATA record
-   uint32 Frame, Target, TargetDisplacement; // Contents of FIXUPP record
-   uint8 byte1, byte2;                 // First two bytes of subrecord
+   //uint32_t LastDataRecord = 0;          // Index to the data record that relocations refer to
+   uint32_t LastDataRecordSize = 0;      // Size of the data record that relocations refer to
+   int8_t * LastDataRecordPointer = 0;   // Pointer to data in the data record that relocations refer to
+   uint32_t i;                           // Loop counter
+   uint32_t Segment, Offset, Size;       // Contents of LEDATA or LIDATA record
+   uint32_t LastOffset = 0;              // Offset of last LEDATA or LIDATA record
+   uint32_t Frame, Target, TargetDisplacement; // Contents of FIXUPP record
+   uint8_t byte1, byte2;                 // First two bytes of subrecord
 
    // Bitfields in subrecords
    OMF_SLocat Locat;         // Structure of first two bytes of FIXUP subrecord swapped = Locat field
@@ -467,18 +467,18 @@ void COMF::DumpRelocations() {
 
       if (Records[i].Type2 == OMF_COMDAT) {
          // COMDAT record
-         //uint32 Flags = Records[i].GetByte(); // 1 = continuation, 2 = iterated, 4 = local, 8 = data in code segment
-         uint32 Attributes = Records[i].GetByte();
-         uint32 Base = 0;
+         //uint32_t Flags = Records[i].GetByte(); // 1 = continuation, 2 = iterated, 4 = local, 8 = data in code segment
+         uint32_t Attributes = Records[i].GetByte();
+         uint32_t Base = 0;
          // 0 = explicit, 1 = far code, 2 = far data, 3 = code32, 4 = data32
          // 0x00 = no match, 0x10 = pick any, 0x20 = same size, 0x30 = exact match
-         uint32 Align = Records[i].GetByte(); // Alignment
+         uint32_t Align = Records[i].GetByte(); // Alignment
          Offset  = Records[i].GetNumeric();    // Offset
-         uint32 TypeIndex = Records[i].GetIndex(); // Type index
+         uint32_t TypeIndex = Records[i].GetIndex(); // Type index
          if ((Attributes & 0x0F) == 0) {
             Base = Records[i].GetIndex(); // Public base
          }
-         uint32 NameIndex = Records[i].GetIndex(); // LNAMES index
+         uint32_t NameIndex = Records[i].GetIndex(); // LNAMES index
          Size    = Records[i].End - Records[i].Index; // Calculate size of data
 
          printf("\n  COMDAT: name %s, Offset 0x%X, Size 0x%X, Attrib 0x%02X, Align %i, Type %i, Base %i",
@@ -550,7 +550,7 @@ void COMF::DumpRelocations() {
                if (FixData.s.T == 0) {
                   // Target specified
                   Target = Records[i].GetIndex();
-                  uint32 TargetMethod = FixData.s.Target + FixData.s.P * 4;
+                  uint32_t TargetMethod = FixData.s.Target + FixData.s.P * 4;
 
                   switch (FixData.s.Target) { // = Target method modulo 4
                   case 0: // T0 and T4: Target = segment
@@ -577,22 +577,22 @@ void COMF::DumpRelocations() {
                }
                // Get inline addend
                if (LastDataRecordPointer && Locat.s.Offset < LastDataRecordSize) {
-                  int8 * inlinep = LastDataRecordPointer + Locat.s.Offset;
+                  int8_t * inlinep = LastDataRecordPointer + Locat.s.Offset;
                   switch (Locat.s.Location) {
                   case 0: case 4:  // 8 bit
                      printf(", inline 0x%X", *inlinep);  break;
 
                   case 1: case 2: case 5: // 16 bit
-                     printf(", inline 0x%X", *(int16*)inlinep);  break;
+                     printf(", inline 0x%X", *(int16_t*)inlinep);  break;
 
                   case 3: // 16+16 bit
-                     printf(", inline 0x%X:0x%X", *(int16*)(inlinep+2), *(int16*)inlinep);  break;
+                     printf(", inline 0x%X:0x%X", *(int16_t*)(inlinep+2), *(int16_t*)inlinep);  break;
 
                   case 9: case 13: // 32 bit
-                     printf(", inline 0x%X", *(int32*)inlinep);  break;
+                     printf(", inline 0x%X", *(int32_t*)inlinep);  break;
 
                   case 6: case 11: // 16+32 bit
-                     printf(", inline 0x%X:0x%X", *(int16*)(inlinep+4), *(int32*)inlinep);  break;
+                     printf(", inline 0x%X:0x%X", *(int16_t*)(inlinep+4), *(int32_t*)inlinep);  break;
                   }
                }
             }
@@ -600,7 +600,7 @@ void COMF::DumpRelocations() {
                // This is a THREAD subrecord
                TrdDat.b = byte1;                 // Put byte into bitfield
 
-               uint32 Index  = 0;
+               uint32_t Index  = 0;
                if (TrdDat.s.Method < 4) {
                   Index  = Records[i].GetIndex(); // has index field if method < 4 ?
                }
@@ -617,7 +617,7 @@ void COMF::DumpRelocations() {
 
 void COMF::DumpComments() {
    // Dump COMENT records
-   uint32 i;           // Record index
+   uint32_t i;           // Record index
    int startindex;
    printf("\n");
    for (i = 0; i < NumRecords; i++) {
@@ -660,7 +660,7 @@ void COMF::PublicNames(CMemoryBuffer * Strings, CSList<SStringEntry> * Index, in
 
          // Public symbols definition found
          rec.GetIndex(); // Read group
-         uint32 Segment = rec.GetIndex(); // Read segment
+         uint32_t Segment = rec.GetIndex(); // Read segment
          if (Segment == 0) rec.GetWord(); // Read base frame
          // Loop through strings in record
          while (rec.Index < rec.End) {
@@ -680,7 +680,7 @@ void COMF::PublicNames(CMemoryBuffer * Strings, CSList<SStringEntry> * Index, in
          // CEXTDEF record. Store communal symbol names
          // Loop through entries in record
          while (rec.Index < rec.End) {
-            uint32 LIndex = rec.GetIndex() - 1;  // Index into preceding LNAMES
+            uint32_t LIndex = rec.GetIndex() - 1;  // Index into preceding LNAMES
             rec.GetIndex();                      // Type index. Ignore
             // Check if index valid
             if (LIndex < LocalNameOffset.GetNumEntries()) {
@@ -706,7 +706,7 @@ void COMF::PublicNames(CMemoryBuffer * Strings, CSList<SStringEntry> * Index, in
             // Loop through strings in record
             while (rec.Index < rec.End) {
                char * LocalName = rec.GetString();
-               uint32 LocalNameIndex = NameBuffer.PushString(LocalName); // Store local name
+               uint32_t LocalNameIndex = NameBuffer.PushString(LocalName); // Store local name
                LocalNameOffset.Push(LocalNameIndex);// Store local name index
             }
             if (rec.Index != rec.End) err.submit(1203);  // Check for consistency
@@ -716,16 +716,16 @@ void COMF::PublicNames(CMemoryBuffer * Strings, CSList<SStringEntry> * Index, in
    while (rec.GetNext());                        // End of loop through records
 }
 
-char * COMF::GetLocalName(uint32 i) {
+char * COMF::GetLocalName(uint32_t i) {
    // Get section name or class name by name index
     if (i == 0 || i >= LocalNameOffset.GetNumEntries())  {
         i = NameBuffer.PushString("null");
-        return NameBuffer.Buf() + i;
+        return (char*)NameBuffer.Buf() + i;
     }
-    return NameBuffer.Buf() + LocalNameOffset[i];
+    return (char*)NameBuffer.Buf() + LocalNameOffset[i];
 }
 
-uint32 COMF::GetLocalNameO(uint32 i) {
+uint32_t COMF::GetLocalNameO(uint32_t i) {
    // Get section name or class by converting name index offset into NameBuffer
    if (i > 0 && i < LocalNameOffset.GetNumEntries()) {
       return LocalNameOffset[i];
@@ -733,7 +733,7 @@ uint32 COMF::GetLocalNameO(uint32 i) {
    return 0;
 }
 
-const char * COMF::GetSegmentName(uint32 i) {
+const char * COMF::GetSegmentName(uint32_t i) {
    // Get section name by segment index
    if (i == 0) return "none";
    if ((i & 0xC000) == 0x4000) {
@@ -743,17 +743,17 @@ const char * COMF::GetSegmentName(uint32 i) {
       return text;
    }
    if (i <= NumRecords) {
-      return NameBuffer.Buf() + SegmentNameOffset[i];
+      return(char*) NameBuffer.Buf() + SegmentNameOffset[i];
    }
    return "?";
 }
 
 
-const char * COMF::GetSymbolName(uint32 i) {
+const char * COMF::GetSymbolName(uint32_t i) {
    // Get external symbol name by index
    if (i == 0) return "null";
    if (i < SymbolNameOffset.GetNumEntries()) {
-      return NameBuffer.Buf() + SymbolNameOffset[i];
+      return (char*)NameBuffer.Buf() + SymbolNameOffset[i];
    }
    // return "?";
    // index out of range
@@ -762,43 +762,43 @@ const char * COMF::GetSymbolName(uint32 i) {
    return temp;
 }
 
-const char * COMF::GetGroupName(uint32 i) {
+const char * COMF::GetGroupName(uint32_t i) {
    // Get group name by index
    if (i == 0) return "none";
    if (i <= NumRecords) {
-      return NameBuffer.Buf() + GroupNameOffset[i];
+      return (char*)NameBuffer.Buf() + GroupNameOffset[i];
    }
    return "?";
 }
 
-const char * COMF::GetRecordTypeName(uint32 i) {
+const char * COMF::GetRecordTypeName(uint32_t i) {
    // Get record type name
    return Lookup(OMFRecordTypeNames, i);
 }
 
 // Member functions for parsing SOMFRecordPointer
-uint8  SOMFRecordPointer::GetByte() {
+uint8_t  SOMFRecordPointer::GetByte() {
    // Read next byte from buffer
    return *(buffer + FileOffset + Index++);
 }
 
-uint16 SOMFRecordPointer::GetWord() {
+uint16_t SOMFRecordPointer::GetWord() {
    // Read next 16 bit word from buffer
-   uint16 x = *(uint16*)(buffer + FileOffset + Index);
+   uint16_t x = *(uint16_t*)(buffer + FileOffset + Index);
    Index += 2;
    return x;
 }
 
-uint32 SOMFRecordPointer::GetDword() {
+uint32_t SOMFRecordPointer::GetDword() {
    // Read next 32 bit dword from buffer
-   uint32 x = *(uint32*)(buffer + FileOffset + Index);
+   uint32_t x = *(uint32_t*)(buffer + FileOffset + Index);
    Index += 4;
    return x;
 }
 
-uint32 SOMFRecordPointer::GetIndex() {
+uint32_t SOMFRecordPointer::GetIndex() {
    // Read byte or word, depending on sign of first byte
-   uint32 byte1, byte2;
+   uint32_t byte1, byte2;
    byte1 = GetByte();
    if (byte1 & 0x80) {
       // Two byte index
@@ -811,7 +811,7 @@ uint32 SOMFRecordPointer::GetIndex() {
    }
 }
 
-uint32 SOMFRecordPointer::GetNumeric(){
+uint32_t SOMFRecordPointer::GetNumeric(){
    // Read word or dword, depending on record type even or odd
    if (Type & 1) {
       // Odd record type. Number is 32 bits
@@ -823,9 +823,9 @@ uint32 SOMFRecordPointer::GetNumeric(){
    }
 }
 
-uint32 SOMFRecordPointer::GetLength() {
+uint32_t SOMFRecordPointer::GetLength() {
    // Read 1, 2, 3 or 4 bytes, depending on value of first byte
-   uint32 x = GetByte();
+   uint32_t x = GetByte();
    switch (x) {
    case 0x81: // 16-bit value
       return GetWord();
@@ -843,7 +843,7 @@ uint32 SOMFRecordPointer::GetLength() {
 char * SOMFRecordPointer::GetString() {
    // Read string and return as ASCIIZ string in static buffer
    static char String[256];
-   uint8 Length = GetByte();
+   uint8_t Length = GetByte();
    if (Length == 0 /*|| Length >= sizeof(String)*/) {
       String[0] = 0;
    }
@@ -859,7 +859,7 @@ char * SOMFRecordPointer::GetString() {
    return String;
 }
 
-void SOMFRecordPointer::Start(int8 * Buffer, uint32 FileOffset, uint32 FileEnd) {
+void SOMFRecordPointer::Start(int8_t * Buffer, uint32_t FileOffset, uint32_t FileEnd) {
    // Start scanning through records
    this->buffer = Buffer;
    this->FileOffset = FileOffset;
@@ -867,12 +867,12 @@ void SOMFRecordPointer::Start(int8 * Buffer, uint32 FileOffset, uint32 FileEnd) 
    Index = 0;
    Type = GetByte();
    Type2 = Type;  if (Type2 < OMF_LIBHEAD) Type2 &= ~1; // Make even
-   uint16 RecordSize = GetWord();
+   uint16_t RecordSize = GetWord();
    End = Index + RecordSize - 1;
    if (FileOffset + RecordSize + 3 > FileEnd) err.submit(2301); // Extends beyond end of file
 }
 
-uint8 SOMFRecordPointer::GetNext(uint32 align) {
+uint8_t SOMFRecordPointer::GetNext(uint32_t align) {
    // Get next record. Returns record type, made even. Returns 0 if finished
    // align = alignment after MODEND records = page size. Applies to lib files only
    FileOffset += End + 1;
@@ -880,24 +880,24 @@ uint8 SOMFRecordPointer::GetNext(uint32 align) {
    // Check if alignment needed
    if (align > 1 && Type2 == OMF_MODEND) {
       // Align after MODEND record in library
-      FileOffset = (FileOffset + align - 1) & - (int32)align;
+      FileOffset = (FileOffset + align - 1) & - (int32_t)align;
    }
    if (FileOffset >= FileEnd) return 0;          // End of file
    Index = 0;                                    // Start reading record
    Type = GetByte();                             // Get record type
    Type2 = Type;  if (Type2 < OMF_LIBHEAD) Type2 &= ~1; // Make even
-   uint16 RecordSize = GetWord();                // Get record size
+   uint16_t RecordSize = GetWord();                // Get record size
    End = Index + RecordSize - 1;                 // Point to checksum byte
-   if ((uint64)FileOffset + RecordSize + 3 > FileEnd) err.submit(2301); // Extends beyond end of file
+   if ((uint64_t)FileOffset + RecordSize + 3 > FileEnd) err.submit(2301); // Extends beyond end of file
    return Type2;
 }
 
-uint32 SOMFRecordPointer::InterpretLIDATABlock() {
+uint32_t SOMFRecordPointer::InterpretLIDATABlock() {
    // Interpret Data block in LIDATA record recursively
    // Prints repeat count and returns total size
-   uint32 RepeatCount = GetNumeric();
-   uint32 BlockCount  = GetWord();
-   uint32 Size = 0;
+   uint32_t RepeatCount = GetNumeric();
+   uint32_t BlockCount  = GetWord();
+   uint32_t Size = 0;
    printf("%i * ", RepeatCount);
    if (BlockCount == 0) {
       Size = GetByte();
@@ -907,7 +907,7 @@ uint32 SOMFRecordPointer::InterpretLIDATABlock() {
    }
    // Nested repeat blocks
    printf("(");
-   for (uint32 i = 0; i < BlockCount; i++) {
+   for (uint32_t i = 0; i < BlockCount; i++) {
       // Recursion
       Size += InterpretLIDATABlock();
       if (i+1 < BlockCount) printf(" + ");
@@ -917,14 +917,14 @@ uint32 SOMFRecordPointer::InterpretLIDATABlock() {
 }
 
 
-uint32 SOMFRecordPointer::UnpackLIDATABlock(int8 * destination, uint32 MaxSize) {
+uint32_t SOMFRecordPointer::UnpackLIDATABlock(int8_t * destination, uint32_t MaxSize) {
    // Unpack Data block in LIDATA record recursively and store data at destination
-   uint32 RepeatCount = GetNumeric();            // Outer repeat count
-   uint32 BlockCount  = GetWord();               // Inner repeat count
-   uint32 Size = 0;                              // Size of data expanded so far
-   uint32 RSize;                                 // Size of recursively expanded data
-   uint32 SaveIndex;                             // Save Index for repetition
-   uint32 i, j;                                  // Loop counters
+   uint32_t RepeatCount = GetNumeric();            // Outer repeat count
+   uint32_t BlockCount  = GetWord();               // Inner repeat count
+   uint32_t Size = 0;                              // Size of data expanded so far
+   uint32_t RSize;                                 // Size of recursively expanded data
+   uint32_t SaveIndex;                             // Save Index for repetition
+   uint32_t i, j;                                  // Loop counters
    if (BlockCount == 0) {
       // Contains one repeated block
       Size = GetByte();                          // Size of repeated block
@@ -969,7 +969,7 @@ COMFFileBuilder::COMFFileBuilder() {
    Index = 0;
 }
 
-void COMFFileBuilder::StartRecord(uint8 type) {
+void COMFFileBuilder::StartRecord(uint8_t type) {
    // Start building new record
    this->Type = type;                            // Save type
    RecordStart = Index = GetDataSize();          // Remember start position
@@ -980,11 +980,11 @@ void COMFFileBuilder::StartRecord(uint8 type) {
 void COMFFileBuilder::EndRecord() {
    // Finish building current record
    // Update length
-   Get<uint16>(RecordStart + 1) = GetSize() + 1;
+   Get<uint16_t>(RecordStart + 1) = GetSize() + 1;
 
    // Make checksum
-   int8 checksum = 0;
-   for (uint32 i = RecordStart; i < Index; i++) checksum += Buf()[i];
+   int8_t checksum = 0;
+   for (uint32_t i = RecordStart; i < Index; i++) checksum += Buf()[i];
    PutByte(-checksum);
 
    // Check size limit
@@ -993,25 +993,25 @@ void COMFFileBuilder::EndRecord() {
    }
 }
 
-void COMFFileBuilder::PutByte(uint8 x) {
+void COMFFileBuilder::PutByte(uint8_t x) {
    // Put byte into buffer
    Push(&x, 1);
    Index++;
 }
 
-void COMFFileBuilder::PutWord(uint16 x) {
+void COMFFileBuilder::PutWord(uint16_t x) {
    // Put 16 bit word into buffer
    Push(&x, 2);
    Index += 2;
 }
 
-void COMFFileBuilder::PutDword(uint32 x) {
+void COMFFileBuilder::PutDword(uint32_t x) {
    // Put 32 bit dword into buffer
    Push(&x, 4);
    Index += 4;
 }
 
-void COMFFileBuilder::PutIndex(uint32 x) {
+void COMFFileBuilder::PutIndex(uint32_t x) {
    // Put byte or word into buffer (word if > 0x7F)
    if (x < 0x80) {
       // One byte
@@ -1022,43 +1022,43 @@ void COMFFileBuilder::PutIndex(uint32 x) {
       if (x > 0x7fff) {
          err.submit(2303);             // Index out of range
       }
-      PutByte((uint8)(x >> 8) | 0x80); // First byte = high byte | 0x80
-      PutByte(uint8(x));               // Second byte = low byte
+      PutByte((uint8_t)(x >> 8) | 0x80); // First byte = high byte | 0x80
+      PutByte(uint8_t(x));               // Second byte = low byte
    }
 }
 
-void COMFFileBuilder::PutNumeric(uint32 x) {
+void COMFFileBuilder::PutNumeric(uint32_t x) {
    // Put word or dword into buffer, depending on type being even or odd
    if (Type & 1) {
       PutDword(x);                     // Type is odd, put 32 bits
    }
    else {
       if (x > 0xffff) err.submit(2304);// Index out of range
-      PutWord(uint16(x));              // Type is even, put 16 bits
+      PutWord(uint16_t(x));              // Type is even, put 16 bits
    }
 }
 
 void COMFFileBuilder::PutString(const char * s) {
    // Put ASCII string into buffer, preceded by size
-   uint32 len = (uint32)strlen(s);     // Check length
+   uint32_t len = (uint32_t)strlen(s);     // Check length
    if (len > 255) {
       // String too long
       err.submit(1204, s);             // Issue warning
       len = 255;                       // Truncate string to 255 characters
    }
-   PutByte(uint8(len));                // Store length
+   PutByte(uint8_t(len));                // Store length
    Push(s, len);                       // Store len bytes
    Index += len;                       // Update index
 }
 
-void COMFFileBuilder::PutBinary(void * p, uint32 Size) {
+void COMFFileBuilder::PutBinary(void * p, uint32_t Size) {
    // Put binary data of any length
    if (Size > 1024) {err.submit(9000); Size = 1024;}  // 1024 bytes size limit
    Push(p, Size);
    Index += Size;
 }
 
-uint32 COMFFileBuilder::GetSize() {
+uint32_t COMFFileBuilder::GetSize() {
    // Get size of data added so far
    if (Index <= RecordStart + 3) return 0;
    return Index - RecordStart - 3;     // Type and size fields not included in size

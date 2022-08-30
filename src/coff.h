@@ -27,13 +27,13 @@
 /********************** FILE HEADER **********************/
 
 struct SCOFF_FileHeader {
- uint16 Machine;              // Machine ID (magic number)
- uint16 NumberOfSections;     // number of sections
- uint32 TimeDateStamp;        // time & date stamp
- uint32 PSymbolTable;         // file pointer to symbol table
- uint32 NumberOfSymbols;      // number of symbol table entries
- uint16 SizeOfOptionalHeader; // size of optional header
- uint16 Flags;                // Flags indicating attributes
+ uint16_t Machine;              // Machine ID (magic number)
+ uint16_t NumberOfSections;     // number of sections
+ uint32_t TimeDateStamp;        // time & date stamp
+ uint32_t PSymbolTable;         // file pointer to symbol table
+ uint32_t NumberOfSymbols;      // number of symbol table entries
+ uint16_t SizeOfOptionalHeader; // size of optional header
+ uint16_t Flags;                // Flags indicating attributes
 };
 
 // Values of Machine:
@@ -49,16 +49,16 @@ struct SCOFF_FileHeader {
 
 // Structure used in optional header
 struct SCOFF_IMAGE_DATA_DIRECTORY {
-   uint32 VirtualAddress;              // Image relative address of table
-   uint32 Size;                        // Size of table
+   uint32_t VirtualAddress;              // Image relative address of table
+   uint32_t Size;                        // Size of table
 };
 
 // Extended structure used internally with virtual address translated to section:offset
 struct SCOFF_ImageDirAddress : public SCOFF_IMAGE_DATA_DIRECTORY {
-   int32  Section;                     // Section containing table
-   uint32 SectionOffset;               // Offset relative to section
-   uint32 FileOffset;                  // Offset relative to file
-   uint32 MaxOffset;                   // Section size - SectionOffset
+   int32_t  Section;                     // Section containing table
+   uint32_t SectionOffset;               // Offset relative to section
+   uint32_t FileOffset;                  // Offset relative to file
+   uint32_t MaxOffset;                   // Section size - SectionOffset
    const char * Name;                  // Name of table
 };
 
@@ -66,37 +66,37 @@ struct SCOFF_ImageDirAddress : public SCOFF_IMAGE_DATA_DIRECTORY {
 union SCOFF_OptionalHeader {
    // 32 bit version
    struct {
-      uint16 Magic;                    // Magic number
-      uint8  LinkerMajorVersion;
-      uint8  LinkerMinorVersion;
-      uint32 SizeOfCode;
-      uint32 SizeOfInitializedData;
-      uint32 SizeOfUninitializedData;
-      uint32 AddressOfEntryPoint;      // Entry point relative to image base
-      uint32 BaseOfCode;
-      uint32 BaseOfData;
+      uint16_t Magic;                    // Magic number
+      uint8_t  LinkerMajorVersion;
+      uint8_t  LinkerMinorVersion;
+      uint32_t SizeOfCode;
+      uint32_t SizeOfInitializedData;
+      uint32_t SizeOfUninitializedData;
+      uint32_t AddressOfEntryPoint;      // Entry point relative to image base
+      uint32_t BaseOfCode;
+      uint32_t BaseOfData;
       // Windows specific fields
-      int32  ImageBase;                // Image base
-      uint32 SectionAlignment;
-      uint32 FileAlignment;
-      uint16 MajorOperatingSystemVersion;
-      uint16 MinorOperatingSystemVersion;
-      uint16 MajorImageVersion;
-      uint16 MinorImageVersion;
-      uint16 MajorSubsystemVersion;
-      uint16 MinorSubsystemVersion;
-      uint32 Win32VersionValue;        // must be 0
-      uint32 SizeOfImage;
-      uint32 SizeOfHeaders;
-      uint32 CheckSum;
-      uint16 Subsystem;
-      uint16 DllCharacteristics;
-      uint32 SizeOfStackReserve;
-      uint32 SizeOfStackCommit;
-      uint32 SizeOfHeapReserve;
-      uint32 SizeOfHeapCommit;
-      uint32 LoaderFlags;              // 0
-      uint32 NumberOfRvaAndSizes;
+      int32_t  ImageBase;                // Image base
+      uint32_t SectionAlignment;
+      uint32_t FileAlignment;
+      uint16_t MajorOperatingSystemVersion;
+      uint16_t MinorOperatingSystemVersion;
+      uint16_t MajorImageVersion;
+      uint16_t MinorImageVersion;
+      uint16_t MajorSubsystemVersion;
+      uint16_t MinorSubsystemVersion;
+      uint32_t Win32VersionValue;        // must be 0
+      uint32_t SizeOfImage;
+      uint32_t SizeOfHeaders;
+      uint32_t CheckSum;
+      uint16_t Subsystem;
+      uint16_t DllCharacteristics;
+      uint32_t SizeOfStackReserve;
+      uint32_t SizeOfStackCommit;
+      uint32_t SizeOfHeapReserve;
+      uint32_t SizeOfHeapCommit;
+      uint32_t LoaderFlags;              // 0
+      uint32_t NumberOfRvaAndSizes;
       // Data directories
       SCOFF_IMAGE_DATA_DIRECTORY ExportTable;
       SCOFF_IMAGE_DATA_DIRECTORY ImportTable;
@@ -117,36 +117,36 @@ union SCOFF_OptionalHeader {
    } h32;
    // 64 bit version
    struct {
-      uint16 Magic;                    // Magic number
-      uint8  LinkerMajorVersion;
-      uint8  LinkerMinorVersion;
-      uint32 SizeOfCode;
-      uint32 SizeOfInitializedData;
-      uint32 SizeOfUninitializedData;
-      uint32 AddressOfEntryPoint;      // Entry point relative to image base
-      uint32 BaseOfCode;
+      uint16_t Magic;                    // Magic number
+      uint8_t  LinkerMajorVersion;
+      uint8_t  LinkerMinorVersion;
+      uint32_t SizeOfCode;
+      uint32_t SizeOfInitializedData;
+      uint32_t SizeOfUninitializedData;
+      uint32_t AddressOfEntryPoint;      // Entry point relative to image base
+      uint32_t BaseOfCode;
       // Windows specific fields
-      int64  ImageBase;                // Image base
-      uint32 SectionAlignment;
-      uint32 FileAlignment;
-      uint16 MajorOperatingSystemVersion;
-      uint16 MinorOperatingSystemVersion;
-      uint16 MajorImageVersion;
-      uint16 MinorImageVersion;
-      uint16 MajorSubsystemVersion;
-      uint16 MinorSubsystemVersion;
-      uint32 Win32VersionValue;        // must be 0
-      uint32 SizeOfImage;
-      uint32 SizeOfHeaders;
-      uint32 CheckSum;
-      uint16 Subsystem;
-      uint16 DllCharacteristics;
-      uint64 SizeOfStackReserve;
-      uint64 SizeOfStackCommit;
-      uint64 SizeOfHeapReserve;
-      uint64 SizeOfHeapCommit;
-      uint32 LoaderFlags;              // 0
-      uint32 NumberOfRvaAndSizes;
+      int64_t  ImageBase;                // Image base
+      uint32_t SectionAlignment;
+      uint32_t FileAlignment;
+      uint16_t MajorOperatingSystemVersion;
+      uint16_t MinorOperatingSystemVersion;
+      uint16_t MajorImageVersion;
+      uint16_t MinorImageVersion;
+      uint16_t MajorSubsystemVersion;
+      uint16_t MinorSubsystemVersion;
+      uint32_t Win32VersionValue;        // must be 0
+      uint32_t SizeOfImage;
+      uint32_t SizeOfHeaders;
+      uint32_t CheckSum;
+      uint16_t Subsystem;
+      uint16_t DllCharacteristics;
+      uint64_t SizeOfStackReserve;
+      uint64_t SizeOfStackCommit;
+      uint64_t SizeOfHeapReserve;
+      uint64_t SizeOfHeapCommit;
+      uint32_t LoaderFlags;              // 0
+      uint32_t NumberOfRvaAndSizes;
       // Data directories
       SCOFF_IMAGE_DATA_DIRECTORY ExportTable;
       SCOFF_IMAGE_DATA_DIRECTORY ImportTable;
@@ -173,44 +173,44 @@ union SCOFF_OptionalHeader {
 
 // Export directory table
 struct SCOFF_ExportDirectory {
-   uint32 Flags;
-   uint32 DateTime;
-   uint16 VersionMajor;
-   uint16 VersionMinor;
-   uint32 DLLNameRVA;                  // Image-relative address of DLL name
-   uint32 OrdinalBase;                 // Ordinal number of first export
-   uint32 AddressTableEntries;         // Number of entries in export address table
-   uint32 NamePointerEntries;          // Number of entries in name pointer table
-   uint32 ExportAddressTableRVA;       // Image-relative address of export address table
-   uint32 NamePointerTableRVA;         // Image-relative address of export name pointer table
-   uint32 OrdinalTableRVA;             // Image-relative address of ordinal table
+   uint32_t Flags;
+   uint32_t DateTime;
+   uint16_t VersionMajor;
+   uint16_t VersionMinor;
+   uint32_t DLLNameRVA;                  // Image-relative address of DLL name
+   uint32_t OrdinalBase;                 // Ordinal number of first export
+   uint32_t AddressTableEntries;         // Number of entries in export address table
+   uint32_t NamePointerEntries;          // Number of entries in name pointer table
+   uint32_t ExportAddressTableRVA;       // Image-relative address of export address table
+   uint32_t NamePointerTableRVA;         // Image-relative address of export name pointer table
+   uint32_t OrdinalTableRVA;             // Image-relative address of ordinal table
 };
 
 // Import directory table
 struct SCOFF_ImportDirectory {
-   uint32 ImportLookupTableRVA;        // Image-relative address of import lookup table
-   uint32 DateTime;
-   uint32 ForwarderChain;
-   uint32 DLLNameRVA;                  // Image-relative address of DLL name string
-   uint32 ImportAddressTableRVA;       // Image-relative address of import address table
+   uint32_t ImportLookupTableRVA;        // Image-relative address of import lookup table
+   uint32_t DateTime;
+   uint32_t ForwarderChain;
+   uint32_t DLLNameRVA;                  // Image-relative address of DLL name string
+   uint32_t ImportAddressTableRVA;       // Image-relative address of import address table
 };
 
 // Import hint/name table entry
 struct SCOFF_ImportHintName {
-   uint16 Hint;                        // Index into export name pointer table
+   uint16_t Hint;                        // Index into export name pointer table
    char   Name[2];                     // Variable length
 };
 
 // Base relocation block header
 struct SCOFF_BaseRelocationBlock {
-   uint32 PageRVA;                     // Image-relative base to add to offset
-   uint32 BlockSize;                   // Size of SCOFF_BaseRelocationBlock plus all SCOFF_BaseRelocation
+   uint32_t PageRVA;                     // Image-relative base to add to offset
+   uint32_t BlockSize;                   // Size of SCOFF_BaseRelocationBlock plus all SCOFF_BaseRelocation
 };
 
 // Base relocation block entry
 struct SCOFF_BaseRelocation {
-   uint16 Offset:12;                   // Offset relative to PageRVA
-   uint16 Type:4;                      // Base relocation type
+   uint16_t Offset:12;                   // Offset relative to PageRVA
+   uint16_t Type:4;                      // Base relocation type
 };
 
 // Base relocation types
@@ -226,15 +226,15 @@ struct SCOFF_BaseRelocation {
 
 struct SCOFF_SectionHeader {
  char    Name[8];        // section name
- uint32  VirtualSize;    // size of section when loaded. (Should be 0 for object files, but it seems to be accumulated size of all sections)
- uint32  VirtualAddress; // subtracted from offsets during relocation. preferably 0
- uint32  SizeOfRawData;  // section size in file
- uint32  PRawData;       // file  to raw data for section
- uint32  PRelocations;   // file  to relocation entries
- uint32  PLineNumbers;   // file  to line number entries
- uint16  NRelocations;   // number of relocation entries
- uint16  NLineNumbers;   // number of line number entries
- uint32  Flags;          // flags
+ uint32_t  VirtualSize;    // size of section when loaded. (Should be 0 for object files, but it seems to be accumulated size of all sections)
+ uint32_t  VirtualAddress; // subtracted from offsets during relocation. preferably 0
+ uint32_t  SizeOfRawData;  // section size in file
+ uint32_t  PRawData;       // file  to raw data for section
+ uint32_t  PRelocations;   // file  to relocation entries
+ uint32_t  PLineNumbers;   // file  to line number entries
+ uint16_t  NRelocations;   // number of relocation entries
+ uint16_t  NLineNumbers;   // number of line number entries
+ uint32_t  Flags;          // flags
 };
 
 // Section flags values
@@ -285,10 +285,10 @@ struct SCOFF_SectionHeader {
 //#pragma pack(push, 1)
 struct SCOFF_LineNumbers {
  union {
-  uint32 Fname;    // function name symbol table index, if Line == 0
-  uint32 Addr;     // section-relative address of code that corresponds to line
+  uint32_t Fname;    // function name symbol table index, if Line == 0
+  uint32_t Addr;     // section-relative address of code that corresponds to line
  };
- uint16 Line;      // line number
+ uint16_t Line;      // line number
 };
 
 // Warning: Size does not fit standard alignment!
@@ -305,40 +305,40 @@ union SCOFF_SymTableEntry {
    // Normal symbol table entry
    struct {
       char   Name[8];
-      uint32 Value;
-      int16  SectionNumber;
-      uint16 Type;
-      uint8  StorageClass;
-      uint8  NumAuxSymbols;
+      uint32_t Value;
+      int16_t  SectionNumber;
+      uint16_t Type;
+      uint8_t  StorageClass;
+      uint8_t  NumAuxSymbols;
    } s;
    // Auxiliary symbol table entry types:
 
    // Function definition
    struct {
-      uint32 TagIndex; // Index to .bf entry
-      uint32 TotalSize; // Size of function code
-      uint32 PointerToLineNumber; // Pointer to line number entry
-      uint32 PointerToNextFunction; // Symbol table index of next function
-      uint16 x_tvndx;      // Unused
+      uint32_t TagIndex; // Index to .bf entry
+      uint32_t TotalSize; // Size of function code
+      uint32_t PointerToLineNumber; // Pointer to line number entry
+      uint32_t PointerToNextFunction; // Symbol table index of next function
+      uint16_t x_tvndx;      // Unused
    } func;
 
    // .bf abd .ef
    struct {
-      uint32 Unused1;
-      uint16 SourceLineNumber; // Line number in source file
-      uint16 Unused2;
-      uint32 Unused3; // Pointer to line number entry
-      uint32 PointerToNextFunction; // Symbol table index of next function
-      uint16 Unused4;      // Unused
+      uint32_t Unused1;
+      uint16_t SourceLineNumber; // Line number in source file
+      uint16_t Unused2;
+      uint32_t Unused3; // Pointer to line number entry
+      uint32_t PointerToNextFunction; // Symbol table index of next function
+      uint16_t Unused4;      // Unused
    } bfef;
 
    // Weak external
    struct {
-      uint32 TagIndex; // Symbol table index of alternative symbol2
-      uint32 Characteristics; //
-      uint32 Unused1;
-      uint32 Unused2;
-      uint16 Unused3;      // Unused
+      uint32_t TagIndex; // Symbol table index of alternative symbol2
+      uint32_t Characteristics; //
+      uint32_t Unused1;
+      uint32_t Unused2;
+      uint16_t Unused3;      // Unused
    } weak;
 
    // File name
@@ -348,19 +348,19 @@ union SCOFF_SymTableEntry {
 
    // String table index
    struct {          // MS COFF uses multiple aux records rather than a string table entry!
-      uint32 zeroes; // zeroes if name file name longer than 18
-      uint32 offset; // string table entry
+      uint32_t zeroes; // zeroes if name file name longer than 18
+      uint32_t offset; // string table entry
    } stringindex;
 
    // Section definition
    struct {
-      uint32 Length;
-      uint16 NumberOfRelocations;  // Line number in source file
-      uint16 NumberOfLineNumbers;
-      uint32 CheckSum;             // Pointer to line number entry
-      uint16 Number;               // Symbol table index of next function
-      uint8  Selection;            // Unused
-      uint8  Unused1[3];
+      uint32_t Length;
+      uint16_t NumberOfRelocations;  // Line number in source file
+      uint16_t NumberOfLineNumbers;
+      uint32_t CheckSum;             // Pointer to line number entry
+      uint16_t Number;               // Symbol table index of next function
+      uint8_t  Selection;            // Unused
+      uint8_t  Unused1[3];
    } section;
 };
 
@@ -383,12 +383,12 @@ union SCOFF_SymTableEntry {
 
 /********************** Section number values for symbol table entries **********************/
 
-#define COFF_SECTION_UNDEF ((int16)0)      // external symbol
-#define COFF_SECTION_ABSOLUTE ((int16)-1)  // value of symbol is absolute
-#define COFF_SECTION_DEBUG ((int16)-2)     // debugging symbol - value is meaningless
-#define COFF_SECTION_N_TV ((int16)-3)      // indicates symbol needs preload transfer vector
-#define COFF_SECTION_P_TV ((int16)-4)      // indicates symbol needs postload transfer vector
-#define COFF_SECTION_REMOVE_ME ((int16)-99)// Specific for objconv program: Debug or exception section being removed
+#define COFF_SECTION_UNDEF ((int16_t)0)      // external symbol
+#define COFF_SECTION_ABSOLUTE ((int16_t)-1)  // value of symbol is absolute
+#define COFF_SECTION_DEBUG ((int16_t)-2)     // debugging symbol - value is meaningless
+#define COFF_SECTION_N_TV ((int16_t)-3)      // indicates symbol needs preload transfer vector
+#define COFF_SECTION_P_TV ((int16_t)-4)      // indicates symbol needs postload transfer vector
+#define COFF_SECTION_REMOVE_ME ((int16_t)-99)// Specific for objconv program: Debug or exception section being removed
 
 /*
  * Type of a symbol, in low N bits of the word
@@ -406,9 +406,9 @@ union SCOFF_SymTableEntry {
 #define T_ENUM  10 // enumeration
 #define T_MOE  11 // member of enumeration
 #define T_UCHAR  12 // unsigned character
-#define T_USHORT 13 // uint16
+#define T_USHORT 13 // uint16_t
 #define T_UINT  14 // unsigned integer
-#define T_ULONG  15 // uint32
+#define T_ULONG  15 // uint32_t
 #define T_LNGDBL 16 // long double
  */
 /*
@@ -470,9 +470,9 @@ union SCOFF_SymTableEntry {
 //#pragma pack(push, 1)  //__attribute__((packed));
 
 struct SCOFF_Relocation {
-  uint32 VirtualAddress;   // Section-relative address of relocation source
-  uint32 SymbolTableIndex; // Zero-based index into symbol table
-  uint16 Type;             // Relocation type
+  uint32_t VirtualAddress;   // Section-relative address of relocation source
+  uint32_t SymbolTableIndex; // Zero-based index into symbol table
+  uint16_t Type;             // Relocation type
 };
 #define SIZE_SCOFF_Relocation  10  // Size of SCOFF_Relocation packed
 //#pragma pack(pop)
@@ -527,7 +527,7 @@ struct SCOFF_Relocation {
 
 // Function to put a name into SCOFF_SymTableEntry. Put name in string table
 // if longer than 8 characters
-uint32 COFF_PutNameInSymbolTable(SCOFF_SymTableEntry & sym, const char * name, CMemoryBuffer & StringTable);
+uint32_t COFF_PutNameInSymbolTable(SCOFF_SymTableEntry & sym, const char * name, CMemoryBuffer & StringTable);
 
 // Function to put a name into SCOFF_SectionHeader. Put name in string table
 // if longer than 8 characters

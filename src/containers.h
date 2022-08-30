@@ -90,27 +90,27 @@ void operator >> (CFileBuffer & a, CFileBuffer & b); // Transfer ownership of bu
 // added. Used for storage of files, file sections, tables, etc.
 class CMemoryBuffer {
 public:
-   CMemoryBuffer();                              // Constructor
-   ~CMemoryBuffer();                             // Destructor
-   void SetSize(uint32 size);                    // Allocate buffer of specified size
-   uint32 GetDataSize()  {return DataSize;};     // File data size
-   uint32 GetBufferSize(){return BufferSize;};   // Buffer size
-   uint32 GetNumEntries(){return NumEntries;};   // Get number of entries
-   uint32 Push(void const * obj, uint32 size);   // Add object to buffer, return offset
-   uint32 PushString(char const * s);            // Add ASCIIZ string to buffer, return offset
-   uint32 GetLastIndex();                        // Index of last object pushed (zero-based)
-   void Align(uint32 a);                         // Align next entry to address divisible by a
-   int8 * Buf() {return buffer;};                // Access to buffer
-   template <class TX> TX & Get(uint32 Offset) { // Get object of arbitrary type from buffer
+   CMemoryBuffer();                                // Constructor
+   ~CMemoryBuffer();                               // Destructor
+   void SetSize(uint32_t size);                    // Allocate buffer of specified size
+   uint32_t GetDataSize()  {return DataSize;};     // File data size
+   uint32_t GetBufferSize(){return BufferSize;};   // Buffer size
+   uint32_t GetNumEntries(){return NumEntries;};   // Get number of entries
+   uint32_t Push(void const * obj, uint32_t size); // Add object to buffer, return offset
+   uint32_t PushString(char const * s);            // Add ASCIIZ string to buffer, return offset
+   uint32_t GetLastIndex();                        // Index of last object pushed (zero-based)
+   void Align(uint32_t a);                         // Align next entry to address divisible by a
+   int8_t * Buf() {return buffer;};                // Access to buffer
+   template <class TX> TX & Get(uint32_t Offset) { // Get object of arbitrary type from buffer
       if (Offset >= DataSize) {err.submit(2016); Offset = 0;} // Offset out of range
       return *(TX*)(buffer + Offset);}
 private:
-   CMemoryBuffer(CMemoryBuffer&);                // Make private copy constructor to prevent copying
-   int8 * buffer;                                // Buffer containing binary data. To be modified only by SetSize and operator >>
-   uint32 BufferSize;                            // Size of allocated buffer ( > DataSize)
+   CMemoryBuffer(CMemoryBuffer&);                  // Make private copy constructor to prevent copying
+   int8_t * buffer;                                // Buffer containing binary data. To be modified only by SetSize and operator >>
+   uint32_t BufferSize;                            // Size of allocated buffer ( > DataSize)
 protected:
-   uint32 NumEntries;                            // Number of objects pushed
-   uint32 DataSize;                              // Size of data, offset to vacant space
+   uint32_t NumEntries;                            // Number of objects pushed
+   uint32_t DataSize;                              // Size of data, offset to vacant space
    friend void operator >> (CFileBuffer & a, CFileBuffer & b); // Transfer ownership of buffer and other properties
 };
 
@@ -147,20 +147,20 @@ public:
    void Put(const char * text);                  // Write text string to buffer
    void Put(const char character);               // Write single character to buffer
    void NewLine();                               // Add linefeed
-   void Tabulate(uint32 i);                      // Insert spaces until column i
+   void Tabulate(uint32_t i);                      // Insert spaces until column i
    int  LineType;                                // 0 = DOS/Windows linefeeds, 1 = UNIX linefeeds
-   void PutDecimal(int32 x, int IsSigned = 0);   // Write decimal number to buffer
-   void PutHex(uint8  x, int MasmForm = 0);      // Write hexadecimal number to buffer
-   void PutHex(uint16 x, int MasmForm = 0);      // Write hexadecimal number to buffer
-   void PutHex(uint32 x, int MasmForm = 0);      // Write hexadecimal number to buffer
-   void PutHex(uint64 x, int MasmForm = 0);      // Write hexadecimal number to buffer
+   void PutDecimal(int32_t x, int IsSigned = 0);   // Write decimal number to buffer
+   void PutHex(uint8_t  x, int MasmForm = 0);      // Write hexadecimal number to buffer
+   void PutHex(uint16_t x, int MasmForm = 0);      // Write hexadecimal number to buffer
+   void PutHex(uint32_t x, int MasmForm = 0);      // Write hexadecimal number to buffer
+   void PutHex(uint64_t x, int MasmForm = 0);      // Write hexadecimal number to buffer
    void PutFloat(float x);                       // Write floating point number to buffer
    void PutFloat(double x);                      // Write floating point number to buffer
-   uint32 GetColumn() {return column;}           // Get column number
+   uint32_t GetColumn() {return column;}           // Get column number
 protected:
-   uint32 column;                                // Current column
+   uint32_t column;                                // Current column
 private:
-   uint32 PushString(char const * s){return 0;}; // Make PushString private to prevent using it
+   uint32_t PushString(char const * s){return 0;}; // Make PushString private to prevent using it
 };
 
 
@@ -172,7 +172,7 @@ template <class RecordType>
 class CArrayBuf {
 private:
    RecordType * buffer;                          // Dynamically allocated memory
-   uint32 num;                                   // Number of entries in array
+   uint32_t num;                                   // Number of entries in array
    CArrayBuf (CArrayBuf &);                      // Make private copy constructor to prevent copying
 public:
    CArrayBuf() {                                 // Default constructor
@@ -181,7 +181,7 @@ public:
    ~CArrayBuf() {                                // Destructor
       if (num) delete[] buffer;                  // Deallocate memory. Will call RecordType destructor if any
    }
-   void SetNum(uint32 n) {                       // Set size of array. May be called only once!
+   void SetNum(uint32_t n) {                       // Set size of array. May be called only once!
       if (n <= num) return;                      // Already allocated
       if (num) {
          err.submit(9004);                       // Cannot resize because items may have destructors
@@ -197,10 +197,10 @@ public:
          }
       }
    }
-   uint32 GetNumEntries() {
+   uint32_t GetNumEntries() {
       return num;                                // Read size
    }
-   RecordType & operator[] (uint32 i) {          // Access array element [i]
+   RecordType & operator[] (uint32_t i) {          // Access array element [i]
       if (i >= num) {
          err.submit(9003);  i = 0;               // Error: index out of range
       }
@@ -269,16 +269,16 @@ public:
       // Add blank entry to list
       CMemoryBuffer::Push(0, sizeof(RecordType));
    }
-   void SetNum(uint32 n) {
+   void SetNum(uint32_t n) {
       // Reserve space for n entries. Fill with zeroes
       SetSize(n * sizeof(RecordType));
       NumEntries = n;  DataSize = n * sizeof(RecordType);
    }
-   uint32 GetNumEntries() {
+   uint32_t GetNumEntries() {
       // Get number of entries
       return NumEntries;
    }
-   RecordType & operator[] (uint32 i) {
+   RecordType & operator[] (uint32_t i) {
       // Get entries by operator [] as for an array
       if (i >= NumEntries) {
          err.submit(9003); i = 0;}               // Error: index out of range
@@ -288,10 +288,10 @@ public:
       // Sort list by ascending RecordType items
       // Operator < must be defined for RecordType
       // Simple Bubble sort:
-      int32 i, j;
+      int32_t i, j;
       RecordType temp, * p1, * p2;
-      for (i = 0; i < (int32)NumEntries; i++) {
-         for (j = 0; j < (int32)NumEntries - i - 1; j++) {
+      for (i = 0; i < (int32_t)NumEntries; i++) {
+         for (j = 0; j < (int32_t)NumEntries - i - 1; j++) {
             p1 = (RecordType*)(Buf() + j * sizeof(RecordType));
             p2 = (RecordType*)(Buf() + (j+1) * sizeof(RecordType));
             if (*p2 < *p1) {
@@ -301,15 +301,15 @@ public:
          }
       }
    }
-   int32 FindFirst(RecordType const & x) {
+   int32_t FindFirst(RecordType const & x) {
       // Returns index to first record >= x.
       // Returns 0 if x is smaller than all entries.
       // Returns NumEntries if x is bigger than all entries. Note that this
       // is not a valid index into the list.
       // List must be sorted before calling FindFirst
-      uint32 a = 0;                              // Start of search interval
-      uint32 b = NumEntries;                     // End of search interval + 1
-      uint32 c = 0;                              // Middle of search interval
+      uint32_t a = 0;                              // Start of search interval
+      uint32_t b = NumEntries;                     // End of search interval + 1
+      uint32_t c = 0;                              // Middle of search interval
       // Binary search loop:
       while (a < b) {
          c = (a + b) / 2;
@@ -318,24 +318,24 @@ public:
          else {
             b = c;}
       }
-      return (int32)a;
+      return (int32_t)a;
    }
-   int32 Exists(RecordType const & x) {
+   int32_t Exists(RecordType const & x) {
       // Returns the record number if a record equal to x exists in the list.
       // Returns -1 if not. The list must be sorted before calling Exists.
       // Two records a and b are assumed to be equal if !(a < b || b < a)
-      uint32 i = FindFirst(x);
+      uint32_t i = FindFirst(x);
       if (i == NumEntries) return -1;
       if (x < (*this)[i]) return -1; else return i;
    }
-   int32 PushSort(RecordType const & x) {
+   int32_t PushSort(RecordType const & x) {
       // Add member to list and keep the list sorted.
       // If the list is sorted before calling PushSort then it will also be
       // sorted after the call. If x is equal to an existing entry then x
       // will be inserted before the existing entry.
       // Operator < must be defined for RecordType.
-      int32 i = FindFirst(x);                    // Find where to insert x
-      int32 RecordsToMove = (int32)NumEntries-i; // Number of records to move
+      int32_t i = FindFirst(x);                    // Find where to insert x
+      int32_t RecordsToMove = (int32_t)NumEntries-i; // Number of records to move
       SetNum(NumEntries + 1);                    // Make space for one more record
       // Move subsequent entries up one place
       if (RecordsToMove > 0) {
@@ -347,7 +347,7 @@ public:
       (*this)[i] = x;
       return i;
    }
-   int32 PushUnique(RecordType const & x) {
+   int32_t PushUnique(RecordType const & x) {
       // Add member to list and keep the list sorted. Avoids duplicate entries.
       // PushUnique will insert x in the list and keep the list sorted.
       // If an entry equal to x already exists in the list then x is not
@@ -357,11 +357,11 @@ public:
       // This list must be sorted and without duplicates before calling
       // PushUnique.
       // Operator < must be defined for RecordType.
-      int32 i = FindFirst(x);                    // Find where to insert x
-      if (i < (int32)NumEntries && !(x < (*this)[i])) {
+      int32_t i = FindFirst(x);                    // Find where to insert x
+      if (i < (int32_t)NumEntries && !(x < (*this)[i])) {
          return i;                               // Duplicate found. Return index
       }
-      int32 RecordsToMove = (int32)NumEntries-i; // Number of records to move
+      int32_t RecordsToMove = (int32_t)NumEntries-i; // Number of records to move
       SetNum(NumEntries + 1);                    // Make space for one more record
       // Move subsequent entries up one place
       if (RecordsToMove > 0) {
@@ -374,10 +374,10 @@ public:
       // Return index
       return i;
    }
-   void Remove(uint32 index) {
+   void Remove(uint32_t index) {
       // Remove record with this index
       if (index >= NumEntries) return;           // Index out of range
-      uint32 RecordsToMove = NumEntries - index - 1; // Number of records to move
+      uint32_t RecordsToMove = NumEntries - index - 1; // Number of records to move
       // Move subsequent entries down one place
       if (RecordsToMove > 0) {
          memmove(Buf() + index * sizeof(RecordType),
