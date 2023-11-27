@@ -1,14 +1,14 @@
 /****************************   coff.h   *************************************
 * Author:        Agner Fog
 * Date created:  2006-07-15
-* Last modified: 2008-06-04
+* Last modified: 2022-08-31
 * Project:       objconv
 * Module:        coff.h
 * Description:
 * Header file for definition of structures in MS Windows COFF Intel x86 (PE)
 * object file format.
 *
-* Copyright 2006-2008 GNU General Public License http://www.gnu.org/licenses
+* Copyright 2006-2022 GNU General Public License http://www.gnu.org/licenses
 * Parts (c) 1995 DJ Delorie GNU General Public License
 *****************************************************************************/
 
@@ -355,12 +355,12 @@ union SCOFF_SymTableEntry {
    // Section definition
    struct {
       uint32_t Length;
-      uint16_t NumberOfRelocations;  // Line number in source file
-      uint16_t NumberOfLineNumbers;
-      uint32_t CheckSum;             // Pointer to line number entry
-      uint16_t Number;               // Symbol table index of next function
-      uint8_t  Selection;            // Unused
-      uint8_t  Unused1[3];
+      uint16_t NumberOfRelocations;  // Number of relocation entries for the section
+      uint16_t NumberOfLineNumbers;  // Number of line-number entries for the section
+      uint32_t CheckSum;             // Checksum for communal data
+      uint16_t Number;               // Index of associated section (for COMDAT selection 5)
+      uint8_t  Selection;            // COMDAT selection number
+      uint8_t  Unused1[3];           // Unused
    } section;
 };
 

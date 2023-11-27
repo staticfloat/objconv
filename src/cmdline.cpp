@@ -1,14 +1,14 @@
 /****************************  cmdline.cpp  **********************************
 * Author:        Agner Fog
 * Date created:  2006-07-25
-* Last modified: 2022-04-28
+* Last modified: 2023-03-29
 * Project:       objconv
 * Module:        cmdline.cpp
 * Description:
 * This module is for interpretation of command line options
 * Also contains symbol change function
 *
-* Copyright 2006-2022 GNU General Public License http://www.gnu.org/licenses
+* Copyright 2006-2023 GNU General Public License http://www.gnu.org/licenses
 *****************************************************************************/
 
 #include "stdafx.h"
@@ -16,8 +16,11 @@
 // List of recognized output file type options
 static SIntTxt TypeOptionNames[] = {
     {CMDL_OUTPUT_ELF,   "elf"},
+    {CMDL_OUTPUT_ELF,   "ELF"},
     {CMDL_OUTPUT_PE,    "pe"},
+    {CMDL_OUTPUT_PE,    "PE"},
     {CMDL_OUTPUT_PE,    "coff"},
+    {CMDL_OUTPUT_PE,    "COFF"},
     {CMDL_OUTPUT_PE,    "cof"},
     {CMDL_OUTPUT_PE,    "win"},
     {CMDL_OUTPUT_OMF,   "omf"},
@@ -1186,7 +1189,7 @@ void CCommandLineInterpreter::ReportStatistics() {
 void CCommandLineInterpreter::Help() {
     // Print help message
     printf("\nObject file converter version %.2f for x86 and x86-64 platforms.", OBJCONV_VERSION);
-    printf("\nCopyright (c) 2022 by Agner Fog. Gnu General Public License.");
+    printf("\nCopyright (c) 2023 by Agner Fog. Gnu General Public License.");
     printf("\n\nUsage: objconv options inputfile [outputfile]");
     printf("\n\nOptions:");
     printf("\n-fXXX[SS]  Output file format XXX, word size SS. Supported formats:");

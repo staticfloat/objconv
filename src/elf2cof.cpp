@@ -81,7 +81,10 @@ void CELF2COF<ELFSTRUCTURES>::MakeSectionsIndex() {
       // Get section name
       const char * sname = "";
       uint32_t namei = this->SectionHeaders[oldsec].sh_name;
-      if (namei >= this->SecStringTableLen) err.submit(2112);
+
+      if (namei >= this->SecStringTableLen) {
+          err.submit(2112);
+      }
       else sname = this->SecStringTable + namei;
 
       if (cmd.DebugInfo == CMDL_DEBUG_STRIP) {
@@ -149,7 +152,9 @@ void CELF2COF<ELFSTRUCTURES>::MakeSections() {
          // Section name
          const char * sname = "";
          uint32_t namei = OldHeader.sh_name;
-         if (namei >= this->SecStringTableLen) err.submit(2112);
+         if (namei >= this->SecStringTableLen) {
+             err.submit(2112);
+         }
          else sname = this->SecStringTable + namei;
 
          // Check for special names
