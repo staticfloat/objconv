@@ -1,13 +1,13 @@
 /****************************    elf2elf.cpp    *****************************
 * Author:        Agner Fog
 * Date created:  2006-01-13
-* Last modified: 2013-11-27
+* Last modified: 2022-08-31
 * Project:       objconv
 * Module:        elf2elf.cpp
 * Description:
 * Module for changing symbol names in ELF file
 *
-* Copyright 2006-2013 GNU General Public License http://www.gnu.org/licenses
+* Copyright 2006-2022 GNU General Public License http://www.gnu.org/licenses
 *****************************************************************************/
 #include "stdafx.h"
 // All functions in this module are templated to make two versions: 32 and 64 bits.
@@ -27,30 +27,30 @@ template <class TELF_Header, class TELF_SectionHeader, class TELF_Symbol, class 
 void CELF2ELF<ELFSTRUCTURES>::Convert() {
    // Some compilers require this-> for accessing members of template base class,
    // according to the so-called two-phase lookup rule.
-   MakeSymbolTable();               // Remake symbol tables and string tables
-   ChangeSections();                // Modify section names and relocation table symbol indices
-   MakeBinaryFile();                // Put everyting together into ToFile
-   *this << ToFile;                 // Take over new file buffer
+   MakeSymbolTable();        // Remake symbol tables and string tables
+   ChangeSections();         // Modify section names and relocation table symbol indices
+   MakeBinaryFile();         // Put everyting together into ToFile
+   *this << ToFile;          // Take over new file buffer
 }
 
 
 // MakeSymbolTable()
 template <class TELF_Header, class TELF_SectionHeader, class TELF_Symbol, class TELF_Relocation>
 void CELF2ELF<ELFSTRUCTURES>::MakeSymbolTable() {
-   uint32_t SectionNumber;      // Section number
-   char * SectionName;        // Section name
-   uint32_t SecNamei;           // Section name index
-   uint32_t OldSymi;            // Old symbol index
-   uint32_t NewSymi;            // New symbol index
-   int isymt;                 // 0 = symtab, 1 = dynsym
-   const char * name1;        // Old name of symbol
-   const char * name2;        // Changed name of symbol
-   int SymbolType;            // Symbol type for cmd.SymbolChange
-   int action;                // Symbol change action
-   int binding;               // Symbol binding
-   TELF_Symbol sym;               // Symbol table entry
-   TELF_Symbol AliasEntry;        // Symbol table alias entry
-   uint32_t symnamei;           // New symbol name index
+   uint32_t SectionNumber;   // Section number
+   char * SectionName;       // Section name
+   uint32_t SecNamei;        // Section name index
+   uint32_t OldSymi;         // Old symbol index
+   uint32_t NewSymi;         // New symbol index
+   int isymt;                // 0 = symtab, 1 = dynsym
+   const char * name1;       // Old name of symbol
+   const char * name2;       // Changed name of symbol
+   int SymbolType;           // Symbol type for cmd.SymbolChange
+   int action;               // Symbol change action
+   int binding;              // Symbol binding
+   TELF_Symbol sym;          // Symbol table entry
+   TELF_Symbol AliasEntry;   // Symbol table alias entry
+   uint32_t symnamei;        // New symbol name index
    CMemoryBuffer TempGlobalSymbolTable; // Temporary storage of public and external symbols
 
    // Find symbol table and string tables
@@ -59,12 +59,12 @@ void CELF2ELF<ELFSTRUCTURES>::MakeSymbolTable() {
       TELF_SectionHeader sheader = this->SectionHeaders[SectionNumber];
       switch (sheader.sh_type) {
       case SHT_SYMTAB:
-         isymtab[0] = SectionNumber;                // Symbol table found
+         isymtab[0] = SectionNumber;        // Symbol table found
          istrtab[0] = this->SectionHeaders[SectionNumber].sh_link; // Associated string table
          break;
 
       case SHT_DYNSYM:
-         isymtab[1] = SectionNumber;             // Dynamic symbol table found
+         isymtab[1] = SectionNumber;        // Dynamic symbol table found
          istrtab[1] = this->SectionHeaders[SectionNumber].sh_link; // Associated string table
          break;
 
@@ -74,13 +74,13 @@ void CELF2ELF<ELFSTRUCTURES>::MakeSymbolTable() {
              err.submit(2112); return;}
          SectionName = this->SecStringTable + SecNamei;
          if (SectionNumber == this->FileHeader.e_shstrndx || !strcmp(SectionName,".shstrtab")) {
-            istrtab[2] = SectionNumber;           // Section header string table found
+            istrtab[2] = SectionNumber;     // Section header string table found
          }
          else if (!strcmp(SectionName,".strtab") && !istrtab[0]) {
             istrtab[0] = SectionNumber;     // Symbol string table found
          }
          else if (!strcmp(SectionName,".stabstr")) {
-            istrtab[3] = SectionNumber;    // Debug string table found
+            istrtab[3] = SectionNumber;     // Debug string table found
          }
          break;
       }
@@ -270,8 +270,14 @@ void CELF2ELF<ELFSTRUCTURES>::ChangeSections() {
    TELF_Relocation * relocp;        // Pointer to relocation entry
    uint32_t oldsymi, newsymi;     // Relocation symbol index
 
+   uint32_t sectionSymtab = 2;     // section string table index into NewStringTable
+
+   if (istrtab[2] == istrtab[0]) {
+       sectionSymtab = 0;              // sections and symbols use same table
+   }
+
    // Initialize section header string table .shstrtab. First entry = 0
-   NewStringTable[2].Push(0, 1);
+   NewStringTable[sectionSymtab].Push(0, 1);
 
    // Loop through sections
    SectionHeaderOffset = uint32_t(this->FileHeader.e_shoff);
@@ -292,7 +298,7 @@ void CELF2ELF<ELFSTRUCTURES>::ChangeSections() {
 
       // Store name in .shstrtab string table
       if (name1 && *name1) {
-         namei = NewStringTable[2].PushString(name1);
+         namei = NewStringTable[sectionSymtab].PushString(name1);
       }
       else {
          namei = 0;

@@ -1,7 +1,7 @@
 /****************************  disasm2.cpp   ********************************
 * Author:        Agner Fog
 * Date created:  2007-02-25
-* Last modified: 2022-04-25
+* Last modified: 2023-03-29
 * Project:       objconv
 * Module:        disasm2.cpp
 * Description:
@@ -9,7 +9,7 @@
 *
 * Changes that relate to assembly language syntax should be done in this file only.
 *
-* Copyright 2007-2022 GNU General Public License http://www.gnu.org/licenses
+* Copyright 2007-2023 GNU General Public License http://www.gnu.org/licenses
 *****************************************************************************/
 #include "stdafx.h"
 
@@ -387,7 +387,7 @@ void CDisassembler::WriteOperandType(uint32_t type) {
     case SUBTYPE_MASM:
         WriteOperandTypeMASM(type);  break;
     case SUBTYPE_NASM:
-        WriteOperandTypeYASM(type);  break;
+        WriteOperandTypeNASM(type);  break;
     case SUBTYPE_GASM:
         WriteOperandTypeGASM(type);  break;
     }
@@ -458,7 +458,7 @@ void CDisassembler::WriteOperandTypeMASM(uint32_t type) {
     if (type) OutFile.Put("ptr ");
 }
 
-void CDisassembler::WriteOperandTypeYASM(uint32_t type) {
+void CDisassembler::WriteOperandTypeNASM(uint32_t type) {
     // Write type override before operand, e.g. "dword", NASM/YASM syntax
     if (type & 0xF00) {
         type &= 0xF00;                             // Ignore element type for vectors
@@ -478,7 +478,7 @@ void CDisassembler::WriteOperandTypeYASM(uint32_t type) {
                 OutFile.Put("far ");
             }
             else {
-                // Size currently not supported by YASM
+                // Size currently not supported by NASM
                 switch (type) {
                 case 3: OutFile.Put("far ");
                     s.OpComment = "16+16 bit. Needs 66H prefix";
@@ -1461,7 +1461,7 @@ void CDisassembler::WriteDataItems() {
             case SUBTYPE_MASM:
                 WriteDataLabelMASM(Symname, sym, SeparateLine);  break;
             case SUBTYPE_NASM:
-                WriteDataLabelYASM(Symname, sym, SeparateLine);  break;
+                WriteDataLabelNASM(Symname, sym, SeparateLine);  break;
             case SUBTYPE_GASM:
                 WriteDataLabelGASM(Symname, sym, SeparateLine);  break;
             }
@@ -1483,7 +1483,7 @@ void CDisassembler::WriteDataItems() {
             case SUBTYPE_MASM:
                 WriteUninitDataItemsMASM(ElementSize, DataCount);  break;
             case SUBTYPE_NASM:
-                WriteUninitDataItemsYASM(ElementSize, DataCount);  break;
+                WriteUninitDataItemsNASM(ElementSize, DataCount);  break;
             case SUBTYPE_GASM:
                 WriteUninitDataItemsGASM(ElementSize, DataCount);  break;
             }
@@ -1504,7 +1504,7 @@ void CDisassembler::WriteDataItems() {
             case SUBTYPE_MASM:
                 WriteUninitDataItemsMASM(ElementSize, DataCount);  break;
             case SUBTYPE_NASM:
-                WriteUninitDataItemsYASM(ElementSize, DataCount);  break;
+                WriteUninitDataItemsNASM(ElementSize, DataCount);  break;
             case SUBTYPE_GASM:
                 WriteUninitDataItemsGASM(ElementSize, DataCount);  break;
             }
@@ -1609,7 +1609,7 @@ void CDisassembler::WriteDataItems() {
                 case SUBTYPE_MASM:
                     WriteDataDirectiveMASM(ElementSize);  break;
                 case SUBTYPE_NASM:
-                    WriteDataDirectiveYASM(ElementSize);  break;
+                    WriteDataDirectiveNASM(ElementSize);  break;
                 case SUBTYPE_GASM:
                     WriteDataDirectiveGASM(ElementSize);  break;
                 }
@@ -1746,8 +1746,8 @@ void CDisassembler::WriteDataLabelMASM(const char * name, uint32_t sym, int line
     }
 }
 
-void CDisassembler::WriteDataLabelYASM(const char * name, uint32_t sym, int line) {
-    // Write label before data item, YASM syntax
+void CDisassembler::WriteDataLabelNASM(const char * name, uint32_t sym, int line) {
+    // Write label before data item, NASM syntax
     // name = name of data item(s)
     // sym  = symbol index
     // line = 1 if label is on separate line, 0 if data follows on same line
@@ -1896,8 +1896,8 @@ void CDisassembler::WriteUninitDataItemsMASM(uint32_t size, uint32_t count) {
     }
 }
 
-void CDisassembler::WriteUninitDataItemsYASM(uint32_t size, uint32_t count) {
-    // Write uninitialized (BSS) data, YASM syntax
+void CDisassembler::WriteUninitDataItemsNASM(uint32_t size, uint32_t count) {
+    // Write uninitialized (BSS) data, NASM syntax
     // Write data definition directive for appropriate size
     switch (size) {
     case 1:
@@ -1943,8 +1943,8 @@ void CDisassembler::WriteDataDirectiveMASM(uint32_t size) {
     }
 }
 
-void CDisassembler::WriteDataDirectiveYASM(uint32_t size) {
-    // Write DB, etc., YASM syntax
+void CDisassembler::WriteDataDirectiveNASM(uint32_t size) {
+    // Write DB, etc., NASM syntax
     // Write data definition directive for appropriate size
     switch (size) {
     case 1:  OutFile.Put("db ");  break;
@@ -2541,12 +2541,12 @@ void CDisassembler::WriteFileBegin() {
         WritePublicsAndExternalsMASM();
         break;
     case SUBTYPE_NASM:
-        WriteFileBeginYASM();
-        WritePublicsAndExternalsYASMGASM();
+        WriteFileBeginNASM();
+        WritePublicsAndExternalsNASMGASM();
         break;
     case SUBTYPE_GASM:
         WriteFileBeginGASM();
-        WritePublicsAndExternalsYASMGASM();
+        WritePublicsAndExternalsNASMGASM();
         break;
     }
 }
@@ -2625,8 +2625,8 @@ void CDisassembler::WriteFileBeginMASM() {
     OutFile.NewLine();                            // Blank line
 }
 
-void CDisassembler::WriteFileBeginYASM() {
-    // Write YASM-specific file init
+void CDisassembler::WriteFileBeginNASM() {
+    // Write NASM-specific file init
     OutFile.NewLine();
     if (WordSize == 64) {
         OutFile.Put("default rel"); OutFile.NewLine();
@@ -2795,8 +2795,8 @@ void CDisassembler::WritePublicsAndExternalsMASM() {
 }
 
 
-void CDisassembler::WritePublicsAndExternalsYASMGASM() {
-    // Write public and external symbol definitions, YASM and GAS syntax
+void CDisassembler::WritePublicsAndExternalsNASMGASM() {
+    // Write public and external symbol definitions, NASM and GAS syntax
     uint32_t i;                                     // Loop counter
     uint32_t LinesWritten = 0;                      // Count lines written
     const char * XName;                           // Name of external symbols
@@ -2991,7 +2991,7 @@ void CDisassembler::WriteSegmentBegin() {
     case SUBTYPE_MASM:
         WriteSegmentBeginMASM();  break;
     case SUBTYPE_NASM:
-        WriteSegmentBeginYASM();  break;
+        WriteSegmentBeginNASM();  break;
     case SUBTYPE_GASM:
         WriteSegmentBeginGASM();  break;
     }
@@ -3094,7 +3094,7 @@ void CDisassembler::WriteSegmentBeginMASM() {
     }
 }
 
-void CDisassembler::WriteSegmentBeginYASM() {
+void CDisassembler::WriteSegmentBeginNASM() {
     // Write begin of segment
     OutFile.NewLine();                            // Blank line
 
@@ -3118,10 +3118,10 @@ void CDisassembler::WriteSegmentBeginYASM() {
         OutFile.PutDecimal(Sections[Section].WordSize);
     }
     if ((Sections[Section].Type & 0xFF) == 1) {
-        OutFile.Put(" execute");
+        OutFile.Put(" exec");
     }
     else {
-        OutFile.Put(" noexecute");
+        OutFile.Put(" noexec");
     }
 
     // Tabulate to comment
@@ -3148,7 +3148,7 @@ void CDisassembler::WriteSegmentBeginYASM() {
     if (Sections[Section].Type & 0x1000) {
         // Communal
         OutFile.Put(CommentSeparator);
-        OutFile.Put(" Communal section not supported by YASM");
+        OutFile.Put(" Communal section not supported by NASM");
         OutFile.NewLine();
     }
 }
@@ -3285,7 +3285,7 @@ void CDisassembler::WriteFunctionBegin() {
     case SUBTYPE_MASM:
         WriteFunctionBeginMASM(SymI, Symbols[SymI].Scope);  break;
     case SUBTYPE_NASM:
-        WriteFunctionBeginYASM(SymI, Symbols[SymI].Scope);  break;
+        WriteFunctionBeginNASM(SymI, Symbols[SymI].Scope);  break;
     case SUBTYPE_GASM:
         WriteFunctionBeginGASM(SymI, Symbols[SymI].Scope);  break;
     }
@@ -3332,8 +3332,8 @@ void CDisassembler::WriteFunctionBeginMASM(uint32_t symi, uint32_t scope) {
     OutFile.NewLine();
 }
 
-void CDisassembler::WriteFunctionBeginYASM(uint32_t symi, uint32_t scope) {
-    // Write begin of function, YASM syntax
+void CDisassembler::WriteFunctionBeginNASM(uint32_t symi, uint32_t scope) {
+    // Write begin of function, NASM syntax
     // Write name
     WriteSymbolName(symi);
     // Colon
@@ -3413,7 +3413,7 @@ void CDisassembler::WriteFunctionEnd() {
         case SUBTYPE_MASM:
             WriteFunctionEndMASM(SymNewI);  break;
         case SUBTYPE_NASM:
-            WriteFunctionEndYASM(SymNewI);  break;
+            WriteFunctionEndNASM(SymNewI);  break;
         case SUBTYPE_GASM:
             WriteFunctionEndGASM(SymNewI);  break;
         }
@@ -3432,8 +3432,8 @@ void CDisassembler::WriteFunctionEndMASM(uint32_t symi) {
     OutFile.NewLine();
 }
 
-void CDisassembler::WriteFunctionEndYASM(uint32_t symi) {
-    // Write end of function, YASM syntax
+void CDisassembler::WriteFunctionEndNASM(uint32_t symi) {
+    // Write end of function, NASM syntax
     // Write comment
     OutFile.Put(CommentSeparator);
     // Write name
@@ -3487,7 +3487,7 @@ void CDisassembler::WriteCodeLabel(uint32_t symi) {
     case SUBTYPE_MASM:
         WriteCodeLabelMASM(symi, Symbols[symi].Scope);  break;
     case SUBTYPE_NASM:
-        WriteCodeLabelYASM(symi, Symbols[symi].Scope);  break;
+        WriteCodeLabelNASM(symi, Symbols[symi].Scope);  break;
     case SUBTYPE_GASM:
         WriteCodeLabelGASM(symi, Symbols[symi].Scope);  break;
     }
@@ -3549,8 +3549,8 @@ void CDisassembler::WriteCodeLabelMASM(uint32_t symi, uint32_t scope) {
     }
 }
 
-void CDisassembler::WriteCodeLabelYASM(uint32_t symi, uint32_t scope) {
-    // Write private or public code label, YASM syntax
+void CDisassembler::WriteCodeLabelNASM(uint32_t symi, uint32_t scope) {
+    // Write private or public code label, NASM syntax
     if ((scope & 0xFF) > 2) {
         // Scope is public
         OutFile.NewLine();
@@ -3590,8 +3590,8 @@ void CDisassembler::WriteCodeLabelYASM(uint32_t symi, uint32_t scope) {
 }
 
 void CDisassembler::WriteCodeLabelGASM(uint32_t symi, uint32_t scope) {
-    // Write private or public code label, GAS syntax same as YASM syntax
-    WriteCodeLabelYASM(symi, scope);
+    // Write private or public code label, GAS syntax same as NASM syntax
+    WriteCodeLabelNASM(symi, scope);
 }
 
 void CDisassembler::WriteAssume() {

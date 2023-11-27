@@ -1,13 +1,13 @@
 /****************************  disasm.h   **********************************
 * Author:        Agner Fog
 * Date created:  2007-02-21
-* Last modified: 2022-04-25
+* Last modified: 2023-03-29
 * Project:       objconv
 * Module:        disasm.h
 * Description:
 * Header file for disassembler
 *
-* Copyright 2007-2022 GNU General Public License http://www.gnu.org/licenses
+* Copyright 2007-2023 GNU General Public License http://www.gnu.org/licenses
 *****************************************************************************/
 #ifndef DISASM_H
 #define DISASM_H
@@ -738,27 +738,27 @@ protected:
    int     TranslateAbsAddress(int64_t Addr, int32_t &Sect, uint32_t &Offset); // Translate absolute virtual address to section and offset
    void    WriteFileBegin();                     // Write begin of file
    void    WriteFileBeginMASM();                 // Write MASM-specific file init
-   void    WriteFileBeginYASM();                 // Write YASM-specific file init
+   void    WriteFileBeginNASM();                 // Write NASM-specific file init
    void    WriteFileBeginGASM();                 // Write  GAS-specific file init
    void    WriteFileEnd();                       // Write end of file
    void    WriteSegmentBegin();                  // Write begin of segment
    void    WriteSegmentBeginMASM();              // Write begin of segment, MASM syntax
-   void    WriteSegmentBeginYASM();              // Write begin of segment, YASM syntax
+   void    WriteSegmentBeginNASM();              // Write begin of segment, NASM syntax
    void    WriteSegmentBeginGASM();              // Write begin of segment, GAS  syntax
    void    WriteSegmentEnd();                    // Write end of segment
    void    WritePublicsAndExternalsMASM();       // Write public and external symbol definitions, MASM syntax
-   void    WritePublicsAndExternalsYASMGASM();   // Write public and external symbol definitions, YASM and GAS syntax
+   void    WritePublicsAndExternalsNASMGASM();   // Write public and external symbol definitions, NASM and GAS syntax
    void    WriteFunctionBegin();                 // Write begin of function
    void    WriteFunctionBeginMASM(uint32_t symi, uint32_t scope);// Write begin of function, MASM syntax
-   void    WriteFunctionBeginYASM(uint32_t symi, uint32_t scope);// Write begin of function, YASM syntax
+   void    WriteFunctionBeginNASM(uint32_t symi, uint32_t scope);// Write begin of function, NASM syntax
    void    WriteFunctionBeginGASM(uint32_t symi, uint32_t scope);// Write begin of function, GAS  syntax
    void    WriteFunctionEnd();                   // Write end of function
    void    WriteFunctionEndMASM(uint32_t symi);    // Write end of function, MASM syntax
-   void    WriteFunctionEndYASM(uint32_t symi);    // Write end of function, YASM syntax
+   void    WriteFunctionEndNASM(uint32_t symi);    // Write end of function, NASM syntax
    void    WriteFunctionEndGASM(uint32_t symi);    // Write end of function, GAS  syntax
    void    WriteCodeLabel(uint32_t symi);          // Write private or public code label
    void    WriteCodeLabelMASM(uint32_t symi, uint32_t scope);// Write private or public code label, MASM syntax
-   void    WriteCodeLabelYASM(uint32_t symi, uint32_t scope);// Write private or public code label, MASM syntax
+   void    WriteCodeLabelNASM(uint32_t symi, uint32_t scope);// Write private or public code label, MASM syntax
    void    WriteCodeLabelGASM(uint32_t symi, uint32_t scope);// Write private or public code label, MASM syntax
    int     WriteFillers();                       // Check if code is a series of NOPs or other fillers. If so then write it as such
    void    WriteAlign(uint32_t a);                 // Write alignment directive
@@ -782,17 +782,17 @@ protected:
    void    WriteRelocationTarget(uint32_t irel, uint32_t Context, int64_t Addend);// Write cross reference
    void    WriteOperandType(uint32_t type);        // Write type override before operand, e.g. "dword ptr"
    void    WriteOperandTypeMASM(uint32_t type);    // Write type override before operand, e.g. "dword ptr", MASM syntax
-   void    WriteOperandTypeYASM(uint32_t type);    // Write type override before operand, e.g. "dword", YASM syntax
+   void    WriteOperandTypeNASM(uint32_t type);    // Write type override before operand, e.g. "dword", NASM syntax
    void    WriteOperandTypeGASM(uint32_t type);    // Write type override before operand, e.g. "dword ptr", GAS syntax
    void    WriteDataItems();                     // Write data items
    void    WriteDataLabelMASM(const char * name, uint32_t sym, int line); // Write label before data item, MASM syntax
-   void    WriteDataLabelYASM(const char * name, uint32_t sym, int line); // Write label before data item, YASM syntax
+   void    WriteDataLabelNASM(const char * name, uint32_t sym, int line); // Write label before data item, NASM syntax
    void    WriteDataLabelGASM(const char * name, uint32_t sym, int line); // Write label before data item, GAS  syntax
    void    WriteUninitDataItemsMASM(uint32_t size, uint32_t count);// Write uninitialized (BSS) data, MASM syntax
-   void    WriteUninitDataItemsYASM(uint32_t size, uint32_t count);// Write uninitialized (BSS) data, YASM syntax
+   void    WriteUninitDataItemsNASM(uint32_t size, uint32_t count);// Write uninitialized (BSS) data, NASM syntax
    void    WriteUninitDataItemsGASM(uint32_t size, uint32_t count);// Write uninitialized (BSS) data, GAS  syntax
    void    WriteDataDirectiveMASM(uint32_t size);  // Write DB, etc., MASM syntax
-   void    WriteDataDirectiveYASM(uint32_t size);  // Write DB, etc., MASM syntax
+   void    WriteDataDirectiveNASM(uint32_t size);  // Write DB, etc., MASM syntax
    void    WriteDataDirectiveGASM(uint32_t size);  // Write DB, etc., MASM syntax
    void    WriteDataComment(uint32_t ElementSize, uint32_t LinePos, uint32_t Pos, uint32_t irel);// Write comment after data item
    uint32_t  GetDataItemSize(uint32_t Type);         // Get size of data item with specified type
