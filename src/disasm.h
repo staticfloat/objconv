@@ -1,13 +1,13 @@
 /****************************  disasm.h   **********************************
 * Author:        Agner Fog
 * Date created:  2007-02-21
-* Last modified: 2023-03-29
+* Last modified: 2025-08-26
 * Project:       objconv
 * Module:        disasm.h
 * Description:
 * Header file for disassembler
 *
-* Copyright 2007-2023 GNU General Public License http://www.gnu.org/licenses
+* Copyright 2007-2025 GNU General Public License http://www.gnu.org/licenses
 *****************************************************************************/
 #ifndef DISASM_H
 #define DISASM_H
@@ -435,7 +435,7 @@ struct SOpcodeProp {
    uint32_t Vreg;                                  // ~VEX.vvvv or AMD DREX byte
    uint32_t Kreg;                                  // EVEX.aaa = MVEX.kkk mask register
    uint32_t Esss;                                  // EVEX.zLLb = MVEX.Esss option bits
-   SwizSpec const * SwizRecord;                  // Selected entry in MVEX table for MVEX code
+   SwizSpec const * SwizRecord;                    // Selected entry in MVEX table for MVEX code
    uint32_t OffsetMultiplier;                      // Multiplier for 1-byte offset calculated from EVEX or obtained from MVEX.sss and table lookup
    uint32_t Operands[5];                           // Operand types for destination, source, immediate
    uint32_t OpcodeStart1;                          // Index to first opcode byte, after prefixes
@@ -446,8 +446,8 @@ struct SOpcodeProp {
    uint32_t ImmediateField;                        // Beginning of immediate operand or jump address field
    uint32_t ImmediateFieldSize;                    // Size of immediate operand or jump address field
    uint32_t ImmediateRelocation;                   // Relocation pointing to immediate operand or jump address field
-   const char * OpComment;                       // Additional comment for opcode
-   void   Reset() {                              // Set everything to zero
+   const char * OpComment;                         // Additional comment for opcode
+   void   Reset() {                                // Set everything to zero
       memset(this, 0, sizeof(*this));}
 };
 // The meaning of each bit in s.Warnings and s.Errors is given in

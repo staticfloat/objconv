@@ -1,7 +1,7 @@
 /****************************  disasm2.cpp   ********************************
 * Author:        Agner Fog
 * Date created:  2007-02-25
-* Last modified: 2023-03-29
+* Last modified: 2025-08-26
 * Project:       objconv
 * Module:        disasm2.cpp
 * Description:
@@ -9,7 +9,7 @@
 *
 * Changes that relate to assembly language syntax should be done in this file only.
 *
-* Copyright 2007-2023 GNU General Public License http://www.gnu.org/licenses
+* Copyright 2007-2025 GNU General Public License http://www.gnu.org/licenses
 *****************************************************************************/
 #include "stdafx.h"
 
@@ -72,7 +72,7 @@ SIntTxt AsmWarningTexts1[] = {
     {8,          "Displacement could be made smaller by sign extension"},
     {0x10,       "SIB byte unnecessary here"},
     {0x20,       "A shorter instruction exists for register operand"},
-    {0x40,       "Length-changing prefix causes delay on Intel processors"},
+    {0x40,       "Length-changing prefix causes delay on old Intel processors"},
     {0x80,       "Address size prefix should be avoided"},
     {0x100,      "Same prefix occurs more than once"},
     {0x200,      "Prefix valid but unnecessary"},
@@ -91,7 +91,7 @@ SIntTxt AsmWarningTexts1[] = {
     {0x400000,   "Memory operand is misaligned. Performance penalty"},
     {0x800000,   "Alignment fault. Memory operand must be aligned"},
     {0x1000000,  "Multi-byte NOP. Replace with ALIGN"},
-    {0x2000000,  "Bogus length-changing prefix causes delay on Intel processors here"},
+    {0x2000000,  "Bogus length-changing prefix causes delay on old Intel processors here"},
     {0x4000000,  "Non-default size for stack operation"},
     {0x8000000,  "Function does not end with ret or jmp"},
     {0x10000000, "No jump seems to point here"},
@@ -1098,6 +1098,9 @@ void CDisassembler::WriteImmediateOperand(uint32_t Type) {
     if ((s.Operands[0] & 0xFFF) <= 0xA && s.Operands[0] != 0 || (s.Operands[0] & 0xF0) == 0xA0) {
         // Destination is general purpose register
         OSize = s.OperandSize;
+        if ((s.Operands[0] & 0x0F) < 3) {
+            OSize = (s.Operands[0] & 0x0F) << 3;
+        }
     }
     else {
         // Constant probably unrelated to destination size
@@ -1108,8 +1111,8 @@ void CDisassembler::WriteImmediateOperand(uint32_t Type) {
 
     // Check if sign extended
     if (OSize > s.ImmediateFieldSize * 8) {
-        if (WriteFormat == 2 && Value >= 0) {
-            // Hexadecimal sign extended, not negative:
+        if (WriteFormat == 2  && Value >= 0) {
+            // Hexadecimal sign extended
             // Does not need full length
             OSize = s.ImmediateFieldSize * 8;
         }

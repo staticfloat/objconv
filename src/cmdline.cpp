@@ -1189,7 +1189,7 @@ void CCommandLineInterpreter::ReportStatistics() {
 void CCommandLineInterpreter::Help() {
     // Print help message
     printf("\nObject file converter version %.2f for x86 and x86-64 platforms.", OBJCONV_VERSION);
-    printf("\nCopyright (c) 2023 by Agner Fog. Gnu General Public License.");
+    printf("\nCopyright (c) 2025 by Agner Fog. Gnu General Public License.");
     printf("\n\nUsage: objconv options inputfile [outputfile]");
     printf("\n\nOptions:");
     printf("\n-fXXX[SS]  Output file format XXX, word size SS. Supported formats:");

@@ -1,7 +1,7 @@
 /****************************  disasm1.cpp   ********************************
 * Author:        Agner Fog
 * Date created:  2007-02-25
-* Last modified: 2022-08-02
+* Last modified: 2025-08-26
 * Project:       objconv
 * Module:        disasm1.cpp
 * Description:
@@ -11,7 +11,7 @@
 * Instruction tables are in opcodes.cpp.
 * All functions relating to file output are in disasm2.cpp
 *
-* Copyright 2007-2022 GNU General Public License http://www.gnu.org/licenses
+* Copyright 2007-2025 GNU General Public License http://www.gnu.org/licenses
 *****************************************************************************/
 #include "stdafx.h"
 
