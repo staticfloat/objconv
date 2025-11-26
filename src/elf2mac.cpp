@@ -1,13 +1,13 @@
 /****************************  elf2mac.cpp   *********************************
 * Author:        Agner Fog
 * Date created:  2007-01-10
-* Last modified: 2012-05-05
+* Last modified: 2025-10-30
 * Project:       objconv
 * Module:        elf2mac.cpp
 * Description:
 * Module for converting ELF file to Mach-O file
 *
-* Copyright 2007-2012 GNU General Public License http://www.gnu.org/licenses
+* Copyright 2007-2025 GNU General Public License http://www.gnu.org/licenses
 *****************************************************************************/
 
 #include "stdafx.h"
@@ -224,7 +224,22 @@ void CELF2MAC<ELFSTRUCTURES,MACSTRUCTURES>::MakeSymbolTable() {
 
          if (NewSymTab[0].GetNumEntries() == 0) {
             // make empty symbol record for index 0
+            // NOTE on linking an objconv-elf2mac-converted .o with ld_classic vs. with ld_new:
+            // - ld_classic can handle this dummy entry with n_type=MAC_N_UNDF(0) without any problem
+            // - ld_new (indroduced with XCode 15) terminates with an assert, if it finds this dummy entry
+            //   with n_type=MAC_N_UNDF(0) and there are other non-dummy undefined symbol entries in the .o file:
+            //   0  0x1045e81bc  __assert_rtn + 72
+            //   1  0x10450d5bc  ld::InputFiles::SliceParser::parseObjectFile(mach_o::Header const*) const + 15360
+            //   2  0x10451688c  ld::InputFiles::SliceParser::parse() const + 696
+            //   ...
+            //   ld: Assertion failed: (firstUndefinedSymbol != 0), function parseObjectFile, file InputFiles.cpp, line 1810.
+            // - a working fix for objconv to make the ld_new happy: use MAC_N_ABS(2) for the n_type of the dummy entry!
+//#define ELF2MAC_USE_MAC_N_ABS_FOR_DUMMY_SYMBOL
+#ifndef ELF2MAC_USE_MAC_N_ABS_FOR_DUMMY_SYMBOL
             NewSymTab[0].AddSymbol(0, "", 0, 0, 0, 0);
+#else
+            NewSymTab[0].AddSymbol(0, "", MAC_N_ABS, 0, 0, 0);
+#endif
          }
 
          // Loop through old symbol table
