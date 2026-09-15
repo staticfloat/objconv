@@ -1,3 +1,6 @@
+2026-05-14 version 2.57
+* fixed problem with comdat records in omf2asm.cpp
+
 2025-10-30 version 2.56
 * minor change in elf2mac.cpp
 
