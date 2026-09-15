@@ -1,13 +1,13 @@
 /****************************  omf2asm.cpp   *********************************
 * Author:        Agner Fog, modified by Don Clugston
 * Date created:  2007-05-27
-* Last modified: 2014-05-32
+* Last modified: 2026-05-14
 * Project:       objconv
 * Module:        omf2asm.cpp
 * Description:
 * Module for disassembling OMF object files
 *
-* (c) 2007-2014 GNU General Public License www.gnu.org/copyleft/gpl.html
+* (c) 2007-2026 GNU General Public License www.gnu.org/copyleft/gpl.html
 *****************************************************************************/
 #include "stdafx.h"
 
@@ -367,7 +367,7 @@ void COMF2ASM::MakePublicSymbolsTable() {
       if (Records[i].Type2 == OMF_COMDEF) {
          // COMDEF record, Borland communal name
          uint32_t DType;
-         //uint32_t DSize;
+         uint32_t DSize;
          //uint32_t DNum;
          Records[i].Index = 3;
 
@@ -376,6 +376,7 @@ void COMF2ASM::MakePublicSymbolsTable() {
             string = Records[i].GetString();
             Records[i].GetByte(); // Type index, should be 0, ignore
             DType = Records[i].GetByte(); // Data type
+            DSize = Records[i].GetLength(); // Record length
             switch (DType) {
             case 0x61:
                //DNum  = Records[i].GetLength();
@@ -383,6 +384,12 @@ void COMF2ASM::MakePublicSymbolsTable() {
                continue; // Don't know what to do with this type. Ignore
             case 0x62:
                //DSize = Records[i].GetLength();
+               continue; // Don't know what to do with this type. Ignore
+            case 0x6C:
+               //16 bit comdef
+               continue; // Don't know what to do with this type. Ignore
+            case 0x6D:
+               //32 bit comdef
                continue; // Don't know what to do with this type. Ignore
             default:
                //DSize = Records[i].GetLength();
